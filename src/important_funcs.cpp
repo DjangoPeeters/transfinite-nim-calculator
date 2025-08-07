@@ -176,14 +176,14 @@ namespace important_funcs {
             vector<uint32_t> alpha1{}; // actually alpha_finite_terms, but reused later for saving space
             if (finite_summand1 != 0) {
                 for (uint8_t i = 0; i <= msb(finite_summand1); i++) {
-                    if (finite_summand1 & (((uint64_t)1) << i) != 0) {
+                    if ((finite_summand1 & (((uint64_t)1) << i)) != 0) {
                         alpha1.push_back(i);
                     }
                 }
             }
             vector<uint32_t> alpha_large_terms{};
             for (uint16_t q : q_set1) { // already sorted
-                if (q & 1 != 0) {
+                if ((q & 1) != 0) {
                     alpha_large_terms.push_back(algebra.get_basis()[find(algebra.get_q_components().begin(),
                         algebra.get_q_components().end(), q) - algebra.get_q_components().begin()]);
                 }

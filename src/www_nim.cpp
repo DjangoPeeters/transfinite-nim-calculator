@@ -32,11 +32,11 @@ namespace www_nim {
             
             vector<uint8_t> result{};
             for (uint8_t i = msb(n); i > 0; i--) {
-                if (n & (((uint64_t)1) << i) != 0) {
+                if ((n & (((uint64_t)1) << i)) != 0) {
                     result.push_back(i);
                 }
             }
-            if (n & 1 != 0) result.push_back(0);
+            if ((n & 1) != 0) result.push_back(0);
             return result;
         }
 
