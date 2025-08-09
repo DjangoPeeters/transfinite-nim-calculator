@@ -81,5 +81,6 @@ int main() {
     // test 6:  601 seconds for alpha(47) :|       (use more pointers and nullptr instead of initial {0, 0} in table)
     // test 7:  493 seconds for alpha(47) :|       (use custom struct instead of std::vector so there's less overhead)
     
+    
     return 0;
 }
