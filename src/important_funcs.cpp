@@ -87,13 +87,15 @@ namespace important_funcs {
 
             impartial_term_algebra algebra(components);
             cout << "Field has exponent " << algebra.get_term_count() << "." << endl;
-            vector<uint32_t> kappag_in_algebra{};
+            term_array kappag_in_algebra((uint32_t)kappag_set.size());
+            uint32_t i = 0;
             for (const auto r : kappag_set) {
-                kappag_in_algebra.push_back(algebra.get_basis()[find(algebra.get_q_components().begin(),
-                    algebra.get_q_components().end(), r) - algebra.get_q_components().begin()]);
+                kappag_in_algebra.terms[i] = algebra.get_basis()[find(algebra.get_q_components().begin(),
+                    algebra.get_q_components().end(), r) - algebra.get_q_components().begin()];
+                i++;
             }
 
-            vector<uint32_t> respow = algebra.square(kappag_in_algebra);
+            term_array respow = algebra.square(kappag_in_algebra);
             uint64_t degree = 1; // not sure how much space is adequate for this variable
             while (respow != kappag_in_algebra) {
                 respow = algebra.square(respow);
@@ -167,6 +169,8 @@ namespace important_funcs {
         }
 
         bool done = false;
+        term_array one(1);
+        one.terms[0] = 0;
         while (!done) {
             uint64_t finite_summand1 = finite_summand(p, excess1);
             vector<uint16_t> finite_components1(finite_components(p, excess1));
@@ -202,8 +206,13 @@ namespace important_funcs {
 
             if (div_2_pow_min_1(p, algebra.get_term_count())) {
                 cpp_int testpow(((cpp_int(1) << algebra.get_term_count()) - 1) / p);
-                vector<uint32_t> respow(algebra.power(alpha1, testpow));
-                if (respow.size() != 1 || respow[0] != 0) done = true;
+
+                term_array alpha_terms((uint32_t)alpha1.size());
+                for (uint32_t i = 0; i < alpha1.size(); i++) {
+                    alpha_terms.terms[i] = alpha1[i];
+                }
+                term_array respow = algebra.power(alpha_terms, testpow);
+                if (respow != one) done = true;
             } else {
                 cout << "[p = " << p << "] div_2_pow_min_1 failed." << endl;
                 done = true;

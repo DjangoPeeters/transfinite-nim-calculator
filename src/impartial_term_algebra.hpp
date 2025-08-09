@@ -14,6 +14,64 @@ using boost::multiprecision::cpp_int;
 struct term_array {
     uint32_t terms_size;
     uint32_t* terms;
+
+    term_array(): terms_size(0), terms(nullptr) {}
+
+    term_array(uint32_t size): terms_size(size), terms(new uint32_t[size]) {}
+
+    term_array(const term_array& other): terms_size(other.terms_size), terms(nullptr) {
+        if (other.terms != nullptr && other.terms_size > 0) {
+            terms = new uint32_t[terms_size];
+            std::memcpy(terms, other.terms, terms_size * sizeof(uint32_t));  // Faster than loop
+        }
+    }
+
+    term_array(term_array&& other) noexcept : terms_size(other.terms_size), terms(other.terms) {
+        other.terms = nullptr;
+        other.terms_size = 0;
+    }
+
+    ~term_array() {
+        if (terms != nullptr) delete[] terms;
+        terms = nullptr;
+        terms_size = 0;
+    }
+
+    term_array& operator=(const term_array& other) {
+        if (this != &other) {
+            if (terms != nullptr) delete[] terms;
+            terms_size = other.terms_size;
+
+            if (other.terms != nullptr && other.terms_size > 0) {
+                terms = new uint32_t[terms_size];
+                for (uint32_t i = 0; i < terms_size; i++) {
+                    terms[i] = other.terms[i];
+                }
+            } else {
+                terms = nullptr;
+            }
+        }
+        return *this;
+    }
+
+    term_array& operator=(term_array&& other) noexcept {
+        if (this != &other) {
+            if (terms != nullptr) delete[] terms;
+            terms_size = other.terms_size;
+            terms = other.terms;
+            other.terms = nullptr;
+            other.terms_size = 0;
+        }
+        return *this;
+    }
+
+    friend bool operator!=(const term_array& me, const term_array& other) {
+        if (me.terms_size != other.terms_size) return true;
+        for (uint32_t i = 0; i < me.terms_size; i++) {
+            if (me.terms[i] != other.terms[i]) return true;
+        }
+        return false;
+    }
 };
 
 /* q is used when something is related to non-trivial prime powers */
@@ -23,7 +81,9 @@ class impartial_term_algebra {
         uint16_t* q_degrees; // ditto
         uint32_t* basis; // multiplying everything together from `q_degrees` might need more than 16 bits
         uint32_t term_count;
+        uint32_t accumulator_size;
         uint64_t* accumulator; // using uint64_t to represent 64 contiguous bits
+        uint32_t accumulate_size;
         term_array* kappa_table; // some entries come from `basis`
         term_array*** q_power_times_term_table; // ditto
         // maybe give q_power_times_term_table type uint32_t**** and keep sizes in a new member
@@ -42,11 +102,11 @@ class impartial_term_algebra {
 
         const vector<uint16_t>& get_q_components() const;
         const uint32_t get_term_count() const;
-        uint32_t* const get_basis() const;
+        const uint32_t* const get_basis() const;
 
-        vector<uint32_t> multiply(const vector<uint32_t>& aterms, const vector<uint32_t>& bterms);
-        vector<uint32_t> square(const vector<uint32_t>& terms);
-        vector<uint32_t> power(const vector<uint32_t>& terms, const cpp_int& n);
+        term_array multiply(const term_array& a, const term_array& b);
+        term_array square(const term_array& a);
+        term_array power(const term_array& a, const cpp_int& n);
 };
 
 #endif
