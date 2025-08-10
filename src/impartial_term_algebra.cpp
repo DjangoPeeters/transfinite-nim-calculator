@@ -36,7 +36,7 @@ q_power_times_term_table(new term_array**[q_components.size()]) {
     }
     term_count = basis[q_components.size()];
     accumulator_size = ((term_count + 63) >> 6);
-    accumulator = new uint64_t[accumulator_size];
+    accumulator = new uint64_t[accumulator_size]; // maybe use an unordered set instead of a sparse array?
     for (uint32_t i = 0; i < accumulator_size; i++) {
         accumulator[i] = 0;
     }
@@ -283,13 +283,15 @@ term_array impartial_term_algebra::power(const term_array& a, const cpp_int& n) 
     unsigned index = 0;
     unsigned msbnp1 = msb(n) + 1;
     std::time_t checkpoint_time = time(nullptr);
+    uint32_t minutes = 0;
     while (index < msbnp1) {
         if (bit_test(n, index)) {
             result = multiply(result, curpow);
         }
         curpow = square(curpow);
         if (time(nullptr) - checkpoint_time >= 60) {
-            std::cout << index << "/" << msbnp1 << " bits complete ("
+            minutes++;
+            std::cout << minutes << " minutes: " << index << "/" << msbnp1 << " bits complete ("
             << (((float)index) / msbnp1) << "); curpow/result has "
             << curpow.terms_size << "/" << result.terms_size << " terms" << std::endl;
             checkpoint_time = time(nullptr);
