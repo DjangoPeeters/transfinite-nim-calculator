@@ -126,6 +126,7 @@ namespace important_funcs {
 
         vector<uint16_t> result = kappa_set(f(p));
         q_set_cache[p] = result;
+        cache_q_set(p, result);
         return result;
     }
 
@@ -222,6 +223,7 @@ namespace important_funcs {
         }
 
         excess_cache[p] = excess1;
+        cache_excess(p, excess1);
         return excess1;
     }
 };

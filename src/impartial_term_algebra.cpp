@@ -73,9 +73,6 @@ q_power_times_term_table(new term_array**[q_components.size()]) {
         q_power_times_term_table[i] = new term_array*[q_degrees[i]];
         for (size_t j = 0; j < q_degrees[i]; j++) {
             q_power_times_term_table[i][j] = new term_array[term_count];
-            for (size_t k = 0; k < term_count; k++) {
-                q_power_times_term_table[i][j][k];
-            }
         }
     }
 

@@ -20,11 +20,13 @@
 #include "www.hpp"
 #include "kappa_component.hpp"
 #include "www_nim.hpp"
+#include "constants.hpp"
 
 #include <cstdint>
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include <ctime>
 
 using namespace std;
@@ -54,13 +56,13 @@ void write_alpha(ofstream& file, uint16_t p,
 int main() {
     
     ofstream file;
-    file.open("alpha_log.txt");
+    file.open("alpha_log.txt", ios::app);
     file << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
     file << "    p           q_set excess                alpha t(sec)" << endl;
     time_t checkpoint_time;
     uint16_t p;
     time_t t;
-    for (int n = 1; n <= 15; n++) {
+    for (int n = 2; n <= 14; n++) { // alpha(2) is a dummy value
         p = nth_prime(n);
         checkpoint_time = time(nullptr);
         cout << "===== Calculating alpha(" << p << "). =====" << endl;
@@ -80,7 +82,6 @@ int main() {
     // test 5: 3185 seconds for alpha(47) :/       (use more pointers)
     // test 6:  601 seconds for alpha(47) :|       (use more pointers and nullptr instead of initial {0, 0} in table)
     // test 7:  493 seconds for alpha(47) :|       (use custom struct instead of std::vector so there's less overhead)
-    
     
     return 0;
 }
