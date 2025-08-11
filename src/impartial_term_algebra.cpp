@@ -210,7 +210,7 @@ void impartial_term_algebra::accumulate_term_product(uint32_t x, uint32_t y) {
         return;
     } else {
         size_t index = q_components.size();
-        while (y / basis[index] == 0) index--; // be careful for infinite loops
+        while (y < basis[index]) index--; // be careful for infinite loops
         term_array product = q_power_times_term(index, (uint16_t)(y / basis[index]), x); // 0 <= `y / basis[index]` < some prime from `q_degrees`
         for (uint32_t i = 0; i < product.terms_size; i++) {
             accumulate_term_product(product.terms[i], y % basis[index]);
