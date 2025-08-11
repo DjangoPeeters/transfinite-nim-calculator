@@ -82,9 +82,6 @@ int main() {
     // test 5: 3185 seconds for alpha(47) :/       (use more pointers)
     // test 6:  601 seconds for alpha(47) :|       (use more pointers and nullptr instead of initial {0, 0} in table)
     // test 7:  493 seconds for alpha(47) :|       (use custom struct instead of std::vector so there's less overhead)
-    // passed Aaron Siegel's java program with 415 seconds for alpha(47)
-    // test 8:  226 seconds for alpha(47) :)       (didn't look at other open tabs while in VSCode after a minute)
-    // test 9:  195 seconds for alpha(47) :)       (didn't look at other open tabs while in VSCode)
     
     return 0;
 }
