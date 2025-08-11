@@ -74,6 +74,15 @@ struct term_array {
     }
 };
 
+struct tmp_term_array { // only for transferring `term_array`'s
+    uint32_t terms_size;
+    uint32_t* terms;
+
+    tmp_term_array(const term_array& other): terms_size(other.terms_size), terms(other.terms) {}
+
+    ~tmp_term_array() {}
+};
+
 /* q is used when something is related to non-trivial prime powers */
 class impartial_term_algebra {
     private:
@@ -87,6 +96,7 @@ class impartial_term_algebra {
         term_array* kappa_table; // some entries come from `basis`
         term_array*** q_power_times_term_table; // ditto
         // maybe give q_power_times_term_table type uint32_t**** and keep sizes in a new member
+        uint32_t* basis_search;
 
         term_array q_power_times_term(size_t q_index, uint16_t q_exponent, uint32_t term); // same `uint16_t` as for `q_degrees`
         term_array q_power_times_term_calc(size_t q_index, uint16_t q_exponent, uint32_t term); // ditto

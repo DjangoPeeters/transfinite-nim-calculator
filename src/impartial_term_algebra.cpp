@@ -83,6 +83,15 @@ q_power_times_term_table(new term_array**[q_components.size()]) {
             }
         }
     }
+
+    basis_search = new uint32_t[term_count];
+    basis_search[0] = 0; // dummy value
+    uint32_t index = 0;
+    for (uint32_t term = 1; term < term_count; term++) {
+        index = q_components.size();
+        while (term < basis[index]) index--;
+        basis_search[term] = index;
+    }
 }
 
 impartial_term_algebra::~impartial_term_algebra() {
@@ -105,6 +114,8 @@ impartial_term_algebra::~impartial_term_algebra() {
     basis = nullptr;
     delete[] q_degrees;
     q_degrees = nullptr;
+    delete[] basis_search;
+    basis_search = nullptr;
 }
 
 term_array impartial_term_algebra::q_power_times_term(size_t q_index, uint16_t q_exponent, uint32_t term) {
@@ -209,11 +220,11 @@ void impartial_term_algebra::accumulate_term_product(uint32_t x, uint32_t y) {
         flip_accumulator_term(x);
         return;
     } else {
-        size_t index = q_components.size();
-        while (y < basis[index]) index--; // be careful for infinite loops
-        term_array product = q_power_times_term(index, (uint16_t)(y / basis[index]), x); // 0 <= `y / basis[index]` < some prime from `q_degrees`
+        uint32_t bi = basis[basis_search[y]];
+        // 0 <= `y / bi` < some prime from `q_degrees`
+        tmp_term_array product = tmp_term_array(q_power_times_term_table[basis_search[y]][(uint16_t)(y / bi)][x]);
         for (uint32_t i = 0; i < product.terms_size; i++) {
-            accumulate_term_product(product.terms[i], y % basis[index]);
+            accumulate_term_product(product.terms[i], y % bi);
         }
         return;
     }
