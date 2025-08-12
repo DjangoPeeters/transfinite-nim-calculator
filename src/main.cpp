@@ -62,7 +62,7 @@ int main() {
     time_t checkpoint_time;
     uint16_t p;
     time_t t;
-    for (int n = 2; n <= 15; n++) { // alpha(2) is a dummy value
+    for (int n = 2; n <= 55; n++) { // alpha(2) is a dummy value
         p = nth_prime(n);
         checkpoint_time = time(nullptr);
         cout << "===== Calculating alpha(" << p << "). =====" << endl;
