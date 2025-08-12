@@ -212,7 +212,7 @@ namespace important_funcs {
                 for (uint32_t i = 0; i < alpha1.size(); i++) {
                     alpha_terms.terms[i] = alpha1[i];
                 }
-                term_array respow = algebra.power(alpha_terms, testpow);
+                term_array respow = algebra.power(alpha_terms, testpow); // we need to exploit more properties of `testpow`
                 if (respow != one) done = true;
             } else {
                 cout << "[p = " << p << "] div_2_pow_min_1 failed." << endl;
