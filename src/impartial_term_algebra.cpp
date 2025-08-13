@@ -295,6 +295,7 @@ term_array impartial_term_algebra::power(const term_array& a, const cpp_int& n) 
     unsigned msbnp1 = msb(n) + 1;
     std::time_t checkpoint_time = time(nullptr);
     uint32_t minutes = 0;
+    // maybe convert n to a bit array? (less overhead)
     while (index < msbnp1) {
         if (bit_test(n, index)) {
             result = multiply(result, curpow);

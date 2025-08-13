@@ -34,7 +34,7 @@ using namespace prime_generator;
 using namespace important_funcs;
 using namespace www_nim;
 
-void write_alpha(ofstream& file, uint16_t p,
+void write_alpha(fstream& file, uint16_t p,
     const vector<uint16_t>& q_set_p, uint8_t excess_p, const www& alpha_p, time_t t) {
     string s_p = to_string(p); while (s_p.length() < 5) s_p = " " + s_p;
     string s_q_set_p = "[";
@@ -48,21 +48,26 @@ void write_alpha(ofstream& file, uint16_t p,
     string s_excess_p = to_string(excess_p); while (s_excess_p.length() < 6) s_excess_p = " " + s_excess_p;
     string s_alpha_p = alpha_p.to_string(); while (s_alpha_p.length() < 20) s_alpha_p = " " + s_alpha_p;
     string s_t = to_string(t); while (s_t.length() < 6) s_t = " " + s_t;
+    file.open("alpha_log.txt", std::ios::in | std::ios::out | std::ios::ate);
+    file.seekp(-59, std::ios::end);
     file << s_p << " " << s_q_set_p << " " << s_excess_p << " " << s_alpha_p << " " << s_t << endl;
+    file << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl << endl << endl;
+    file.close();
 }
 
 //TODO optimize
-//TODO check for memory leakage
 int main() {
     
-    ofstream file;
+    fstream file;
     file.open("alpha_log.txt", ios::app);
     file << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
     file << "    p           q_set excess                alpha t(sec)" << endl;
+    file << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl << endl << endl;
+    file.close();
     time_t checkpoint_time;
     uint16_t p;
     time_t t;
-    for (int n = 2; n <= 15; n++) { // alpha(2) is a dummy value
+    for (int n = 2; n <= 55; n++) { // alpha(2) is a dummy value
         p = nth_prime(n);
         checkpoint_time = time(nullptr);
         cout << "===== Calculating alpha(" << p << "). =====" << endl;
@@ -72,9 +77,8 @@ int main() {
         cout << endl;
         write_alpha(file, p, q_set(p), excess(p), alpha(p), t);
     }
-    file << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl << endl << endl;
-    file.close();
     
+    // record times:
     // test 1: 4282 seconds for alpha(47) :(
     // test 2: 3400 seconds for alpha(47) :/       (use more pointers)
     // test 3: 3350 seconds for alpha(47) :/       (use uint64_t* instead of vector<bool>)
