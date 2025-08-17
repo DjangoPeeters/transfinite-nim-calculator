@@ -21,6 +21,8 @@ using boost::multiprecision::msb;
 using boost::multiprecision::bit_test;
 using namespace nt_funcs;
 
+constexpr int PUSH_INTERVAL = 1; // every time `1 << push_interval` many steps have been done, push to the logger 
+
 impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& log_queue, std::atomic<bool>& calculation_done,
     vector<uint16_t>& q_components_): log_queue_(log_queue), calculation_done_(calculation_done),
     q_components(q_components_), q_degrees(new uint16_t[q_components.size()]),
@@ -333,7 +335,7 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
             result = multiply(result, curpow);
         }
         curpow = square(curpow);
-        if (index & ((unsigned)1 << 0)) { // Send progress update
+        if (index & ((unsigned)1 << PUSH_INTERVAL)) { // Send progress update
             while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
             }

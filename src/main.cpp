@@ -29,8 +29,34 @@ using namespace prime_generator;
 using namespace important_funcs;
 using namespace www_nim;
 
+/*
+record times:
+test 1: 4282 seconds for alpha(47) :(
+test 2: 3400 seconds for alpha(47) :/       (use more pointers)
+test 3: 3350 seconds for alpha(47) :/       (use uint64_t* instead of vector<bool>)
+test 4: 3300 seconds for alpha(47) :/       (use index instead of moving i and store msb(n))
+test 5: 3185 seconds for alpha(47) :/       (use more pointers)
+test 6:  601 seconds for alpha(47) :|       (use more pointers and nullptr instead of initial {0, 0} in table)
+test 7:  493 seconds for alpha(47) :|       (use custom struct instead of std::vector so there's less overhead)
+passed Aaron Siegel's java program with 415 seconds
+test 8:  195 seconds for alpha(47) :)       (use custom struct more)
+test 9:  110 seconds for alpha(47) :)       (use another custom struct only for transferring instead of creation)
+test 10:  85 seconds for alpha(47) :))      (use separate threads for calculating and logging)
+*/
+
+// most important file for the calculation: important_funcs.cpp (`TEST_MODE = true` initializes the cache empty except for  `p = 2`)
+
+void prep_alpha(fstream& file) {
+    file.open("alpha_log.txt", ios::app);
+    file << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+    file << "    p           q_set excess                alpha t(sec)" << endl;
+    file << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl << endl << endl;
+    file.close();
+}
+
 void write_alpha(fstream& file, uint16_t p,
     const vector<uint16_t>& q_set_p, uint8_t excess_p, const www& alpha_p, time_t t) {
+    
     string s_p = to_string(p); while (s_p.length() < 5) s_p = " " + s_p;
     string s_q_set_p = "[";
     if (!q_set_p.empty()) {
@@ -55,15 +81,12 @@ void write_alpha(fstream& file, uint16_t p,
 int main() {
     
     fstream file;
-    file.open("alpha_log.txt", ios::app);
-    file << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
-    file << "    p           q_set excess                alpha t(sec)" << endl;
-    file << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl << endl << endl;
-    file.close();
+    prep_alpha(file);
     time_t checkpoint_time;
     uint16_t p;
     time_t t;
-    for (int n = 2; n <= 55; n++) { // alpha(2) is a dummy value
+    unsigned n = 2; // `alpha(nth_prime(2))` (a.k.a. `alpha(2)`) is a dummy value
+    while (1) {
         p = nth_prime(n);
         checkpoint_time = time(nullptr);
         cout << "===== Calculating alpha(" << p << "). =====" << endl;
@@ -72,19 +95,8 @@ int main() {
         cout << "===== Time is " << t << " seconds. =====" << endl;
         cout << endl;
         write_alpha(file, p, q_set(p), excess(p), alpha(p), t);
+        n++;
     }
-    
-    // record times:
-    // test 1: 4282 seconds for alpha(47) :(
-    // test 2: 3400 seconds for alpha(47) :/       (use more pointers)
-    // test 3: 3350 seconds for alpha(47) :/       (use uint64_t* instead of vector<bool>)
-    // test 4: 3300 seconds for alpha(47) :/       (use index instead of moving i and store msb(n))
-    // test 5: 3185 seconds for alpha(47) :/       (use more pointers)
-    // test 6:  601 seconds for alpha(47) :|       (use more pointers and nullptr instead of initial {0, 0} in table)
-    // test 7:  493 seconds for alpha(47) :|       (use custom struct instead of std::vector so there's less overhead)
-    // passed Aaron Siegel's java program with 415 seconds
-    // test 8:  195 seconds for alpha(47) :)       (use custom struct more)
-    // test 9:  110 seconds for alpha(47) :)       (use another custom struct only for transferring instead of creation)
 
     return 0;
 }

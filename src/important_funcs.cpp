@@ -26,10 +26,13 @@ using std::endl;
 using boost::multiprecision::msb;
 using namespace nt_funcs;
 
+constexpr bool TEST_MODE = true;
+
 namespace important_funcs {
     namespace {
-        map<uint16_t, vector<uint16_t>> q_set_cache(test_values::q_set_cache);
-        map<uint16_t, uint8_t> excess_cache(test_values::excess_cache); // every excess for primes p <= 257 is at most 4
+        map<uint16_t, vector<uint16_t>> q_set_cache(TEST_MODE ? test_values::q_set_cache : record_values::q_set_cache);
+        // every excess for primes p <= 257 is at most 4
+        map<uint16_t, uint8_t> excess_cache(TEST_MODE ? test_values::excess_cache : record_values::excess_cache);
 
         uint64_t finite_summand(uint16_t p, uint16_t excess) {
             vector<uint16_t> q_set1 = q_set(p);

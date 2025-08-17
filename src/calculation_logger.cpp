@@ -57,8 +57,7 @@ void calculation_logger::progress_calculation_logger() {
     data_quad result;
     std::time_t checkpoint_time = time(nullptr);
     while (!calculation_done_ || !log_queue_.empty()) {
-        if (log_queue_.pop(result) && (time(nullptr) - checkpoint_time >= 60)) {
-            checkpoint_time = time(nullptr);
+        if (log_queue_.pop(result)) {
             if (result.index == UNSIGNED_MAX) {
                 write_to_console("Logging completed.");
                 if (log_file_.is_open()) {
@@ -67,11 +66,14 @@ void calculation_logger::progress_calculation_logger() {
                 break;
             }
             
-            std::string message = to_string(result.index) + "/" + to_string(result.msbnp1) + " bits complete ("
-            + to_string(((float)result.index) / result.msbnp1) + "); curpow/result has "
-            + to_string(result.cur_size) + "/" + to_string(result.res_size) + " terms";
-            write_to_console(message);
-            write_to_file(message);
+            if (result.index == 0 || result.index == result.msbnp1 || time(nullptr) - checkpoint_time >= 60) {
+                checkpoint_time = time(nullptr);
+                std::string message = to_string(result.index) + "/" + to_string(result.msbnp1) + " bits complete ("
+                + to_string(((float)result.index) / result.msbnp1) + "); curpow/result has "
+                + to_string(result.cur_size) + "/" + to_string(result.res_size) + " terms";
+                write_to_console(message);
+                write_to_file(message);
+            }
         } else {
             // Queue empty, small sleep to prevent busy waiting
             std::this_thread::sleep_for(std::chrono::microseconds(100));
