@@ -17,10 +17,10 @@ class kappa_component { // maybe nest this class inside `www_nim` because it'll 
         kappa_component(const kappa_component& other) = default;
         ~kappa_component() = default;
 
-        const uint16_t get_k() const;
-        const uint16_t get_n() const;
-        const uint16_t get_exponent() const;
-        const uint16_t get_p() const;
+        uint16_t get_k() const;
+        uint16_t get_n() const;
+        uint16_t get_exponent() const;
+        uint16_t get_p() const;
 
         kappa_component& operator=(const kappa_component& other);
         friend bool operator==(const kappa_component& me, const kappa_component& other);

@@ -2,12 +2,17 @@
 #include "nt_funcs.hpp"
 #include "impartial_term_algebra.hpp"
 #include "constants.hpp"
+#include "ring_buffer_queue.hpp"
+#include "calculation_logger.hpp"
 
 #include <cstdint>
 #include <vector>
+#include <utility>
 #include <set>
 #include <map>
 #include <algorithm>
+#include <thread>
+#include <atomic>
 #include <iostream>
 #include <boost/multiprecision/integer.hpp>
 
@@ -55,14 +60,18 @@ namespace important_funcs {
                 components.insert(pn);
             }
 
-            for (uint16_t q1 : q_set(p)) components.merge(primitive_components(q1));
+            for (const uint16_t q1 : q_set(p)) {
+                for (const uint16_t q2 : primitive_components(q1)) {
+                    components.insert(q2);
+                }
+            }
             vector<uint16_t> fin_comps = finite_components(p, (uint16_t)excess(p));
             components.insert(fin_comps.begin(), fin_comps.end());
             return components;
         }
 
         vector<uint16_t> kappa_set(uint16_t h) {
-            auto [p, q] = max_pow_min_prime_div(h);
+            uint16_t q = max_pow_min_prime_div(h).second;
             if (h == q) return {h};
 
             uint16_t g = h/q;
@@ -85,7 +94,15 @@ namespace important_funcs {
             }
             cout << "})." << endl;
 
-            impartial_term_algebra algebra(components);
+            // Shared resources
+            ring_buffer_calculation_queue log_queue;
+            std::atomic<bool> calculation_done{false};
+
+            // Create objects
+            impartial_term_algebra algebra(log_queue, calculation_done, components);
+            // no multithread needed yet
+            // calculation_logger logger(log_queue, calculation_done); // no logger file needed yet
+
             cout << "Field has exponent " << algebra.get_term_count() << "." << endl;
             term_array kappag_in_algebra((uint32_t)kappag_set.size());
             uint32_t i = 0;
@@ -95,12 +112,7 @@ namespace important_funcs {
                 i++;
             }
 
-            term_array respow = algebra.square(kappag_in_algebra);
-            uint64_t degree = 1; // not sure how much space is adequate for this variable
-            while (respow != kappag_in_algebra) {
-                respow = algebra.square(respow);
-                degree++;
-            }
+            uint64_t degree = algebra.degree(kappag_in_algebra);
             cout << "Degree is " << degree << "." << endl;
 
             if (degree % q == 0) {
@@ -177,7 +189,14 @@ namespace important_funcs {
             vector<uint16_t> finite_components1(finite_components(p, excess1));
             components.insert(components.end(), finite_components1.begin(), finite_components1.end());
 
-            auto algebra = impartial_term_algebra(components);
+            // Shared resources
+            ring_buffer_calculation_queue log_queue;
+            std::atomic<bool> calculation_done{false};
+
+            // Create objects
+            impartial_term_algebra algebra(log_queue, calculation_done, components);
+            calculation_logger logger(log_queue, calculation_done, "calculation.log");
+            
             vector<uint32_t> alpha1{}; // actually alpha_finite_terms, but reused later for saving space
             if (finite_summand1 != 0) {
                 for (uint8_t i = 0; i <= msb(finite_summand1); i++) {
@@ -212,7 +231,21 @@ namespace important_funcs {
                 for (uint32_t i = 0; i < alpha1.size(); i++) {
                     alpha_terms.terms[i] = alpha1[i];
                 }
-                term_array respow = algebra.power(alpha_terms, testpow); // we need to exploit more properties of `testpow`
+
+                cout << "Starting multithreaded calculation..." << endl;
+                term_array respow = term_array();
+                // we need to exploit more properties of `testpow`
+
+                // Start threads
+                std::thread calc_thread(&impartial_term_algebra::excess_power, &algebra, alpha_terms, testpow, std::ref(respow));
+                std::thread log_thread(&calculation_logger::progress_calculation_logger, &logger);
+
+                // Wait for completion
+                calc_thread.join();
+                log_thread.join();
+
+                cout << "All threads completed. Check calculation.log for full log." << endl;
+
                 if (respow != one) done = true;
             } else {
                 cout << "[p = " << p << "] div_2_pow_min_1 failed." << endl;

@@ -1,5 +1,5 @@
-#include "ww.hpp"
 #include "www.hpp"
+#include "ww.hpp"
 
 #include <cstdint>
 #include <string>
@@ -108,7 +108,7 @@ www& www::operator=(const www& other) {
 }
 
 www www::operator+(const www& other) const {
-    auto result = list(this->terms);
+    auto result = list<std::pair<ww, uint64_t>>(this->terms);
     result.insert(result.end(), other.get_terms().begin(), other.get_terms().end());
     return result;
 }
@@ -121,7 +121,7 @@ www www::operator*(const www& other) const {
     auto oterms = other.get_terms();
     if (oterms.size() > 1) { // left-distributivity
         www result(0);
-        for (const std::pair<ww, uint64_t> term : oterms) {
+        for (const std::pair<ww, uint64_t>& term : oterms) {
             result += *this * www({term});
         }
         return result;

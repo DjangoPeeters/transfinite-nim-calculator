@@ -8,6 +8,8 @@
 #include <vector>
 #include <set>
 #include <ctime>
+#include <thread>
+#include <chrono>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/integer.hpp>
 
@@ -19,10 +21,12 @@ using boost::multiprecision::msb;
 using boost::multiprecision::bit_test;
 using namespace nt_funcs;
 
-impartial_term_algebra::impartial_term_algebra(vector<uint16_t>& q_components_):
-q_components(q_components_), q_degrees(new uint16_t[q_components.size()]),
-basis(new uint32_t[q_components.size() + 1]), accumulate_size(0), kappa_table(new term_array[q_components.size()]),
-q_power_times_term_table(new term_array**[q_components.size()]) {
+impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& log_queue, std::atomic<bool>& calculation_done,
+    vector<uint16_t>& q_components_): log_queue_(log_queue), calculation_done_(calculation_done),
+    q_components(q_components_), q_degrees(new uint16_t[q_components.size()]),
+    basis(new uint32_t[q_components.size() + 1]), accumulate_size(0), kappa_table(new term_array[q_components.size()]),
+    q_power_times_term_table(new term_array**[q_components.size()]) {
+    
     sort(q_components.begin(), q_components.end(), [](uint16_t a, uint16_t b)
                                         {
                                             return prime_pow(a) < prime_pow(b);
@@ -234,11 +238,11 @@ const vector<uint16_t>& impartial_term_algebra::get_q_components() const {
     return q_components;
 }
 
-const uint32_t impartial_term_algebra::get_term_count() const {
+uint32_t impartial_term_algebra::get_term_count() const {
     return term_count;
 }
 
-const uint32_t* const impartial_term_algebra::get_basis() const {
+uint32_t* impartial_term_algebra::get_basis() const {
     return basis;
 }
 
@@ -280,7 +284,6 @@ term_array impartial_term_algebra::square(const term_array& a) {
     return result;
 }
 
-//TODO optimize
 // a must already be sorted
 term_array impartial_term_algebra::power(const term_array& a, const cpp_int& n) {
     term_array result(1);
@@ -293,22 +296,80 @@ term_array impartial_term_algebra::power(const term_array& a, const cpp_int& n) 
     }
     unsigned index = 0;
     unsigned msbnp1 = msb(n) + 1;
-    std::time_t checkpoint_time = time(nullptr);
-    uint32_t minutes = 0;
+    
+    while (index < msbnp1) {
+        if (bit_test(n, index)) {
+            result = multiply(result, curpow);
+        }
+        curpow = square(curpow);
+        index++;
+    }
+    return result;
+}
+
+//TODO optimize
+// a must already be sorted
+void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, term_array& res) {
+    term_array result(1);
+    result.terms[0] = 0;
+    if(n.is_zero()) {
+        res = result;
+        return;
+    }
+    
+    term_array curpow(a.terms_size);
+    for (uint32_t i = 0; i < a.terms_size; i++) {
+        curpow.terms[i] = a.terms[i];
+    }
+    unsigned index = 0;
+    unsigned msbnp1 = msb(n) + 1;
+    while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+    }
+    
     // maybe convert n to a bit array? (less overhead)
     while (index < msbnp1) {
         if (bit_test(n, index)) {
             result = multiply(result, curpow);
         }
         curpow = square(curpow);
-        if (time(nullptr) - checkpoint_time >= 60) {
-            minutes++;
-            std::cout << minutes << " minutes: " << index << "/" << msbnp1 << " bits complete ("
-            << (((float)index) / msbnp1) << "); curpow/result has "
-            << curpow.terms_size << "/" << result.terms_size << " terms" << std::endl;
-            checkpoint_time = time(nullptr);
+        if (index & ((unsigned)1 << 0)) { // Send progress update
+            while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
+            }
         }
         index++;
     }
+    while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+    }
+    calculation_done_ = true;
+    while (!log_queue_.push({UNSIGNED_MAX, 0, 0, 0})) { // Signal completion to logger
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+    }
+    res = result;
+    return;
+}
+
+// a must already be sorted
+uint64_t impartial_term_algebra::degree(const term_array& a) {
+    term_array respow = square(a);
+    uint64_t result = 1;
+    while (respow != a) {
+        respow = square(respow);
+        result++;
+    }
     return result;
+}
+
+//TODO let calculation_logger also handle this
+// a must already be sorted
+void impartial_term_algebra::q_set_degree(const term_array& a, uint64_t& res) {
+    term_array respow = square(a);
+    uint64_t result = 1;
+    while (respow != a) {
+        respow = square(respow);
+        result++;
+    }
+    res = result; return;
 }

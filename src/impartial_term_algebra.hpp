@@ -1,6 +1,8 @@
 #ifndef IMPARTIAL_TERM_ALGEBRA_HPP
 #define IMPARTIAL_TERM_ALGEBRA_HPP
 
+#include "ring_buffer_queue.hpp"
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <ostream>
@@ -86,6 +88,9 @@ struct tmp_term_array { // only for transferring `term_array`'s
 /* q is used when something is related to non-trivial prime powers */
 class impartial_term_algebra {
     private:
+        ring_buffer_calculation_queue& log_queue_;
+        std::atomic<bool>& calculation_done_;
+
         vector<uint16_t> q_components; // 16 bits will suffice here for now, also see "prime_generator.hpp"
         uint16_t* q_degrees; // ditto
         uint32_t* basis; // multiplying everything together from `q_degrees` might need more than 16 bits
@@ -107,16 +112,20 @@ class impartial_term_algebra {
         inline void clear_accumulator();
         void accumulate_term_product(uint32_t x, uint32_t y);
     public:
-        impartial_term_algebra(vector<uint16_t>& q_components);
+        impartial_term_algebra(ring_buffer_calculation_queue& log_queue, std::atomic<bool>& calculation_done,
+            vector<uint16_t>& q_components);
         ~impartial_term_algebra();
 
         const vector<uint16_t>& get_q_components() const;
-        const uint32_t get_term_count() const;
-        const uint32_t* const get_basis() const;
+        uint32_t get_term_count() const;
+        uint32_t* get_basis() const;
 
         term_array multiply(const term_array& a, const term_array& b);
         term_array square(const term_array& a);
         term_array power(const term_array& a, const cpp_int& n);
+        void excess_power(const term_array&a, const cpp_int& n, term_array& res);
+        uint64_t degree(const term_array& a); // not sure how much space is adequate for the result
+        void q_set_degree(const term_array& a, uint64_t& res);
 };
 
 #endif

@@ -12,15 +12,10 @@
  */
 
 #include "prime_generator.hpp"
-#include "nt_funcs.hpp"
 #include "important_funcs.hpp"
-#include "impartial_term_algebra.hpp"
-#include "fin_nim.hpp"
 #include "ww.hpp"
 #include "www.hpp"
-#include "kappa_component.hpp"
 #include "www_nim.hpp"
-#include "constants.hpp"
 
 #include <cstdint>
 #include <string>
@@ -56,6 +51,7 @@ void write_alpha(fstream& file, uint16_t p,
 }
 
 //TODO optimize
+//TODO split calculating and logging into different threads
 int main() {
     
     fstream file;

@@ -42,9 +42,9 @@ namespace www_nim {
 
         vector<ww> www_to_2_pow(const www& x) {
             vector<ww> result{};
-            for (const auto [a, b] : x.get_terms()) {
-                ww c = ww() * a;
-                for (const uint8_t k : fin_to_2_pow(b)) {
+            for (const auto& ab : x.get_terms()) {
+                ww c = ww() * ab.first;
+                for (const uint8_t k : fin_to_2_pow(ab.second)) {
                     result.push_back(c + k);
                 }
             }
@@ -54,13 +54,13 @@ namespace www_nim {
         www www_of_2_pow(const vector<ww>& x) {
             www result(0);
             www temp(1);
-            for (const ww xi : x) {
+            for (const ww& xi : x) {
                 temp = 1;
-                for (const auto [a, b] : xi.get_terms()) {
-                    if (a == 0) {
-                        temp = temp * (((uint64_t)1) << b);
+                for (const auto& ab : xi.get_terms()) {
+                    if (ab.first == 0) {
+                        temp = temp * (((uint64_t)1) << ab.second);
                     } else {
-                        temp = temp * www({{ww({{a - 1, b}}), 1}});
+                        temp = temp * www({{ww({{ab.first - 1, ab.second}}), 1}});
                     }
                 }
                 result += temp;
@@ -98,7 +98,7 @@ namespace www_nim {
         www www_of_kappa_components(const vector<kappa_component>& components, uint64_t coefficient) {
             list<std::pair<uint16_t, uint16_t>> terms{};
             uint16_t temp1, temp2;
-            for (const auto component : components) {
+            for (const auto& component : components) {
                 temp1 = nth_prime(component.get_k() + 2);
                 temp2 = 1;
                 for (uint16_t i = 0; i < component.get_n(); i++) temp2 *= temp1;
@@ -109,19 +109,19 @@ namespace www_nim {
 
         vector<kappa_component> kappa_components_of_term(const std::pair<ww, uint64_t>& a) {
             vector<kappa_component> result{};
-            for (const auto [exponent, coefficient] : a.first.get_terms()) {
-                uint16_t k = exponent;
-                uint16_t p = nth_prime(exponent + 2);
+            for (const auto& expcoeff : a.first.get_terms()) {
+                uint16_t k = expcoeff.first;
+                uint16_t p = nth_prime(expcoeff.first + 2);
                 uint16_t n = 1;
                 uint16_t pn = p;
-                while (pn <= coefficient) {
+                while (pn <= expcoeff.second) {
                     n++;
                     pn *= p;
                 }
                 uint16_t temp = 1;
                 for (uint16_t i = 0; i < n; i++) {
-                    k = (coefficient / temp) % p;
-                    if (k != 0) result.push_back(kappa_component(exponent, i, k));
+                    k = (expcoeff.second / temp) % p;
+                    if (k != 0) result.push_back(kappa_component(expcoeff.first, i, k));
                     temp *= p;
                 }
             }
@@ -156,7 +156,9 @@ namespace www_nim {
                         www alpha1 = alpha(nth_prime(a.get_k() + 2));
 
                         www result(0);
-                        for (const auto [exp, coef] : alpha1.get_terms()) {
+                        for (const auto& expcoef : alpha1.get_terms()) {
+                            auto exp = expcoef.first;
+                            auto coef = expcoef.second;
                             if (exp == 0) {
                                 auto it = components.begin();
                                 it++; it++;
@@ -210,8 +212,8 @@ namespace www_nim {
         if (b == 1) return a;
 
         www result(0);
-        for (const auto ap : a.get_terms()) {
-            for (const auto bp : b.get_terms()) {
+        for (const auto& ap : a.get_terms()) {
+            for (const auto& bp : b.get_terms()) {
                 result = www_nim_add(result, www_nim_mul_term(ap, bp));
             }
         }
@@ -220,7 +222,7 @@ namespace www_nim {
 
     www www_nim_square(const www& a) {
         www result(0);
-        for (const auto ap : a.get_terms()) {
+        for (const auto& ap : a.get_terms()) {
             result = www_nim_add(result, www_nim_mul_term(ap, ap));
         }
         return result;
@@ -241,7 +243,9 @@ namespace www_nim {
     }
 
     www kappa(uint16_t q) { // q should be a non-trivial prime power
-        auto [p, n] = nt_funcs::prime_pow(q);
+        auto pn = nt_funcs::prime_pow(q);
+        uint16_t p = pn.first;
+        uint16_t n = pn.second;
         if (p == 2) {
             // Fermat 2-power
             return www(((uint64_t)1)<<(((uint16_t)1)<<(n-1)));
@@ -254,7 +258,7 @@ namespace www_nim {
 
     www alpha(uint16_t p) {
         www result(important_funcs::excess(p));
-        for (auto q : important_funcs::q_set(p)) {
+        for (const uint16_t q : important_funcs::q_set(p)) {
             result = kappa(q) + result;
         }
         return result;

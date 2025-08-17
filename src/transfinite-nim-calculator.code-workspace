@@ -64,7 +64,12 @@
 			"cinttypes": "cpp",
 			"typeindex": "cpp",
 			"typeinfo": "cpp",
-			"variant": "cpp"
+			"variant": "cpp",
+			"chrono": "cpp",
+			"ratio": "cpp",
+			"semaphore": "cpp",
+			"stop_token": "cpp",
+			"thread": "cpp"
 		}
 	}
 }
