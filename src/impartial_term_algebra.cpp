@@ -323,14 +323,17 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     }
     unsigned index = 0;
     const unsigned msbnp1 = msb(n) + 1;
+    uint64_t* vn = new uint64_t[msbnp1]();
+    for (unsigned i = 0; i < msbnp1; i++) {
+        if (bit_test(n, i)) vn[i / 64] |= ((uint64_t)1) << (i & 63);
+    }
     while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     
-    // maybe convert n to a bit array? (less overhead)
     const unsigned mask = ((unsigned)1 << 6);
     while (index < msbnp1) {
-        if (bit_test(n, index)) {
+        if (vn[index / 64] & (((uint64_t)1) << (index & 63))) {
             result = multiply(result, curpow);
         }
         curpow = square(curpow);
@@ -348,6 +351,8 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     while (!log_queue_.push({UNSIGNED_MAX, 0, 0, 0})) { // Signal completion to logger
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
+    delete[] vn;
+    vn = nullptr;
     res = result;
     return;
 }
