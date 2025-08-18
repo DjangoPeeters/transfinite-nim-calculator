@@ -35,7 +35,7 @@ namespace important_funcs {
         map<uint16_t, uint8_t> excess_cache(TEST_MODE ? test_values::excess_cache : record_values::excess_cache);
 
         uint64_t finite_summand(uint16_t p, uint16_t excess) {
-            vector<uint16_t> q_set1 = q_set(p);
+            const vector<uint16_t> q_set1 = q_set(p);
             uint64_t base_finite_summand = 0;
             if (!q_set1.empty() && (q_set1[0] & 1) == 0) {
                 base_finite_summand = ((uint64_t)1) << (q_set1[0] >> 1);
@@ -68,7 +68,7 @@ namespace important_funcs {
                     components.insert(q2);
                 }
             }
-            vector<uint16_t> fin_comps = finite_components(p, (uint16_t)excess(p));
+            const vector<uint16_t> fin_comps = finite_components(p, (uint16_t)excess(p));
             components.insert(fin_comps.begin(), fin_comps.end());
             return components;
         }
@@ -127,7 +127,7 @@ namespace important_funcs {
         }
     }
 
-    map<uint16_t, vector<uint16_t>> get_q_set_cache() {
+    std::map<uint16_t, std::vector<uint16_t>>& get_q_set_cache() {
         return q_set_cache;
     }
 
@@ -139,13 +139,13 @@ namespace important_funcs {
             return q_set_cache[p];
         }
 
-        vector<uint16_t> result = kappa_set(f(p));
+        const vector<uint16_t> result = kappa_set(f(p));
         q_set_cache[p] = result;
         cache_q_set(p, result);
         return result;
     }
 
-    map<uint16_t, uint8_t> get_excess_cache() {
+    std::map<uint16_t, uint8_t>& get_excess_cache() {
         return excess_cache;
     }
     
@@ -157,7 +157,7 @@ namespace important_funcs {
             return excess_cache[p];
         }
 
-        vector<uint16_t> q_set1 = q_set(p); // can't be empty because now p != 2
+        const vector<uint16_t> q_set1 = q_set(p); // can't be empty because now p != 2
         cout << "[p = " << p << "] Computing excess (Q-Set = {" << q_set1[0];
         for (size_t i = 1; i < q_set1.size(); i++) {
             cout << ", " << q_set1[i];
@@ -189,7 +189,7 @@ namespace important_funcs {
         one.terms[0] = 0;
         while (!done) {
             uint64_t finite_summand1 = finite_summand(p, excess1);
-            vector<uint16_t> finite_components1(finite_components(p, excess1));
+            const vector<uint16_t> finite_components1(finite_components(p, excess1));
             components.insert(components.end(), finite_components1.begin(), finite_components1.end());
 
             // Shared resources
@@ -228,7 +228,7 @@ namespace important_funcs {
             cout << "] (" << algebra.get_term_count() << " terms)" << endl;
 
             if (div_2_pow_min_1(p, algebra.get_term_count())) {
-                cpp_int testpow(((cpp_int(1) << algebra.get_term_count()) - 1) / p);
+                const cpp_int testpow(((cpp_int(1) << algebra.get_term_count()) - 1) / p);
 
                 term_array alpha_terms((uint32_t)alpha1.size());
                 for (uint32_t i = 0; i < alpha1.size(); i++) {

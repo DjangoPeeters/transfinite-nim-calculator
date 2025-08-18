@@ -51,9 +51,9 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
             kappa_table[i].terms[0] = basis[i] - 1;
             kappa_table[i].terms[1] = basis[i];
         } else if (q_components[i] == q_degrees[i]) {
-            uint16_t p = q_degrees[i];
-            vector<uint16_t> q_set(important_funcs::q_set(p));
-            uint16_t excess = important_funcs::excess(p);
+            const uint16_t p = q_degrees[i];
+            const vector<uint16_t> q_set(important_funcs::q_set(p));
+            const uint16_t excess = important_funcs::excess(p);
 
             vector<uint32_t> kappa_blocks(vector<uint32_t>(q_set.size()));
             for (size_t j = 0; j < q_set.size(); j++) {
@@ -126,25 +126,24 @@ term_array impartial_term_algebra::q_power_times_term(size_t q_index, uint16_t q
     if (q_power_times_term_table[q_index][q_exponent][term].terms != nullptr) {
         return q_power_times_term_table[q_index][q_exponent][term];
     } else {
-        term_array result = q_power_times_term_calc(q_index, q_exponent, term);
+        const term_array result = q_power_times_term_calc(q_index, q_exponent, term);
         q_power_times_term_table[q_index][q_exponent][term] = result;
         return result;
     }
 }
 
 term_array impartial_term_algebra::q_power_times_term_calc(size_t q_index, uint16_t q_exponent, uint32_t term) {
-    uint16_t p = q_degrees[q_index];
-    uint16_t q_exponent_in_term = (uint16_t)((term % basis[q_index + 1]) / basis[q_index]); // see headerfile why I'm casting
-    uint16_t q_exponent_new = q_exponent + q_exponent_in_term;
+    const uint16_t p = q_degrees[q_index];
+    const uint16_t q_exponent_in_term = (uint16_t)((term % basis[q_index + 1]) / basis[q_index]); // see headerfile why I'm casting
+    const uint16_t q_exponent_new = q_exponent + q_exponent_in_term;
     if (q_exponent_new < p) {
         term_array result = term_array(1);
         result.terms[0] = term + (uint32_t)q_exponent * basis[q_index];
         return result;
     } else {
-        uint32_t high_order_part = (term / basis[q_index + 1]) * basis[q_index + 1] + (q_exponent_new % p) * basis[q_index];
-        uint32_t low_order_part = term % basis[q_index];
-        term_array kappa_expansion;
-        kappa_expansion = kappa_table[q_index];
+        const uint32_t high_order_part = (term / basis[q_index + 1]) * basis[q_index + 1] + (q_exponent_new % p) * basis[q_index];
+        const uint32_t low_order_part = term % basis[q_index];
+        const term_array kappa_expansion(kappa_table[q_index]);
 
         set<uint32_t> terms{};
         term_array product;
@@ -172,8 +171,9 @@ term_array impartial_term_algebra::q_power_times_term_calc(size_t q_index, uint1
 term_array impartial_term_algebra::term_times_term(uint32_t x, uint32_t y) {
     set<uint32_t> terms{y};
     term_array product;
+    uint16_t x_exp;
     for (size_t xip1 = q_components.size(); xip1 > 0; xip1--) { // `xip1` is `xi + 1` because `0 - 1` will cause overflow
-        uint16_t x_exp = (uint16_t)((x % basis[xip1]) / basis[xip1 - 1]); // see headerfile why I'm casting
+        x_exp = (uint16_t)((x % basis[xip1]) / basis[xip1 - 1]); // see headerfile why I'm casting
         if (x_exp > 0) {
             set<uint32_t> new_terms{};
             for (uint32_t term : terms) {
@@ -224,9 +224,9 @@ void impartial_term_algebra::accumulate_term_product(uint32_t x, uint32_t y) {
         flip_accumulator_term(x);
         return;
     } else {
-        uint32_t bi = basis[basis_search[y]];
+        const uint32_t bi = basis[basis_search[y]];
         // 0 <= `y / bi` < some prime from `q_degrees`
-        tmp_term_array product = tmp_term_array(q_power_times_term_table[basis_search[y]][(uint16_t)(y / bi)][x]);
+        const tmp_term_array product = tmp_term_array(q_power_times_term_table[basis_search[y]][(uint16_t)(y / bi)][x]);
         for (uint32_t i = 0; i < product.terms_size; i++) {
             accumulate_term_product(product.terms[i], y % bi);
         }
@@ -295,7 +295,7 @@ term_array impartial_term_algebra::power(const term_array& a, const cpp_int& n) 
         curpow.terms[i] = a.terms[i];
     }
     unsigned index = 0;
-    unsigned msbnp1 = msb(n) + 1;
+    const unsigned msbnp1 = msb(n) + 1;
     
     while (index < msbnp1) {
         if (bit_test(n, index)) {

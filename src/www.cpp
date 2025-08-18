@@ -76,7 +76,7 @@ string www::string_of_term(ww a, uint64_t b) {
         }
     } else {
         string stra = a.to_string();
-        if (a.get_terms().size() > 1 || stra.find_first_of('.') != string::npos) stra = "(" + stra + ")";
+        if (a.get_terms().size() > 1 || stra.find_first_of('.') != string::npos || stra.find_first_of('^') != string::npos) stra = "(" + stra + ")";
         if (b == 1) {
             return "w^" + stra;
         } else {

@@ -14,7 +14,7 @@ namespace test_values {
     const map<uint16_t, uint8_t> excess_cache({{2, 0}});
 };
 
-namespace previously_known_values { // known at 6 august 2025
+namespace previously_known_values { // known at 1 january 2025
     const map<uint16_t, vector<uint16_t>> q_set_cache(
         {{2,{}}, {3,{2}}, {5,{4}}, {7,{3}}, {11,{5}}, {13,{4, 3}}, {17,{8}}, {19,{9}},
         {23,{11}}, {29,{4, 7}}, {31,{5}}, {37,{4, 9}}, {41,{5}}, {43,{7}}, {47,{23}},
