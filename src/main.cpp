@@ -42,9 +42,10 @@ passed Aaron Siegel's java program with 415 seconds
 test 8:  195 seconds for alpha(47) :)       (use custom struct more)
 test 9:  110 seconds for alpha(47) :)       (use another custom struct only for transferring instead of creation)
 test 10:  85 seconds for alpha(47) :))      (use separate threads for calculating and logging)
+test 11:  35 seconds for alpha(47) :))      (tweak push interval from calculating to logging)
 */
 
-// most important file for the calculation: important_funcs.cpp (`TEST_MODE = true` initializes the cache empty except for  `p = 2`)
+// most important file for the calculation: important_funcs.cpp (`TEST_MODE = true` initializes the cache empty except for `p = 2`)
 
 void prep_alpha(fstream& file) {
     file.open("alpha_log.txt", ios::app);
@@ -77,7 +78,7 @@ void write_alpha(fstream& file, uint16_t p,
 }
 
 //TODO optimize
-//TODO split calculating and logging into different threads
+//TODO split calculating into more threads
 int main() {
     
     fstream file;
@@ -85,7 +86,7 @@ int main() {
     time_t checkpoint_time;
     uint16_t p;
     time_t t;
-    unsigned n = 2; // `alpha(nth_prime(2))` (a.k.a. `alpha(2)`) is a dummy value
+    unsigned n = 2; // `alpha(nth_prime(1))` (a.k.a. `alpha(2)`) is a dummy value
     while (1) {
         p = nth_prime(n);
         checkpoint_time = time(nullptr);
