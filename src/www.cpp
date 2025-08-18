@@ -75,10 +75,12 @@ string www::string_of_term(ww a, uint64_t b) {
             return "w." + std::to_string(b);
         }
     } else {
+        string stra = a.to_string();
+        if (a.get_terms().size() > 1 || stra.find_first_of('.') != string::npos) stra = "(" + stra + ")";
         if (b == 1) {
-            return "w^" + a.to_string();
+            return "w^" + stra;
         } else {
-            return "w^" + a.to_string() + "." + std::to_string(b);
+            return "w^" + stra + "." + std::to_string(b);
         }
     }
 }
