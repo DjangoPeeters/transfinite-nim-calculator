@@ -235,19 +235,22 @@ namespace important_funcs {
                     alpha_terms.terms[i] = alpha1[i];
                 }
 
-                cout << "Starting multithreaded calculation..." << endl;
                 term_array respow = term_array();
-                // we need to exploit more properties of `testpow`
+                if (testpow < 128) {
+                    respow = algebra.power(alpha_terms, testpow);
+                } else {
+                    cout << "Starting multithreaded calculation..." << endl;
 
-                // Start threads
-                std::thread calc_thread(&impartial_term_algebra::excess_power, &algebra, alpha_terms, testpow, std::ref(respow));
-                std::thread log_thread(&calculation_logger::progress_calculation_logger, &logger);
+                    // Start threads
+                    std::thread calc_thread(&impartial_term_algebra::excess_power, &algebra, alpha_terms, testpow, std::ref(respow));
+                    std::thread log_thread(&calculation_logger::progress_calculation_logger, &logger);
 
-                // Wait for completion
-                calc_thread.join();
-                log_thread.join();
+                    // Wait for completion
+                    calc_thread.join();
+                    log_thread.join();
 
-                cout << "All threads completed. Check calculation.log for full log." << endl;
+                    cout << "All threads completed. Check calculation.log for full log." << endl;
+                }
 
                 if (respow != one) done = true;
             } else {

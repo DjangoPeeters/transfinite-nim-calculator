@@ -78,11 +78,10 @@ namespace periodic_bools {
     std::pair<std::pair<size_t, vector<bool>>, vector<bool>> vb_euclid(const vector<bool>& bools) {
         if (bools.empty()) return {{0, {}}, {}};
         const auto j = bools.size();
-        auto i = 1;
+        size_t i = 1;
 
         auto resqr = vb_div_part(bools, 1);
-        size_t q = 0;
-        vector<bool> r{}, ss{};
+        vector<bool> ss{};
         std::pair<size_t, vector<bool>> qr;
         
         for (size_t k = 1; k < j; k++) {
