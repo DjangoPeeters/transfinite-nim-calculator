@@ -1,6 +1,7 @@
 #include "impartial_term_algebra.hpp"
 #include "nt_funcs.hpp"
 #include "important_funcs.hpp"
+#include "periodic_bools.hpp"
 
 #include <cstddef>
 #include <cstdint>
