@@ -323,7 +323,8 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     }
     unsigned index = 0;
     const unsigned msbnp1 = msb(n) + 1;
-    uint64_t* vn = new uint64_t[msbnp1]();
+
+    uint64_t* vn = new uint64_t[msbnp1](); // less overhead
     for (unsigned i = 0; i < msbnp1; i++) {
         if (bit_test(n, i)) vn[i / 64] |= ((uint64_t)1) << (i & 63);
     }
@@ -353,6 +354,7 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     }
     delete[] vn;
     vn = nullptr;
+
     res = result;
     return;
 }

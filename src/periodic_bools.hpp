@@ -3,8 +3,16 @@
 
 #include <vector>
 
+using std::vector;
+
 namespace periodic_bools {
-    std::pair<unsigned, std::vector<bool>> vb_euclid(std::vector<bool> bools); // returns how many times some big part repeats
+    // pad right with `false` as much as original has max streak of `false`
+    vector<bool> pad_right(const vector<bool>& bools);
+
+    vector<bool> strip_right(const vector<bool>& bools);
+    
+    // returns how many times some big part repeats
+    std::pair<std::pair<std::size_t, vector<bool>>, vector<bool>> vb_euclid(const vector<bool>& bools);
 }
 
 #endif
