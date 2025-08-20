@@ -58,12 +58,19 @@ void calculation_logger::progress_calculation_logger() {
     std::time_t checkpoint_time = time(nullptr);
     while (!calculation_done_ || !log_queue_.empty()) {
         if (log_queue_.pop(result)) {
-            if (result.index == UNSIGNED_MAX) {
-                write_to_console("Logging completed.");
-                if (log_file_.is_open()) {
-                    write_to_file("Logging completed.");
+            if (result.index == UNSIGNED_MAX) { // used for extra info
+                if (result.msbnp1 == 0) {
+                    write_to_console("Logging completed.");
+                    if (log_file_.is_open()) {
+                        write_to_file("Logging completed.");
+                    }
+                    break;
+                } else {
+                    write_to_console("Part " + to_string(result.msbnp1) + " completed.");
+                    if (log_file_.is_open()) {
+                        write_to_file("Part " + to_string(result.msbnp1) + " completed.");
+                    }
                 }
-                break;
             }
             
             if (result.index == 0 || result.index == result.msbnp1 || time(nullptr) - checkpoint_time >= 60) {
