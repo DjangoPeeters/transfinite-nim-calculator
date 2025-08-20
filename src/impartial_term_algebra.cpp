@@ -23,6 +23,8 @@ using boost::multiprecision::bit_test;
 using namespace nt_funcs;
 using namespace periodic_bools;
 
+constexpr unsigned PUSH_INTERVAL = 6;
+
 impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& log_queue, std::atomic<bool>& calculation_done,
     vector<uint16_t>& q_components_): log_queue_(log_queue), calculation_done_(calculation_done),
     q_components(q_components_), q_degrees(new uint16_t[q_components.size()]),
@@ -296,15 +298,13 @@ term_array impartial_term_algebra::power(const term_array& a, const cpp_int& n) 
     for (uint32_t i = 0; i < a.terms_size; i++) {
         curpow.terms[i] = a.terms[i];
     }
-    unsigned index = 0;
     const unsigned msbnp1 = msb(n) + 1;
     
-    while (index < msbnp1) {
+    for (unsigned index = 0; index < msbnp1; index++) {
         if (bit_test(n, index)) {
             result = multiply(result, curpow);
         }
         curpow = square(curpow);
-        index++;
     }
     return result;
 }
@@ -323,35 +323,30 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     for (uint32_t i = 0; i < a.terms_size; i++) {
         curpow.terms[i] = a.terms[i];
     }
-    unsigned index = 0;
     const unsigned msbnp1 = msb(n) + 1;
+    constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
 
     vector<bool> vn = vector<bool>(msbnp1); // less overhead
     for (unsigned i = 0; i < msbnp1; i++) {
         vn[i] = bit_test(n, i);
     }
-    auto qsr = vb_euclid(pad_right(vn)); // test for periodicity in exponent
+    //auto qe = find_rep(vn); // test for periodicity in exponent
     
-    while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
-        std::this_thread::sleep_for(std::chrono::microseconds(10));
-    }
-    
-    const unsigned mask = ((unsigned)1 << 6);
-    while (index < msbnp1) {
+    for (unsigned index = 0; index < msbnp1; index++) {
         if (vn[index]) {
             result = multiply(result, curpow);
         }
         curpow = square(curpow);
-        if (index & mask) { // Send progress update
+        if (!(index & MASK)) { // Send progress update
             while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
         }
-        index++;
     }
-    while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
+    while (!log_queue_.push({msbnp1, msbnp1, curpow.terms_size, result.terms_size})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
+
     calculation_done_ = true;
     while (!log_queue_.push({UNSIGNED_MAX, 0, 0, 0})) { // Signal completion to logger
         std::this_thread::sleep_for(std::chrono::microseconds(10));

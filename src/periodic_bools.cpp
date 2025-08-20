@@ -5,98 +5,83 @@
 using std::vector;
 using std::size_t;
 
-namespace periodic_bools {
+//TODO optimize
+namespace periodic_bools { // entries beyond the end of a vector are treated as `false`
     namespace {
-        // `end` is the end of the part we're dividing by
-        std::pair<std::size_t, vector<bool>> vb_div_part(const vector<bool>& num, size_t end) {
+        std::size_t vb_div_prefix(const vector<bool>& bools, size_t num_end, size_t den_end) {
             size_t q = 0, i = 0;
-
-            bool done = end > num.size();
+            bool done = (den_end > num_end);
             while (!done) {
-                i += end;
+                i += den_end;
                 q++;
-                if (i + end > num.size()) {
+                if (i + den_end > num_end) {
                     done = true;
                 } else {
-                    for (size_t j = 0; j < end; j++) {
-                        if (num[j] != num[i + j]) {
+                    for (size_t j = 0; j < den_end; j++) {
+                        if (bools.size() <= i + j) {
+                            if (j < bools.size() && bools[j]) {
+                                done = true;
+                                break;
+                            } 
+                        } else if (bools[j] != bools[i + j]) {
                             done = true;
                             break;
                         }
                     }
                 }
             }
-
-            vector<bool> r = vector<bool>(num.size() - i);
-            for (size_t j = 0; j < r.size(); j++) {
-                r[j] = num[i + j];
-            }
-
-            return {q, r};
+            return q;
         }
 
-        bool vb_is_multiple(const vector<bool>& bools) {
-            std::pair<size_t, vector<bool>> qr = {0, {}};
-            for (size_t i = 1; i < bools.size(); i++) {
-                qr = vb_div_part(bools, i);
-                if (qr.second.empty() && qr.first > 1) return true;
+        // `end` is the end of the part that we're checking
+        bool vb_is_multiple(const vector<bool>& bools, size_t end) {
+            size_t q = 0;
+            for (size_t i = 1; i < end; i++) {
+                if (end % i != 0) continue;
+                q = vb_div_prefix(bools, end, i);
+                if (q > 1) return true;
             }
-            
             return false;
+        }
+
+        size_t pad_right(const vector<bool>& bools) {
+            size_t falses = 0, tmp = 0, true_stop = 0;
+            for (size_t i = 0; i < bools.size(); i++) {
+                if (bools[i]) {
+                    tmp = 0;
+                    true_stop = i+1;
+                } else {
+                    falses++;
+                    if (tmp > falses) falses = tmp;
+                }
+            }
+
+            return true_stop + falses;
+        }
+
+        size_t strip_right(const vector<bool>& bools) {
+            size_t s = bools.size();
+            while (s > 0 && !bools[s-1]) s--;
+            return s;
         }
     };
 
-    vector<bool> pad_right(const vector<bool>& bools) {
-        size_t falses = 0, tmp = 0;
-        for (size_t i = 0; i < bools.size(); i++) {
-            if (bools[i]) {
-                falses = 0;
-            } else {
-                falses++;
-                if (falses > tmp) tmp = falses;
-            }
-        }
-
-        vector<bool> result(bools);
-        for (size_t i = 0; i < falses; i++) {
-            result.push_back(false);
-        }
-
-        return result;
-    }
-
-    vector<bool> strip_right(const vector<bool>& bools) {
-        size_t s = bools.size();
-
-        while (s > 0 && !bools[s-1]) s--;
-
-        vector<bool> result = vector<bool>(s);
-        result.assign(bools.begin(), bools.begin() + s);
-        return result;
-    }
-
-    std::pair<std::pair<size_t, vector<bool>>, vector<bool>> vb_euclid(const vector<bool>& bools) {
-        if (bools.empty()) return {{0, {}}, {}};
-        const auto j = bools.size();
-        size_t i = 1;
-
-        auto resqr = vb_div_part(bools, 1);
-        vector<bool> ss{};
-        std::pair<size_t, vector<bool>> qr;
+    std::pair<std::size_t, std::size_t> find_rep(const vector<bool>& bools) {
+        if (bools.empty()) return {0, 0};
         
-        for (size_t k = 1; k < j; k++) {
-            ss.push_back(bools[k-1]);
-            if (!vb_is_multiple(ss)) {
-                qr = vb_div_part(bools, k);
-                if (qr.first > resqr.first || (qr.first > 1 && qr.second.size() < resqr.second.size())) {
+        size_t end = pad_right(bools), i = 1, q;
+        auto resq = vb_div_prefix(bools, end, 1);
+
+        for (size_t k = 1; k < end; k++) {
+            if (!vb_is_multiple(bools, k)) {
+                q = vb_div_prefix(bools, end, k);
+                if (q > resq || (q > 1 && resq*i < q*k)) {
                     i = k;
-                    resqr = qr;
+                    resq = q;
                 }
             }
         }
-        vector<bool> ress = vector<bool>(i);
-        for (size_t k = 0; k < i; k++) ress[k] = bools[k];
 
-        return {{resqr.first, ress}, resqr.second};
+        return {resq, i};
     }
 }
