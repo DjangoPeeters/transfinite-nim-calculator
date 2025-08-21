@@ -331,6 +331,8 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
         vn[i] = bit_test(n, i);
     }
     const auto vnrep = find_rep(vn); // test for periodicity in exponent
+    std::cout << "Exponent repetitivity: ((" << vnrep.first.first << ", " << vnrep.first.second << "), "
+    << vnrep.second << ")" << std::endl;
     if (vnrep.first.first <= 1 || vnrep.first.second <= 1) {
         for (unsigned index = 0; index < msbnp1; index++) {
             if (vn[index]) {
@@ -350,6 +352,27 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
         const unsigned q = (unsigned)vnrep.first.first, rep_end = (unsigned)vnrep.first.second;
         const unsigned residu_start = (unsigned)vnrep.second, msbrp1 = (unsigned)vb_msbp1(vn, (size_t)rep_end);
 
+        unsigned lsbn_tmp = 0;
+        while (!vn[lsbn_tmp]) lsbn_tmp++;
+        const unsigned lsbn = lsbn_tmp;
+
+        // bring curpow up to the starting power
+        for (unsigned index = 0; index < lsbn; index++) {
+            curpow = square(curpow);
+            if (!(index & MASK)) { // Send progress update
+                while (!log_queue_.push({index, lsbn, curpow.terms_size, result.terms_size})) {
+                    std::this_thread::sleep_for(std::chrono::microseconds(10));
+                }
+            }
+        }
+        while (!log_queue_.push({lsbn, lsbn, curpow.terms_size, result.terms_size})) {
+            std::this_thread::sleep_for(std::chrono::microseconds(10));
+        }
+        while (!log_queue_.push({UNSIGNED_MAX, 1, 0, 0})) {
+            std::this_thread::sleep_for(std::chrono::microseconds(10));
+        }
+
+        /* test: repetitive, repeat, residu; worse
         // first the repetitive part
         for (unsigned index = 0; index < msbrp1; index++) {
             if (vn[index]) {
@@ -437,6 +460,7 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
         while (!log_queue_.push({UNSIGNED_MAX, 4, 0, 0})) {
             std::this_thread::sleep_for(std::chrono::microseconds(10));
         }
+        */
     }
 
     calculation_done_ = true;

@@ -80,7 +80,6 @@ void write_alpha(fstream& file, uint16_t p,
 //TODO optimize
 //TODO split calculating into more threads
 int main() {
-    
     fstream file;
     prep_alpha(file);
     time_t checkpoint_time;

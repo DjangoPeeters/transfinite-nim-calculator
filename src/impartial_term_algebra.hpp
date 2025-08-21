@@ -100,8 +100,8 @@ class impartial_term_algebra {
         uint32_t accumulate_size;
         term_array* kappa_table; // some entries come from `basis`
         term_array*** q_power_times_term_table; // ditto
-        // maybe give q_power_times_term_table type uint32_t**** and keep sizes in a new member
         uint32_t* basis_search;
+        // maybe store `a^(2^n)` for all terms `a` and some `n`
 
         term_array q_power_times_term(size_t q_index, uint16_t q_exponent, uint32_t term); // same `uint16_t` as for `q_degrees`
         term_array q_power_times_term_calc(size_t q_index, uint16_t q_exponent, uint32_t term); // ditto
