@@ -250,6 +250,7 @@ uint32_t* impartial_term_algebra::get_basis() const {
     return basis;
 }
 
+//TODO optimize
 // a and b must already be sorted
 term_array impartial_term_algebra::multiply(const term_array& a, const term_array& b) {
     clear_accumulator();
@@ -352,6 +353,7 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
         const unsigned q = (unsigned)vnrep.first.first, rep_end = (unsigned)vnrep.first.second;
         const unsigned residu_start = (unsigned)vnrep.second, msbrp1 = (unsigned)vb_msbp1(vn, (size_t)rep_end);
 
+        ///* test: repeat, repetitive, residu; mixed
         unsigned lsbn_tmp = 0;
         while (!vn[lsbn_tmp]) lsbn_tmp++;
         const unsigned lsbn = lsbn_tmp;
@@ -371,6 +373,96 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
         while (!log_queue_.push({UNSIGNED_MAX, 1, 0, 0})) {
             std::this_thread::sleep_for(std::chrono::microseconds(10));
         }
+        // curpow = a^(2^lsbn)
+
+        // first leverage the repetitivity
+        result = term_array(curpow);
+        unsigned num = 0;
+        const unsigned den = (q-1)*(rep_end+1);
+        for (unsigned qi = 1; qi < q; qi++) {
+            for (unsigned j = 0; j < rep_end; j++) {
+                curpow = square(curpow);
+                if (!(num & MASK)) { // Send progress update
+                    while (!log_queue_.push({num, den, curpow.terms_size, result.terms_size})) {
+                        std::this_thread::sleep_for(std::chrono::microseconds(10));
+                    }
+                }
+                num++;
+            }
+            result = multiply(result, curpow);
+            if (!(num & MASK)) { // Send progress update
+                while (!log_queue_.push({num, den, curpow.terms_size, result.terms_size})) {
+                    std::this_thread::sleep_for(std::chrono::microseconds(10));
+                }
+            }
+            num++;
+        }
+        while (!log_queue_.push({den, den, curpow.terms_size, result.terms_size})) {
+            std::this_thread::sleep_for(std::chrono::microseconds(10));
+        }
+        while (!log_queue_.push({UNSIGNED_MAX, 2, 0, 0})) {
+            std::this_thread::sleep_for(std::chrono::microseconds(10));
+        }
+
+        // now the repetitive part
+        term_array tmp = term_array(result);
+        for (unsigned index = lsbn+1; index < msbrp1; index++) {
+            if (vn[index]) {
+                result = multiply(result, tmp);
+            }
+            tmp = square(tmp);
+            if (!(index & MASK)) { // Send progress update
+                while (!log_queue_.push({index, msbrp1, tmp.terms_size, result.terms_size})) {
+                    std::this_thread::sleep_for(std::chrono::microseconds(10));
+                }
+            }
+        }
+        while (!log_queue_.push({msbrp1, msbrp1, tmp.terms_size, result.terms_size})) {
+            std::this_thread::sleep_for(std::chrono::microseconds(10));
+        }
+        while (!log_queue_.push({UNSIGNED_MAX, 3, 0, 0})) {
+            std::this_thread::sleep_for(std::chrono::microseconds(10));
+        }
+
+        if (residu_start < msbnp1) { // there's residu
+            // bring curpow up to the right power
+            // remember: curpow = a^(2^(lsbn + (q-1)*rep_end))
+            for (unsigned index = lsbn + (q-1)*rep_end; index < residu_start; index++) {
+                curpow = square(curpow);
+                if (!(index & MASK)) { // Send progress update
+                    while (!log_queue_.push({index, residu_start, curpow.terms_size, result.terms_size})) {
+                        std::this_thread::sleep_for(std::chrono::microseconds(10));
+                    }
+                }
+            }
+            while (!log_queue_.push({residu_start, residu_start, curpow.terms_size, result.terms_size})) {
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
+            }
+            while (!log_queue_.push({UNSIGNED_MAX, 4, 0, 0})) {
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
+            }
+            // curpow = a^(2^residu_start)
+
+            // now do the residu
+            for (unsigned index = residu_start; index < msbnp1; index++) {
+                if (vn[index]) {
+                    result = multiply(result, curpow);
+                }
+                curpow = square(curpow);
+                if (!(index & MASK)) { // Send progress update
+                    while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
+                        std::this_thread::sleep_for(std::chrono::microseconds(10));
+                    }
+                }
+            }
+            while (!log_queue_.push({msbnp1, msbnp1, curpow.terms_size, result.terms_size})) {
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
+            }
+            while (!log_queue_.push({UNSIGNED_MAX, 5, 0, 0})) {
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
+            }
+        }
+        //*/
 
         /* test: repetitive, repeat, residu; worse
         // first the repetitive part
@@ -422,43 +514,45 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
             std::this_thread::sleep_for(std::chrono::microseconds(10));
         }
 
-        // bring curpow up to the right power
-        // remember: curpow = a^(2^msbrp1)
-        for (unsigned index = msbrp1; index < residu_start; index++) {
-            curpow = square(curpow);
-            if (!(index & MASK)) { // Send progress update
-                while (!log_queue_.push({index, residu_start, curpow.terms_size, result.terms_size})) {
-                    std::this_thread::sleep_for(std::chrono::microseconds(10));
+        if (residu_start < msbnp1) { // there's residu
+            // bring curpow up to the right power
+            // remember: curpow = a^(2^msbrp1)
+            for (unsigned index = msbrp1; index < residu_start; index++) {
+                curpow = square(curpow);
+                if (!(index & MASK)) { // Send progress update
+                    while (!log_queue_.push({index, residu_start, curpow.terms_size, result.terms_size})) {
+                        std::this_thread::sleep_for(std::chrono::microseconds(10));
+                    }
                 }
             }
-        }
-        while (!log_queue_.push({residu_start, residu_start, curpow.terms_size, result.terms_size})) {
-            std::this_thread::sleep_for(std::chrono::microseconds(10));
-        }
-        while (!log_queue_.push({UNSIGNED_MAX, 3, 0, 0})) {
-            std::this_thread::sleep_for(std::chrono::microseconds(10));
-        }
-        // curpow = a^(2^residu_start)
-
-        // now do the residu
-        for (unsigned index = residu_start; index < msbnp1; index++) {
-            if (vn[index]) {
-                result = multiply(result, curpow);
-            }
-            curpow = square(curpow);
-            if (!(index & MASK)) { // Send progress update
-                while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
-                    std::this_thread::sleep_for(std::chrono::microseconds(10));
-                }
-            }
-        }
-        if (residu_start < msbnp1) {
-            while (!log_queue_.push({msbnp1, msbnp1, curpow.terms_size, result.terms_size})) {
+            while (!log_queue_.push({residu_start, residu_start, curpow.terms_size, result.terms_size})) {
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
-        }
-        while (!log_queue_.push({UNSIGNED_MAX, 4, 0, 0})) {
-            std::this_thread::sleep_for(std::chrono::microseconds(10));
+            while (!log_queue_.push({UNSIGNED_MAX, 3, 0, 0})) {
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
+            }
+            // curpow = a^(2^residu_start)
+
+            // now do the residu
+            for (unsigned index = residu_start; index < msbnp1; index++) {
+                if (vn[index]) {
+                    result = multiply(result, curpow);
+                }
+                curpow = square(curpow);
+                if (!(index & MASK)) { // Send progress update
+                    while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
+                        std::this_thread::sleep_for(std::chrono::microseconds(10));
+                    }
+                }
+            }
+            if (residu_start < msbnp1) {
+                while (!log_queue_.push({msbnp1, msbnp1, curpow.terms_size, result.terms_size})) {
+                    std::this_thread::sleep_for(std::chrono::microseconds(10));
+                }
+            }
+            while (!log_queue_.push({UNSIGNED_MAX, 4, 0, 0})) {
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
+            }
         }
         */
     }
