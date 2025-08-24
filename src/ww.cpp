@@ -63,13 +63,13 @@ string ww::string_of_term(uint16_t a, uint16_t b) {
         if (b == 1) {
             return "w";
         } else {
-            return "w." + std::to_string(b);
+            return "w*" + std::to_string(b);
         }
     } else {
         if (b == 1) {
             return "w^" + std::to_string(a);
         } else {
-            return "w^" + std::to_string(a) + "." + std::to_string(b);
+            return "w^" + std::to_string(a) + "*" + std::to_string(b);
         }
     }
 }
