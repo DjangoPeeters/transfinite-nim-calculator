@@ -1,6 +1,7 @@
 #include "constants.hpp"
 
 #include <cstdint>
+#include <mutex>
 #include <string>
 #include <fstream>
 #include <vector>
@@ -83,9 +84,12 @@ map<uint16_t, uint8_t> excess_records() {
 namespace record_values {
     map<uint16_t, vector<uint16_t>> q_set_cache(q_set_records());
     map<uint16_t, uint8_t> excess_cache(excess_records());
+    std::mutex q_set_cache_mutex;
+    std::mutex excess_cache_mutex;
 };
 
 void cache_q_set(uint16_t p, vector<uint16_t> q_set_p) {
+    std::lock_guard<std::mutex> lock(record_values::q_set_cache_mutex);
     if (record_values::q_set_cache.find(p) == record_values::q_set_cache.end()) {
         // new q_set found!
         std::ofstream file;
@@ -103,6 +107,7 @@ void cache_q_set(uint16_t p, vector<uint16_t> q_set_p) {
 };
 
 void cache_excess(uint16_t p, uint8_t excess_p) {
+    std::lock_guard<std::mutex> lock(record_values::excess_cache_mutex);
     if (record_values::excess_cache.find(p) == record_values::excess_cache.end()) {
         // new excess found!
         std::ofstream file;

@@ -12,6 +12,7 @@
 #include <map>
 #include <algorithm>
 #include <thread>
+#include <mutex>
 #include <atomic>
 #include <iostream>
 #include <boost/multiprecision/integer.hpp>
@@ -33,6 +34,8 @@ namespace important_funcs {
         map<uint16_t, vector<uint16_t>> q_set_cache(TEST_MODE ? test_values::q_set_cache : record_values::q_set_cache);
         // every excess for primes p <= 257 is at most 4
         map<uint16_t, uint8_t> excess_cache(TEST_MODE ? test_values::excess_cache : record_values::excess_cache);
+        std::mutex q_set_cache_mutex;
+        std::mutex excess_cache_mutex;
 
         uint64_t finite_summand(uint16_t p, uint16_t excess) {
             const vector<uint16_t> q_set1 = q_set(p);
@@ -128,6 +131,7 @@ namespace important_funcs {
     }
 
     std::map<uint16_t, std::vector<uint16_t>>& get_q_set_cache() {
+        std::lock_guard<std::mutex> lock(q_set_cache_mutex);
         return q_set_cache;
     }
 
@@ -140,12 +144,14 @@ namespace important_funcs {
         }
 
         const vector<uint16_t> result = kappa_set(f(p));
+        std::lock_guard<std::mutex> lock(q_set_cache_mutex);
         q_set_cache[p] = result;
         cache_q_set(p, result);
         return result;
     }
 
     std::map<uint16_t, uint8_t>& get_excess_cache() {
+        std::lock_guard<std::mutex> lock(excess_cache_mutex);
         return excess_cache;
     }
     
@@ -153,9 +159,11 @@ namespace important_funcs {
         if (p == 2) {
             return 0U;
         }
+        std::lock_guard<std::mutex> lock(excess_cache_mutex);
         if (excess_cache.find(p) != excess_cache.end()) {
             return excess_cache[p];
         }
+        lock.~lock_guard();
 
         const vector<uint16_t> q_set1 = q_set(p); // can't be empty because now p != 2
         cout << "[p = " << p << "] Computing excess (Q-Set = {" << q_set1[0];
@@ -262,6 +270,7 @@ namespace important_funcs {
             if (!done) excess1++;
         }
 
+        std::lock_guard<std::mutex> lock(excess_cache_mutex);
         excess_cache[p] = excess1;
         cache_excess(p, excess1);
         return excess1;
