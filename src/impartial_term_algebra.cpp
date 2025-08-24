@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <set>
 #include <ctime>
@@ -312,7 +313,7 @@ term_array impartial_term_algebra::power(const term_array& a, const cpp_int& n) 
 
 //TODO optimize
 // a must already be sorted
-void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, term_array& res) {
+void impartial_term_algebra::excess_power(const term_array& a, const cpp_int& n, term_array& res) {
     term_array result(1);
     result.terms[0] = 0;
     if(n.is_zero()) {
@@ -334,6 +335,12 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     const auto vnrep = find_rep(vn); // test for periodicity in exponent
     std::cout << "Exponent repetitivity: ((" << vnrep.first.first << ", " << vnrep.first.second << "), "
     << vnrep.second << ")" << std::endl;
+    std::ofstream file;
+    file.open("calculation.log", std::ios::app);
+    file << "Exponent repetitivity: ((" << vnrep.first.first << ", " << vnrep.first.second << "), "
+    << vnrep.second << ")" << std::endl;
+    file.close();
+
     if (vnrep.first.first <= 1 || vnrep.first.second <= 1) {
         for (unsigned index = 0; index < msbnp1; index++) {
             if (vn[index]) {
@@ -404,7 +411,7 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
             std::this_thread::sleep_for(std::chrono::microseconds(10));
         }
 
-        // now the repetitive part
+        // now the repetitive part (most time is spent here)
         term_array tmp = term_array(result);
         for (unsigned index = lsbn+1; index < msbrp1; index++) {
             if (vn[index]) {

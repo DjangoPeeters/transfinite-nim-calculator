@@ -101,3 +101,13 @@ int main() {
 
     return 0;
 }
+
+/*	(q, rep_end)	normal		repetitive	repeat
+47	(220, 23)	    35		    293		    9	    better
+59	(42, 58)	    5		    14		    3	    better
+67	(10, 66)	    0		    0		    1	    worse
+107	(78, 106)	    101		    326		    89	    better
+131	(6, 130)	    0		    0		    1	    worse
+139	(110, 138)	    416		    ?		    622	    worse
+149	(9, 148)	    1		    ?		    2	    worse
+*/
