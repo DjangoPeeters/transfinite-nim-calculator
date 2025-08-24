@@ -21,6 +21,8 @@ using boost::multiprecision::msb;
 using boost::multiprecision::bit_test;
 using namespace nt_funcs;
 
+constexpr unsigned PUSH_INTERVAL = 6;
+
 impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& log_queue, std::atomic<bool>& calculation_done,
     vector<uint16_t>& q_components_): log_queue_(log_queue), calculation_done_(calculation_done),
     q_components(q_components_), q_degrees(new uint16_t[q_components.size()]),
@@ -331,13 +333,13 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     
-    const unsigned mask = ((unsigned)1 << 6);
+    constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
     while (index < msbnp1) {
         if (vn[index / 64] & (((uint64_t)1) << (index & 63))) {
             result = multiply(result, curpow);
         }
         curpow = square(curpow);
-        if (index & mask) { // Send progress update
+        if (index & MASK) { // Send progress update
             while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
