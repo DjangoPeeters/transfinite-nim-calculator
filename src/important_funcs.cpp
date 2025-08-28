@@ -37,6 +37,23 @@ namespace important_funcs {
         std::mutex q_set_cache_mutex;
         std::mutex excess_cache_mutex;
 
+        void cache_q_set(uint16_t p, vector<uint16_t> q_set_p) {
+            std::lock_guard<std::mutex> lock(q_set_cache_mutex);
+            if (q_set_cache.find(p) == q_set_cache.end()) {
+                q_set_cache[p] = q_set_p;
+                record_values::cache_q_set(p, q_set_p);
+            }
+        };
+
+        void cache_excess(uint16_t p, uint8_t excess_p) {
+            std::lock_guard<std::mutex> lock(excess_cache_mutex);
+            if (excess_cache.find(p) == excess_cache.end()) {
+                // new excess found!
+                excess_cache[p] = excess_p;
+                record_values::cache_excess(p, excess_p);
+            }
+        };
+
         uint64_t finite_summand(uint16_t p, uint16_t excess) {
             const vector<uint16_t> q_set1 = q_set(p);
             uint64_t base_finite_summand = 0;
@@ -139,13 +156,13 @@ namespace important_funcs {
         if (p == 2) {
             return {};
         }
+        std::lock_guard<std::mutex> lock(q_set_cache_mutex);
         if (q_set_cache.find(p) != q_set_cache.end()) {
             return q_set_cache[p];
         }
+        lock.~lock_guard();
 
         const vector<uint16_t> result = kappa_set(f(p));
-        std::lock_guard<std::mutex> lock(q_set_cache_mutex);
-        q_set_cache[p] = result;
         cache_q_set(p, result);
         return result;
     }
@@ -270,8 +287,6 @@ namespace important_funcs {
             if (!done) excess1++;
         }
 
-        std::lock_guard<std::mutex> lock(excess_cache_mutex);
-        excess_cache[p] = excess1;
         cache_excess(p, excess1);
         return excess1;
     }

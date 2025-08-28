@@ -37,82 +37,84 @@ namespace previously_known_values { // known at 1 january 2025
     );
 };
 
-map<uint16_t, vector<uint16_t>> q_set_records() {
-    std::ifstream file;
-    file.open("q_set_records.txt");
-    map<uint16_t, vector<uint16_t>> result{};
-
-    std::string s, a, b;
-    vector<uint16_t> tmp;
-    std::size_t i;
-    while (file >> s) {
-        i = s.find(",");
-        a = s.substr(1, i - 1);
-        b = s.substr(i+2, s.find("}") - i - 2);
-        tmp = {};
-        if (b.length() != 0) {
-            i = b.find(",");
-            tmp.push_back((uint16_t)stoi(b.substr(0, i)));
-            while (i < b.length()) {
-                tmp.push_back((uint16_t)stoi(b.substr(i+1, b.find(",", i+1))));
-                i = b.find(",", i+1);
-            }
-        }
-        result[(uint16_t)stoi(a)] = tmp;
-    }
-
-    return result;
-};
-
-map<uint16_t, uint8_t> excess_records() {
-    std::ifstream file;
-    file.open("excess_records.txt");
-    map<uint16_t, uint8_t> result{};
-
-    std::string s, a, b;
-    std::size_t i;
-    while (file >> s) {
-        i = s.find(",");
-        a = s.substr(1, i - 1);
-        b = s.substr(i+1, s.find("}") - i - 1);
-        result[(uint16_t)stoi(a)] = (uint8_t)stoi(b);
-    }
-
-    return result;
-};
-
 namespace record_values {
+    namespace {
+        map<uint16_t, vector<uint16_t>> q_set_records() {
+            std::ifstream file;
+            file.open("q_set_records.txt");
+            map<uint16_t, vector<uint16_t>> result{};
+
+            std::string s, a, b;
+            vector<uint16_t> tmp;
+            std::size_t i;
+            while (file >> s) {
+                i = s.find(",");
+                a = s.substr(1, i - 1);
+                b = s.substr(i+2, s.find("}") - i - 2);
+                tmp = {};
+                if (b.length() != 0) {
+                    i = b.find(",");
+                    tmp.push_back((uint16_t)stoi(b.substr(0, i)));
+                    while (i < b.length()) {
+                        tmp.push_back((uint16_t)stoi(b.substr(i+1, b.find(",", i+1))));
+                        i = b.find(",", i+1);
+                    }
+                }
+                result[(uint16_t)stoi(a)] = tmp;
+            }
+
+            return result;
+        };
+
+        map<uint16_t, uint8_t> excess_records() {
+            std::ifstream file;
+            file.open("excess_records.txt");
+            map<uint16_t, uint8_t> result{};
+
+            std::string s, a, b;
+            std::size_t i;
+            while (file >> s) {
+                i = s.find(",");
+                a = s.substr(1, i - 1);
+                b = s.substr(i+1, s.find("}") - i - 1);
+                result[(uint16_t)stoi(a)] = (uint8_t)stoi(b);
+            }
+
+            return result;
+        };
+    }
+
     map<uint16_t, vector<uint16_t>> q_set_cache(q_set_records());
     map<uint16_t, uint8_t> excess_cache(excess_records());
     std::mutex q_set_cache_mutex;
     std::mutex excess_cache_mutex;
-};
 
-void cache_q_set(uint16_t p, vector<uint16_t> q_set_p) {
-    std::lock_guard<std::mutex> lock(record_values::q_set_cache_mutex);
-    if (record_values::q_set_cache.find(p) == record_values::q_set_cache.end()) {
-        // new q_set found!
-        std::ofstream file;
-        file.open("q_set_records.txt", std::ios::app);
-        file << ",\n{" << p << ",{";
-        if (!q_set_p.empty()) {
-            file << q_set_p[0];
-            for (std::size_t i = 1; i < q_set_p.size(); i++) {
-                file << "," << q_set_p[i];
+    void cache_q_set(uint16_t p, vector<uint16_t> q_set_p) {
+        std::lock_guard<std::mutex> lock(q_set_cache_mutex);
+        if (q_set_cache.find(p) == q_set_cache.end()) {
+            // new q_set found!
+            std::ofstream file;
+            file.open("q_set_records.txt", std::ios::app);
+            file << ",\n{" << p << ",{";
+            if (!q_set_p.empty()) {
+                file << q_set_p[0];
+                for (std::size_t i = 1; i < q_set_p.size(); i++) {
+                    file << "," << q_set_p[i];
+                }
             }
+            file << "}}";
+            file.close();
         }
-        file << "}}";
-        file.close();
-    }
-};
+    };
 
-void cache_excess(uint16_t p, uint8_t excess_p) {
-    std::lock_guard<std::mutex> lock(record_values::excess_cache_mutex);
-    if (record_values::excess_cache.find(p) == record_values::excess_cache.end()) {
-        // new excess found!
-        std::ofstream file;
-        file.open("excess_records.txt", std::ios::app);
-        file << ",\n{" << p << "," << (unsigned)excess_p << "}";
-        file.close();
-    }
+    void cache_excess(uint16_t p, uint8_t excess_p) {
+        std::lock_guard<std::mutex> lock(excess_cache_mutex);
+        if (excess_cache.find(p) == excess_cache.end()) {
+            // new excess found!
+            std::ofstream file;
+            file.open("excess_records.txt", std::ios::app);
+            file << ",\n{" << p << "," << (unsigned)excess_p << "}";
+            file.close();
+        }
+    };
 };
