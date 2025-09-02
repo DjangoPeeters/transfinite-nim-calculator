@@ -411,6 +411,7 @@ void impartial_term_algebra::excess_power(const term_array& a, const cpp_int& n,
             std::this_thread::sleep_for(std::chrono::microseconds(10));
         }
 
+        //TODO optimize (maybe multithreading the multiplication of powers of `tmp`)
         // now the repetitive part (most time is spent here)
         term_array tmp = term_array(result);
         for (unsigned index = lsbn+1; index < msbrp1; index++) {
