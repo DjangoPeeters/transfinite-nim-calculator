@@ -12,6 +12,7 @@
 #include <map>
 #include <algorithm>
 #include <thread>
+#include <mutex>
 #include <atomic>
 #include <iostream>
 #include <boost/multiprecision/integer.hpp>
@@ -33,6 +34,25 @@ namespace important_funcs {
         map<uint16_t, vector<uint16_t>> q_set_cache(TEST_MODE ? test_values::q_set_cache : record_values::q_set_cache);
         // every excess for primes p <= 257 is at most 4
         map<uint16_t, uint8_t> excess_cache(TEST_MODE ? test_values::excess_cache : record_values::excess_cache);
+        std::mutex q_set_cache_mutex;
+        std::mutex excess_cache_mutex;
+
+        void cache_q_set(uint16_t p, vector<uint16_t> q_set_p) {
+            std::lock_guard<std::mutex> lock(q_set_cache_mutex);
+            if (q_set_cache.find(p) == q_set_cache.end()) {
+                q_set_cache[p] = q_set_p;
+                record_values::cache_q_set(p, q_set_p);
+            }
+        };
+
+        void cache_excess(uint16_t p, uint8_t excess_p) {
+            std::lock_guard<std::mutex> lock(excess_cache_mutex);
+            if (excess_cache.find(p) == excess_cache.end()) {
+                // new excess found!
+                excess_cache[p] = excess_p;
+                record_values::cache_excess(p, excess_p);
+            }
+        };
 
         uint64_t finite_summand(uint16_t p, uint16_t excess) {
             const vector<uint16_t> q_set1 = q_set(p);
@@ -128,6 +148,7 @@ namespace important_funcs {
     }
 
     std::map<uint16_t, std::vector<uint16_t>>& get_q_set_cache() {
+        std::lock_guard<std::mutex> lock(q_set_cache_mutex);
         return q_set_cache;
     }
 
@@ -135,17 +156,19 @@ namespace important_funcs {
         if (p == 2) {
             return {};
         }
+        std::lock_guard<std::mutex> lock(q_set_cache_mutex);
         if (q_set_cache.find(p) != q_set_cache.end()) {
             return q_set_cache[p];
         }
+        lock.~lock_guard();
 
         const vector<uint16_t> result = kappa_set(f(p));
-        q_set_cache[p] = result;
         cache_q_set(p, result);
         return result;
     }
 
     std::map<uint16_t, uint8_t>& get_excess_cache() {
+        std::lock_guard<std::mutex> lock(excess_cache_mutex);
         return excess_cache;
     }
     
@@ -153,9 +176,11 @@ namespace important_funcs {
         if (p == 2) {
             return 0U;
         }
+        std::lock_guard<std::mutex> lock(excess_cache_mutex);
         if (excess_cache.find(p) != excess_cache.end()) {
             return excess_cache[p];
         }
+        lock.~lock_guard();
 
         const vector<uint16_t> q_set1 = q_set(p); // can't be empty because now p != 2
         cout << "[p = " << p << "] Computing excess (Q-Set = {" << q_set1[0];
@@ -229,6 +254,7 @@ namespace important_funcs {
 
             if (div_2_pow_min_1(p, algebra.get_term_count())) {
                 const cpp_int testpow(((cpp_int(1) << algebra.get_term_count()) - 1) / p);
+                // we need to exploit more properties of `testpow`
 
                 term_array alpha_terms((uint32_t)alpha1.size());
                 for (uint32_t i = 0; i < alpha1.size(); i++) {
@@ -261,7 +287,6 @@ namespace important_funcs {
             if (!done) excess1++;
         }
 
-        excess_cache[p] = excess1;
         cache_excess(p, excess1);
         return excess1;
     }
