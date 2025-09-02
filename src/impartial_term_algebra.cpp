@@ -418,7 +418,7 @@ void impartial_term_algebra::excess_power(const term_array& a, const cpp_int& n,
                 result = multiply(result, tmp);
             }
             tmp = square(tmp);
-            if (!(index & MASK)) { // Send progress update
+            if (!(index & 3)) { // Send progress update
                 while (!log_queue_.push({index, msbrp1, tmp.terms_size, result.terms_size})) {
                     std::this_thread::sleep_for(std::chrono::microseconds(10));
                 }
