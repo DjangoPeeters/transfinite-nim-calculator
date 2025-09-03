@@ -10,15 +10,21 @@
 #include <ctime>
 #include <thread>
 #include <chrono>
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/integer.hpp>
+#include <boost/math/special_functions/log1p.hpp>
 
 using std::size_t;
 using std::vector;
 using std::set;
+using std::cout;
+using std::endl;
 using boost::multiprecision::cpp_int;
 using boost::multiprecision::msb;
 using boost::multiprecision::bit_test;
+using boost::multiprecision::cpp_dec_float_100;
+using boost::multiprecision::log;
 using namespace nt_funcs;
 
 constexpr unsigned PUSH_INTERVAL = 6;
@@ -335,6 +341,17 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     
     //TODO optimize (maybe multithreading the multiplication of powers of `tmp`)
     //TODO use sliding-window method
+    cpp_dec_float_100 lnnm1 = log(cpp_dec_float_100(n)) - 1;
+    cpp_int k = 1, twotokp1 = 4, fourtok = 4;
+    while (lnnm1 >= cpp_dec_float_100(k * (k+1) * fourtok) / cpp_dec_float_100(twotokp1 - k - 2)) {
+        k++;
+        twotokp1 << 1;
+        fourtok << 2;
+    }
+    cout << "Sliding-window with k = " << k << endl;
+    //TODO precompute values
+    //TODO calculate power
+
     constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
     while (index < msbnp1) {
         if (vn[index / 64] & (((uint64_t)1) << (index & 63))) {
