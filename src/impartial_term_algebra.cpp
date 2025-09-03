@@ -333,6 +333,8 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     
+    //TODO optimize (maybe multithreading the multiplication of powers of `tmp`)
+    //TODO use sliding-window method
     constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
     while (index < msbnp1) {
         if (vn[index / 64] & (((uint64_t)1) << (index & 63))) {
