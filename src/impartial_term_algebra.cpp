@@ -331,7 +331,8 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     }
     unsigned index = 0;
     const unsigned msbnp1 = msb(n) + 1;
-    uint64_t* vn = new uint64_t[(msbnp1 + 63) >> 6]();
+    size_t vn_size = (size_t)((msbnp1 + 63) >> 6);
+    uint64_t* vn = new uint64_t[vn_size]();
     for (unsigned i = 0; i < msbnp1; i++) {
         if (bit_test(n, i)) vn[i / 64] |= ((uint64_t)1) << (i & 63);
     }
@@ -359,24 +360,31 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
             odd_powers[i] = multiply(odd_powers[i-1], sqa);
         }
     }
+    cout << "Precomputed values done." << endl;
     
     //TODO calculate power
     /*
-    y := 1; i := l - 1
-    while i > -1 do
-        if n_i = 0 then
-            y := y^2
-            i := i - 1
-        else
-            s := max{i - k + 1, 0}
-            while n_s = 0 do
-                s := s + 1
-            for h := 1 to i - s + 1 do
-                y := y^2
-            u := (n_i, n_{i-1}, ..., n_s)_2
-            y := y * x^u
-            i := s - 1
-    return y
+    size_t ip1 = vn_size, s = 0;
+    while (ip1 > 0) {
+        if (n_{ip1-1} == 0) { // n_{ip1-1} == 0
+            result = square(result);
+            ip1--;
+        } else {
+            if (ip1 > k) {
+                s = ip1 - k;
+            } else {
+                s = 0;
+            }
+            while (n_s == 0) s++; // n_s == 0
+            for (size_t h = s+1; h < ip1; h++) { // from s+1 to ip1 ?
+                result = square(result);
+            }
+            u := (n_{ip1-1}, n_{ip1-2}, ..., n_s)_2
+            result = multiply(result, odd_powers[(u-3) >> 1]);
+            ip1 = s;
+        }
+    }
+    return result
     */
 
     constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
