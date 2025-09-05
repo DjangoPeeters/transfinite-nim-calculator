@@ -349,8 +349,35 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
         fourtok << 2;
     }
     cout << "Sliding-window with k = " << k << endl;
-    //TODO precompute values
+
+    size_t odd_powers_size = (size_t)((cpp_int(1) << (size_t)(k-1)) - 1);
+    term_array* odd_powers = new term_array[odd_powers_size];
+    term_array sqa = square(a);
+    if (odd_powers_size != 0) {
+        odd_powers[0] = multiply(a, sqa);
+        for (size_t i = 1; i < odd_powers_size; i++) {
+            odd_powers[i] = multiply(odd_powers[i-1], sqa);
+        }
+    }
+    
     //TODO calculate power
+    /*
+    y := 1; i := l - 1
+    while i > -1 do
+        if n_i = 0 then
+            y := y^2
+            i := i - 1
+        else
+            s := max{i - k + 1, 0}
+            while n_s = 0 do
+                s := s + 1
+            for h := 1 to i - s + 1 do
+                y := y^2
+            u := (n_i, n_{i-1}, ..., n_s)_2
+            y := y * x^u
+            i := s - 1
+    return y
+    */
 
     constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
     while (index < msbnp1) {
@@ -372,6 +399,9 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     while (!log_queue_.push({UNSIGNED_MAX, 0, 0, 0})) { // Signal completion to logger
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
+
+    delete[] odd_powers;
+    odd_powers = nullptr;
     delete[] vn;
     vn = nullptr;
     res = result;
