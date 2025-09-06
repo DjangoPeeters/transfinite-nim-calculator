@@ -333,10 +333,9 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     const unsigned msbnp1 = msb(n) + 1;
     constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
 
-    size_t vn_size = (size_t)((msbnp1 + 63) >> 6);
-    uint64_t* vn = new uint64_t[vn_size]();
+    vector<bool> vn = vector<bool>(msbnp1); // less overhead
     for (unsigned i = 0; i < msbnp1; i++) {
-        if (bit_test(n, i)) vn[i / 64] |= ((uint64_t)1) << (i & 63);
+        vn[i] = bit_test(n, i);
     }
     while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
@@ -364,10 +363,9 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     }
     cout << "Precomputed values done." << endl;
     
-    
     size_t ip1 = (size_t)msbnp1, s = 0, u = 0, pow2 = 0;
     while (ip1 > 0) {
-        if ((vn[(ip1-1) / 64] & (((uint64_t)1) << ((ip1-1) & 63))) == 0) { // n_{ip1-1} == 0
+        if (!vn[ip1-1]) {
             result = square(result);
             if (index & MASK) { // Send progress update
                 while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
@@ -382,8 +380,8 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
             } else {
                 s = 0;
             }
-            while ((vn[s / 64] & (((uint64_t)1) << (s & 63))) == 0) s++; // n_s == 0
-            for (size_t h = s+1; h < ip1; h++) { // from s+1 to ip1 ?
+            while (!vn[s]) s++;
+            for (size_t h = s+1; h < ip1; h++) { // from s+1 to ip1 ? [see wikipedia]
                 result = square(result);
                 if (index & MASK) { // Send progress update
                     while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
@@ -395,7 +393,7 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
             u = 0;
             pow2 = 1;
             for (size_t h = s; h < ip1; h++) {
-                if ((vn[h / 64] & (((uint64_t)1) << (h & 63))) != 0) { // n_h != 0
+                if (vn[h]) {
                     u += pow2;
                 }
                 pow2 <<= 1;
@@ -408,23 +406,6 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
             ip1 = s;
         }
     }
-    
-
-    /*
-    while (index < msbnp1) {
-        if (vn[index / 64] & (((uint64_t)1) << (index & 63))) {
-            result = multiply(result, curpow);
-        }
-        curpow = square(curpow);
-        if (index & MASK) { // Send progress update
-            while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
-                std::this_thread::sleep_for(std::chrono::microseconds(10));
-            }
-        }
-        index++;
-    }
-    */
-
     while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
@@ -435,8 +416,6 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
 
     delete[] odd_powers;
     odd_powers = nullptr;
-    delete[] vn;
-    vn = nullptr;
     res = result;
     return;
 }
