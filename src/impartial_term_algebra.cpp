@@ -10,15 +10,21 @@
 #include <ctime>
 #include <thread>
 #include <chrono>
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/integer.hpp>
+#include <boost/math/special_functions/log1p.hpp>
 
 using std::size_t;
 using std::vector;
 using std::set;
+using std::cout;
+using std::endl;
 using boost::multiprecision::cpp_int;
 using boost::multiprecision::msb;
 using boost::multiprecision::bit_test;
+using boost::multiprecision::cpp_dec_float_100;
+using boost::multiprecision::log;
 using namespace nt_funcs;
 
 constexpr unsigned PUSH_INTERVAL = 6;
@@ -325,28 +331,80 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     }
     unsigned index = 0;
     const unsigned msbnp1 = msb(n) + 1;
-    uint64_t* vn = new uint64_t[(msbnp1 + 63) >> 6]();
+    constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
+
+    vector<bool> vn = vector<bool>(msbnp1); // less overhead
     for (unsigned i = 0; i < msbnp1; i++) {
-        if (bit_test(n, i)) vn[i / 64] |= ((uint64_t)1) << (i & 63);
+        vn[i] = bit_test(n, i);
     }
     while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     
     //TODO optimize (maybe multithreading the multiplication of powers of `tmp`)
-    //TODO use sliding-window method
-    constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
-    while (index < msbnp1) {
-        if (vn[index / 64] & (((uint64_t)1) << (index & 63))) {
-            result = multiply(result, curpow);
+    cpp_dec_float_100 lnnm1 = log(cpp_dec_float_100(n)) - 1;
+    cpp_int twotokp1 = 4, fourtok = 4;
+    size_t k = 1;
+    while (lnnm1 >= cpp_dec_float_100(k * (k+1) * fourtok) / cpp_dec_float_100(twotokp1 - k - 2)) {
+        k++;
+        twotokp1 << 1;
+        fourtok << 2;
+    }
+    cout << "Sliding-window with k = " << k << endl;
+
+    size_t odd_powers_size = (size_t)((1 << (k-1)) - 1);
+    term_array* odd_powers = new term_array[odd_powers_size];
+    term_array sqa = square(a);
+    if (odd_powers_size != 0) {
+        odd_powers[0] = multiply(a, sqa);
+        for (size_t i = 1; i < odd_powers_size; i++) {
+            odd_powers[i] = multiply(odd_powers[i-1], sqa);
         }
-        curpow = square(curpow);
-        if (index & MASK) { // Send progress update
-            while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
-                std::this_thread::sleep_for(std::chrono::microseconds(10));
+    }
+    cout << "Precomputed values done." << endl;
+    
+    size_t ip1 = (size_t)msbnp1, s = 0, u = 0, pow2 = 0;
+    while (ip1 > 0) {
+        if (!vn[ip1-1]) {
+            result = square(result);
+            if (index & MASK) { // Send progress update
+                while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
+                    std::this_thread::sleep_for(std::chrono::microseconds(10));
+                }
             }
+            index++;
+            ip1--;
+        } else {
+            if (ip1 > k) {
+                s = ip1 - k;
+            } else {
+                s = 0;
+            }
+            while (!vn[s]) s++;
+            for (size_t h = s+1; h < ip1; h++) { // from s+1 to ip1 ? [see wikipedia]
+                result = square(result);
+                if (index & MASK) { // Send progress update
+                    while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
+                        std::this_thread::sleep_for(std::chrono::microseconds(10));
+                    }
+                }
+                index++;
+            }
+            u = 0;
+            pow2 = 1;
+            for (size_t h = s; h < ip1; h++) {
+                if (vn[h]) {
+                    u += pow2;
+                }
+                pow2 <<= 1;
+            }
+            if (u == 1) {
+                result = multiply(result, a);
+            } else {
+                result = multiply(result, odd_powers[(u-3) >> 1]);
+            }
+            ip1 = s;
         }
-        index++;
     }
     while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
@@ -355,8 +413,9 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     while (!log_queue_.push({UNSIGNED_MAX, 0, 0, 0})) { // Signal completion to logger
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
-    delete[] vn;
-    vn = nullptr;
+
+    delete[] odd_powers;
+    odd_powers = nullptr;
     res = result;
     return;
 }
