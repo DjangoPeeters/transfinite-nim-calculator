@@ -43,6 +43,7 @@ test 8:  195 seconds for alpha(47) :)       (use custom struct more)
 test 9:  110 seconds for alpha(47) :)       (use another custom struct only for transferring instead of creation)
 test 10:  85 seconds for alpha(47) :))      (use separate threads for calculating and logging)
 test 11:  35 seconds for alpha(47) :))      (tweak push interval from calculating to logging)
+test 12:   3 seconds for alpha(47) :)))     (use sliding-window method where we only multiply a large term_array with a small constant term_array)
 */
 
 // most important file for the calculation: important_funcs.cpp (`TEST_MODE = true` initializes the cache empty except for `p = 2`)
