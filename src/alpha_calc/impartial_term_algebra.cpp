@@ -381,7 +381,7 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
                 s = 0;
             }
             while (!vn[s]) s++;
-            for (size_t h = s+1; h < ip1; h++) { // from s+1 to ip1 ? [see wikipedia]
+            for (size_t h = s; h < ip1; h++) {
                 result = square(result);
                 if (index & MASK) { // Send progress update
                     while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
