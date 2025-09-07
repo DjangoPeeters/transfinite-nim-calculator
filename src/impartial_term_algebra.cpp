@@ -360,7 +360,7 @@ void impartial_term_algebra::excess_power(const term_array& a, const cpp_int& n,
         const unsigned q = (unsigned)vnrep.first.first, rep_end = (unsigned)vnrep.first.second;
         const unsigned residu_start = (unsigned)vnrep.second, msbrp1 = (unsigned)vb_msbp1(vn, (size_t)rep_end);
 
-        ///* test: repeat, repetitive, residu; mixed
+        /* test: repeat, repetitive, residu; mixed
         unsigned lsbn_tmp = 0;
         while (!vn[lsbn_tmp]) lsbn_tmp++;
         const unsigned lsbn = lsbn_tmp;
@@ -388,7 +388,7 @@ void impartial_term_algebra::excess_power(const term_array& a, const cpp_int& n,
         const unsigned den = (q-1)*(rep_end+1);
         for (unsigned qi = 1; qi < q; qi++) {
             for (unsigned j = 0; j < rep_end; j++) {
-                curpow = square(curpow);
+                result = square(result);
                 if (!(num & MASK)) { // Send progress update
                     while (!log_queue_.push({num, den, curpow.terms_size, result.terms_size})) {
                         std::this_thread::sleep_for(std::chrono::microseconds(10));
@@ -414,18 +414,18 @@ void impartial_term_algebra::excess_power(const term_array& a, const cpp_int& n,
         //TODO optimize (maybe multithreading the multiplication of powers of `tmp`)
         // now the repetitive part (most time is spent here)
         term_array tmp = term_array(result);
-        for (unsigned index = lsbn+1; index < msbrp1; index++) {
-            if (vn[index]) {
+        for (unsigned index = 0; index < msbrp1 - lsbn; index++) {
+            if (vn[msbrp1 - 1 - index]) {
                 result = multiply(result, tmp);
             }
-            tmp = square(tmp);
+            result = square(result);
             if (!(index & 3)) { // Send progress update
-                while (!log_queue_.push({index, msbrp1, tmp.terms_size, result.terms_size})) {
+                while (!log_queue_.push({index, msbrp1 - lsbn, tmp.terms_size, result.terms_size})) {
                     std::this_thread::sleep_for(std::chrono::microseconds(10));
                 }
             }
         }
-        while (!log_queue_.push({msbrp1, msbrp1, tmp.terms_size, result.terms_size})) {
+        while (!log_queue_.push({msbrp1 - lsbn, msbrp1 - lsbn, tmp.terms_size, result.terms_size})) {
             std::this_thread::sleep_for(std::chrono::microseconds(10));
         }
         while (!log_queue_.push({UNSIGNED_MAX, 3, 0, 0})) {
@@ -434,8 +434,8 @@ void impartial_term_algebra::excess_power(const term_array& a, const cpp_int& n,
 
         if (residu_start < msbnp1) { // there's residu
             // bring curpow up to the right power
-            // remember: curpow = a^(2^(lsbn + (q-1)*rep_end))
-            for (unsigned index = lsbn + (q-1)*rep_end; index < residu_start; index++) {
+            // remember: curpow = a^(2^lsbn)
+            for (unsigned index = lsbn; index < residu_start; index++) {
                 curpow = square(curpow);
                 if (!(index & MASK)) { // Send progress update
                     while (!log_queue_.push({index, residu_start, curpow.terms_size, result.terms_size})) {
@@ -472,13 +472,13 @@ void impartial_term_algebra::excess_power(const term_array& a, const cpp_int& n,
         }
         //*/
 
-        /* test: repetitive, repeat, residu; worse
+        ///* test: repetitive, repeat, residu; worse
         // first the repetitive part
         for (unsigned index = 0; index < msbrp1; index++) {
-            if (vn[index]) {
+            if (vn[msbrp1 - 1 - index]) {
                 result = multiply(result, curpow);
             }
-            curpow = square(curpow);
+            result = square(result);
             if (!(index & MASK)) { // Send progress update
                 while (!log_queue_.push({index, msbrp1, curpow.terms_size, result.terms_size})) {
                     std::this_thread::sleep_for(std::chrono::microseconds(10));
@@ -499,7 +499,7 @@ void impartial_term_algebra::excess_power(const term_array& a, const cpp_int& n,
         const unsigned den = (q-1)*(rep_end+1);
         for (unsigned qi = 1; qi < q; qi++) {
             for (unsigned j = 0; j < rep_end; j++) {
-                tmp = square(tmp);
+                result = square(result);
                 if (!(num & MASK)) { // Send progress update
                     while (!log_queue_.push({num, den, tmp.terms_size, result.terms_size})) {
                         std::this_thread::sleep_for(std::chrono::microseconds(10));
@@ -562,7 +562,7 @@ void impartial_term_algebra::excess_power(const term_array& a, const cpp_int& n,
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
         }
-        */
+        //*/
     }
 
     calculation_done_ = true;
