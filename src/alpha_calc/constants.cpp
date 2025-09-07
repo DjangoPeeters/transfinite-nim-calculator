@@ -41,7 +41,7 @@ namespace record_values {
     namespace {
         map<uint16_t, vector<uint16_t>> q_set_records() {
             std::ifstream file;
-            file.open("q_set_records.txt");
+            file.open("logs/q_set_records.txt");
             map<uint16_t, vector<uint16_t>> result{};
 
             std::string s, a, b;
@@ -68,7 +68,7 @@ namespace record_values {
 
         map<uint16_t, uint8_t> excess_records() {
             std::ifstream file;
-            file.open("excess_records.txt");
+            file.open("logs/excess_records.txt");
             map<uint16_t, uint8_t> result{};
 
             std::string s, a, b;
@@ -94,7 +94,7 @@ namespace record_values {
         if (q_set_cache.find(p) == q_set_cache.end()) {
             // new q_set found!
             std::ofstream file;
-            file.open("q_set_records.txt", std::ios::app);
+            file.open("logs/q_set_records.txt", std::ios::app);
             file << ",\n{" << p << ",{";
             if (!q_set_p.empty()) {
                 file << q_set_p[0];
@@ -112,7 +112,7 @@ namespace record_values {
         if (excess_cache.find(p) == excess_cache.end()) {
             // new excess found!
             std::ofstream file;
-            file.open("excess_records.txt", std::ios::app);
+            file.open("logs/excess_records.txt", std::ios::app);
             file << ",\n{" << p << "," << (unsigned)excess_p << "}";
             file.close();
         }
