@@ -135,7 +135,7 @@ namespace important_funcs {
                 i++;
             }
 
-            uint64_t degree = algebra.degree(kappag_in_algebra);
+            uint64_t degree = algebra.degree(kappag_in_algebra); //TODO use logger for this
             cout << "Degree is " << degree << "." << endl;
 
             if (degree % q == 0) {
@@ -222,7 +222,7 @@ namespace important_funcs {
             std::atomic<bool> calculation_done{false};
 
             // Create objects
-            impartial_term_algebra algebra(log_queue, calculation_done, components);
+            impartial_term_algebra algebra(log_queue, calculation_done, components); //TODO make constructor faster?
             calculation_logger logger(log_queue, calculation_done, "calculation.log");
             
             vector<uint32_t> alpha1{}; // actually alpha_finite_terms, but reused later for saving space
