@@ -1,6 +1,6 @@
 #include "impartial_term_algebra.hpp"
-#include "nt_funcs.hpp"
 #include "important_funcs.hpp"
+#include "../number_theory/nt_funcs.hpp"
 
 #include <cstddef>
 #include <cstdint>

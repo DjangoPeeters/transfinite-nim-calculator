@@ -1,5 +1,5 @@
 #include "kappa_component.hpp"
-#include "prime_generator.hpp"
+#include "../number_theory/prime_generator.hpp"
 
 #include <iostream>
 

@@ -11,11 +11,11 @@
  * See the LICENSE file for more information.
  */
 
-#include "prime_generator.hpp"
-#include "important_funcs.hpp"
-#include "ww.hpp"
-#include "www.hpp"
-#include "www_nim.hpp"
+#include "number_theory/prime_generator.hpp"
+#include "alpha_calc/important_funcs.hpp"
+#include "www_nim_calc/ww.hpp"
+#include "www_nim_calc/www.hpp"
+#include "www_nim_calc/www_nim.hpp"
 
 #include <cstdint>
 #include <string>
@@ -49,7 +49,7 @@ test 12:   3 seconds for alpha(47) :)))     (use sliding-window method where we 
 // most important file for the calculation: important_funcs.cpp (`TEST_MODE = true` initializes the cache empty except for `p = 2`)
 
 void prep_alpha(fstream& file) {
-    file.open("alpha_log.txt", ios::app);
+    file.open("logs/alpha_log.txt", ios::app);
     file << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
     file << "    p           q_set excess                alpha t(sec)" << endl;
     file << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl << endl << endl;
@@ -71,7 +71,7 @@ void write_alpha(fstream& file, uint16_t p,
     string s_excess_p = to_string(excess_p); while (s_excess_p.length() < 6) s_excess_p = " " + s_excess_p;
     string s_alpha_p = alpha_p.to_string(); while (s_alpha_p.length() < 20) s_alpha_p = " " + s_alpha_p;
     string s_t = to_string(t); while (s_t.length() < 6) s_t = " " + s_t;
-    file.open("alpha_log.txt", std::ios::in | std::ios::out | std::ios::ate);
+    file.open("logs/alpha_log.txt", std::ios::in | std::ios::out | std::ios::ate);
     file.seekp(-59, std::ios::end);
     file << s_p << " " << s_q_set_p << " " << s_excess_p << " " << s_alpha_p << " " << s_t << endl;
     file << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl << endl << endl;

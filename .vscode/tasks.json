@@ -9,7 +9,7 @@
                 "-g",
                 "*.cpp",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${fileDirname}/bin/${fileBasenameNoExtension}"
             ],
             "options": {
                 "cwd": "${fileDirname}"
@@ -49,7 +49,7 @@
                 "-DDEBUG",
                 "*.cpp",
                 "-o",
-                "${fileDirname}/main_debug"
+                "${fileDirname}/bin/main_debug"
             ],
             "options": {
                 "cwd": "${fileDirname}"
@@ -61,7 +61,7 @@
         {
             "label": "Run Program",
             "type": "shell",
-            "command": "${fileDirname}/main",
+            "command": "${fileDirname}/bin/main",
             "options": {
                 "cwd": "${fileDirname}"
             },

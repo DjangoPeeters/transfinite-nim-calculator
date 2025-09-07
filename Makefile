@@ -1,34 +1,54 @@
 # Mostly written by Claude AI
+SOURCES = src/alpha_calc/calculation_logger.cpp \
+		  src/alpha_calc/constants.cpp \
+		  src/alpha_calc/impartial_term_algebra.cpp \
+		  src/alpha_calc/important_funcs.cpp \
+		  src/alpha_calc/ring_buffer_queue.cpp \
+		  src/number_theory/nt_funcs.cpp \
+		  src/number_theory/prime_generator.cpp \
+		  src/www_nim_calc/fin_nim.cpp \
+		  src/www_nim_calc/kappa_component.cpp \
+		  src/www_nim_calc/ww.cpp \
+		  src/www_nim_calc/www_nim.cpp \
+		  src/www_nim_calc/www.cpp \
+		  src/main.cpp
+OBJECTS = $(SOURCES:src/%.cpp=obj/%.o)
+TARGET = bin/main
+
 CXX = g++
 CXXFLAGS = -std=c++11 -Wall -Wextra -pthread -O2
-TARGET = main
-SOURCES = main.cpp calculation_logger.cpp constants.cpp fin_nim.cpp impartial_term_algebra.cpp important_funcs.cpp kappa_component.cpp nt_funcs.cpp prime_generator.cpp ring_buffer_queue.cpp ww.cpp www_nim.cpp www.cpp
-OBJECTS = $(SOURCES:.cpp=.o)
 
 .PHONY: all clean
 
 all: $(TARGET)
 
+clean:
+	rm -f $(OBJECTS) $(TARGET); \
+	> logs/alpha_log.txt; \
+	> logs/calculation.log
+
+# Create directories
+obj:
+	mkdir -p $@
+
+# Pattern rule for object files
+obj/%.o: src/%.cpp | obj
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 $(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-clean:
-	rm -f $(OBJECTS) $(TARGET) calculation.log
-
 # Dependencies (add these if you want automatic header dependency tracking)
-main.o: main.cpp prime_generator.hpp important_funcs.hpp ww.hpp www.hpp www_nim.hpp
-prime_generator.o: prime_generator.cpp prime_generator.hpp
-important_funcs.o: important_funcs.cpp important_funcs.hpp nt_funcs.hpp impartial_term_algebra.hpp constants.hpp ring_buffer_queue.hpp calculation_logger.hpp
-ww.o: ww.cpp ww.hpp
-www.o: www.cpp www.hpp ww.hpp
-www_nim.o: www_nim.cpp www_nim.hpp prime_generator.hpp nt_funcs.hpp important_funcs.hpp fin_nim.hpp ww.hpp www.hpp kappa_component.hpp
-nt_funcs.o: nt_funcs.cpp nt_funcs.hpp prime_generator.hpp
-impartial_term_algebra.o: impartial_term_algebra.cpp impartial_term_algebra.hpp nt_funcs.hpp important_funcs.hpp
-constants.o: constants.cpp constants.hpp
-ring_buffer_queue.o: ring_buffer_queue.cpp ring_buffer_queue.hpp
-calculation_logger.o: calculation_logger.cpp calculation_logger.hpp ring_buffer_queue.hpp
-fin_nim.o: fin_nim.cpp fin_nim.hpp
-kappa_component.o: kappa_component.cpp kappa_component.hpp prime_generator.hpp
+obj/alpha_calc/calculation_logger.o: src/alpha_calc/calculation_logger.cpp src/alpha_calc/calculation_logger.hpp src/alpha_calc/ring_buffer_queue.hpp
+obj/alpha_calc/constants.o: src/alpha_calc/constants.cpp src/alpha_calc/constants.hpp
+obj/alpha_calc/impartial_term_algebra.o: src/alpha_calc/impartial_term_algebra.cpp src/alpha_calc/impartial_term_algebra.hpp src/number_theory/nt_funcs.hpp src/alpha_calc/important_funcs.hpp
+obj/alpha_calc/important_funcs.o: src/alpha_calc/important_funcs.cpp src/alpha_calc/important_funcs.hpp src/number_theory/nt_funcs.hpp src/alpha_calc/impartial_term_algebra.hpp src/alpha_calc/constants.hpp src/alpha_calc/ring_buffer_queue.hpp src/alpha_calc/calculation_logger.hpp
+obj/alpha_calc/ring_buffer_queue.o: src/alpha_calc/ring_buffer_queue.cpp src/alpha_calc/ring_buffer_queue.hpp
+obj/number_theory/nt_funcs.o: src/number_theory/nt_funcs.cpp src/number_theory/nt_funcs.hpp src/number_theory/prime_generator.hpp
+obj/number_theory/prime_generator.o: src/number_theory/prime_generator.cpp src/number_theory/prime_generator.hpp
+obj/www_nim_calc/fin_nim.o: src/www_nim_calc/fin_nim.cpp src/www_nim_calc/fin_nim.hpp
+obj/www_nim_calc/kappa_component.o: src/www_nim_calc/kappa_component.cpp src/www_nim_calc/kappa_component.hpp src/number_theory/prime_generator.hpp
+obj/www_nim_calc/ww.o: src/www_nim_calc/ww.cpp src/www_nim_calc/ww.hpp
+obj/www_nim_calc/www_nim.o: src/www_nim_calc/www_nim.cpp src/www_nim_calc/www_nim.hpp src/number_theory/prime_generator.hpp src/number_theory/nt_funcs.hpp src/alpha_calc/important_funcs.hpp src/www_nim_calc/fin_nim.hpp src/www_nim_calc/ww.hpp src/www_nim_calc/www.hpp src/www_nim_calc/kappa_component.hpp
+obj/www_nim_calc/www.o: src/www_nim_calc/www.cpp src/www_nim_calc/www.hpp src/www_nim_calc/ww.hpp
+obj/main.o: src/main.cpp src/number_theory/prime_generator.hpp src/alpha_calc/important_funcs.hpp src/www_nim_calc/ww.hpp src/www_nim_calc/www.hpp src/www_nim_calc/www_nim.hpp

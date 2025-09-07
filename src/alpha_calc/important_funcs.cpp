@@ -1,9 +1,9 @@
 #include "important_funcs.hpp"
-#include "nt_funcs.hpp"
 #include "impartial_term_algebra.hpp"
 #include "constants.hpp"
 #include "ring_buffer_queue.hpp"
 #include "calculation_logger.hpp"
+#include "../number_theory/nt_funcs.hpp"
 
 #include <cstdint>
 #include <vector>
@@ -223,7 +223,7 @@ namespace important_funcs {
 
             // Create objects
             impartial_term_algebra algebra(log_queue, calculation_done, components); //TODO make constructor faster?
-            calculation_logger logger(log_queue, calculation_done, "calculation.log");
+            calculation_logger logger(log_queue, calculation_done, "logs/calculation.log");
             
             vector<uint32_t> alpha1{}; // actually alpha_finite_terms, but reused later for saving space
             if (finite_summand1 != 0) {

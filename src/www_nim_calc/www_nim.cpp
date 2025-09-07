@@ -1,11 +1,11 @@
 #include "www_nim.hpp"
-#include "prime_generator.hpp"
-#include "nt_funcs.hpp"
-#include "important_funcs.hpp"
 #include "fin_nim.hpp"
 #include "ww.hpp"
 #include "www.hpp"
 #include "kappa_component.hpp"
+#include "../number_theory/prime_generator.hpp"
+#include "../number_theory/nt_funcs.hpp"
+#include "../alpha_calc/important_funcs.hpp"
 
 #include <cstddef>
 #include <cstdint>
