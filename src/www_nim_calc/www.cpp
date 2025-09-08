@@ -173,5 +173,5 @@ ostream& operator<<(ostream& os, const www& me) {
 }
 
 void www::print() const {
-    std::cout << *this << std::endl;
+    std::cout << *this << '\n';
 }

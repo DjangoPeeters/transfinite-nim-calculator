@@ -10,7 +10,8 @@
 #include <thread>
 
 using std::to_string;
-using std::endl;
+
+std::string logs_dir = "logs";
 
 //TODO maybe make 2 instantiations for excess(p) and q_set(p)
 calculation_logger::calculation_logger(ring_buffer_calculation_queue& log_queue, std::atomic<bool>& calculation_done, 
@@ -20,7 +21,7 @@ calculation_logger::calculation_logger(ring_buffer_calculation_queue& log_queue,
     if (!log_file_name_.empty()) {
         log_file_.open(log_file_name_, std::ios::out | std::ios::app);
         if (!log_file_.is_open()) {
-            std::cerr << "Warning: Could not open log file: " << log_file_name_ << endl;
+            std::cerr << "Warning: Could not open log file: " << log_file_name_ << '\n';
         }
     }
 }
@@ -39,7 +40,7 @@ void calculation_logger::write_to_console(const std::string& message) {
     
     std::cout << "[" << std::put_time(std::localtime(&time_t), "%H:%M:%S")
               << "." << std::setfill('0') << std::setw(3) << ms.count() 
-              << "] " << message << std::endl;
+              << "] " << message << '\n';
 }
 
 void calculation_logger::write_to_file(const std::string& message) {
@@ -49,7 +50,7 @@ void calculation_logger::write_to_file(const std::string& message) {
     auto time_t = std::chrono::system_clock::to_time_t(now);
     
     log_file_ << "[" << std::put_time(std::localtime(&time_t), "%Y-%m-%d %H:%M:%S")
-             << "] " << message << std::endl;
+             << "] " << message << '\n';
     log_file_.flush(); // Ensure immediate write
 }
 

@@ -11,14 +11,17 @@
  * See the LICENSE file for more information.
  */
 
-#include "number_theory/prime_generator.hpp"
+#include "alpha_calc/calculation_logger.hpp"
 #include "alpha_calc/important_funcs.hpp"
+#include "number_theory/prime_generator.hpp"
 #include "www_nim_calc/ww.hpp"
 #include "www_nim_calc/www.hpp"
 #include "www_nim_calc/www_nim.hpp"
 
+#include <cstdlib>
 #include <cstdint>
 #include <string>
+#include <iomanip>
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -49,10 +52,10 @@ test 12:   3 seconds for alpha(47) :)))     (use sliding-window method where we 
 // most important file for the calculation: important_funcs.cpp (`TEST_MODE = true` initializes the cache empty except for `p = 2`)
 
 void prep_alpha(fstream& file) {
-    file.open("logs/alpha_log.txt", ios::app);
-    file << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
-    file << "    p           q_set excess                alpha t(sec)" << endl;
-    file << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl << endl << endl;
+    file.open(logs_dir + "/alpha_log.txt", ios::app);
+    file << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n";
+    file << "    p           q_set excess                alpha t(sec)\n";
+    file << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n\n";
     file.close();
 }
 
@@ -71,17 +74,24 @@ void write_alpha(fstream& file, uint16_t p,
     string s_excess_p = to_string(excess_p); while (s_excess_p.length() < 6) s_excess_p = " " + s_excess_p;
     string s_alpha_p = alpha_p.to_string(); while (s_alpha_p.length() < 20) s_alpha_p = " " + s_alpha_p;
     string s_t = to_string(t); while (s_t.length() < 6) s_t = " " + s_t;
-    file.open("logs/alpha_log.txt", std::ios::in | std::ios::out | std::ios::ate);
+    file.open(logs_dir + "/alpha_log.txt", std::ios::in | std::ios::out | std::ios::ate);
     file.seekp(-59, std::ios::end);
-    file << s_p << " " << s_q_set_p << " " << s_excess_p << " " << s_alpha_p << " " << s_t << endl;
-    file << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl << endl << endl;
+    file << s_p << " " << s_q_set_p << " " << s_excess_p << " " << s_alpha_p << " " << s_t << '\n';
+    file << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n\n";
     file.close();
 }
 
 //TODO optimize
 //TODO split calculating into more threads
-int main() {
-    
+int main(int argc, char *argv[])
+{
+    cout << "argc == " << argc << '\n';
+    for (int ndx{}; ndx != argc; ++ndx) {
+        cout << "argv[" << ndx << "] == " << argv[ndx] << '\n';
+    }
+    cout << "argv[" << argc << "] == " << static_cast<void*>(argv[argc]) << '\n';
+    if (1 < argc) logs_dir = argv[1];
+ 
     fstream file;
     prep_alpha(file);
     time_t checkpoint_time;
@@ -91,11 +101,10 @@ int main() {
     while (1) {
         p = nth_prime(n);
         checkpoint_time = time(nullptr);
-        cout << "===== Calculating alpha(" << p << "). =====" << endl;
-        cout << alpha(p) << endl;
+        cout << "===== Calculating alpha(" << p << "). =====\n";
+        cout << alpha(p) << '\n';
         t = time(nullptr) - checkpoint_time;
-        cout << "===== Time is " << t << " seconds. =====" << endl;
-        cout << endl;
+        cout << "===== Time is " << t << " seconds. =====\n\n";
         write_alpha(file, p, q_set(p), excess(p), alpha(p), t);
         n++;
     }

@@ -6,6 +6,7 @@
 #include "../number_theory/nt_funcs.hpp"
 
 #include <cstdint>
+#include <string>
 #include <vector>
 #include <utility>
 #include <set>
@@ -23,7 +24,6 @@ using std::map;
 using std::sort;
 using std::unique;
 using std::cout;
-using std::endl;
 using boost::multiprecision::msb;
 using namespace nt_funcs;
 
@@ -115,7 +115,7 @@ namespace important_funcs {
             for (size_t i = 1; i < components.size(); i++) {
                 cout << ", " << components[i];
             }
-            cout << "})." << endl;
+            cout << "})." << '\n';
 
             // Shared resources
             ring_buffer_calculation_queue log_queue;
@@ -126,7 +126,7 @@ namespace important_funcs {
             // no multithread needed yet
             // calculation_logger logger(log_queue, calculation_done); // no logger file needed yet
 
-            cout << "Field has exponent " << algebra.get_term_count() << "." << endl;
+            cout << "Field has exponent " << algebra.get_term_count() << "." << '\n';
             term_array kappag_in_algebra((uint32_t)kappag_set.size());
             uint32_t i = 0;
             for (const auto r : kappag_set) {
@@ -136,7 +136,7 @@ namespace important_funcs {
             }
 
             uint64_t degree = algebra.degree(kappag_in_algebra); //TODO use logger for this
-            cout << "Degree is " << degree << "." << endl;
+            cout << "Degree is " << degree << "." << '\n';
 
             if (degree % q == 0) {
                 return kappag_set;
@@ -187,7 +187,7 @@ namespace important_funcs {
         for (size_t i = 1; i < q_set1.size(); i++) {
             cout << ", " << q_set1[i];
         }
-        cout << "})." << endl;
+        cout << "})." << '\n';
 
         vector<uint16_t> components = {};
         for (auto q : q_set1) {
@@ -223,7 +223,7 @@ namespace important_funcs {
 
             // Create objects
             impartial_term_algebra algebra(log_queue, calculation_done, components); //TODO make constructor faster?
-            calculation_logger logger(log_queue, calculation_done, "logs/calculation.log");
+            calculation_logger logger(log_queue, calculation_done, logs_dir + "/calculation.log");
             
             vector<uint32_t> alpha1{}; // actually alpha_finite_terms, but reused later for saving space
             if (finite_summand1 != 0) {
@@ -250,7 +250,7 @@ namespace important_funcs {
                     cout << ", " << alpha1[i];
                 }
             }
-            cout << "] (" << algebra.get_term_count() << " terms)" << endl;
+            cout << "] (" << algebra.get_term_count() << " terms)" << '\n';
 
             if (div_2_pow_min_1(p, algebra.get_term_count())) {
                 const cpp_int testpow(((cpp_int(1) << algebra.get_term_count()) - 1) / p);
@@ -265,7 +265,7 @@ namespace important_funcs {
                 if (testpow < 128) {
                     respow = algebra.power(alpha_terms, testpow);
                 } else {
-                    cout << "Starting multithreaded calculation..." << endl;
+                    cout << "Starting multithreaded calculation..." << '\n';
 
                     // Start threads
                     std::thread calc_thread(&impartial_term_algebra::excess_power, &algebra, alpha_terms, testpow, std::ref(respow));
@@ -275,12 +275,12 @@ namespace important_funcs {
                     calc_thread.join();
                     log_thread.join();
 
-                    cout << "All threads completed. Check calculation.log for full log." << endl;
+                    cout << "All threads completed. Check calculation.log for full log." << '\n';
                 }
 
                 if (respow != one) done = true;
             } else {
-                cout << "[p = " << p << "] div_2_pow_min_1 failed." << endl;
+                cout << "[p = " << p << "] div_2_pow_min_1 failed." << '\n';
                 done = true;
             }
 

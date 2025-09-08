@@ -19,7 +19,6 @@ using std::size_t;
 using std::vector;
 using std::set;
 using std::cout;
-using std::endl;
 using boost::multiprecision::cpp_int;
 using boost::multiprecision::msb;
 using boost::multiprecision::bit_test;
@@ -350,7 +349,7 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
         twotokp1 << 1;
         fourtok << 2;
     }
-    cout << "Sliding-window with k = " << k << endl;
+    cout << "Sliding-window with k = " << k << '\n';
 
     size_t odd_powers_size = (size_t)((1 << (k-1)) - 1);
     term_array* odd_powers = new term_array[odd_powers_size];
@@ -361,7 +360,7 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
             odd_powers[i] = multiply(odd_powers[i-1], sqa);
         }
     }
-    cout << "Precomputed values done." << endl;
+    cout << "Precomputed values done." << '\n';
     
     size_t ip1 = (size_t)msbnp1, s = 0, u = 0, pow2 = 0;
     while (ip1 > 0) {

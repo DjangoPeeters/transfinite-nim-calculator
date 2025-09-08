@@ -6,7 +6,6 @@
 #include <iostream>
 
 using std::cout;
-using std::endl;
 
 namespace nt_funcs {
     uint16_t f(uint16_t p) {

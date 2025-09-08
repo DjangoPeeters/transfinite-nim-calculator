@@ -7,6 +7,8 @@
 #include <fstream>
 #include <string>
 
+extern std::string logs_dir;
+
 class calculation_logger {
 private:
     ring_buffer_calculation_queue& log_queue_;

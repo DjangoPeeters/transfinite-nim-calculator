@@ -168,5 +168,5 @@ ostream& operator<<(ostream& os, const ww& me) {
 }
 
 void ww::print() const {
-    std::cout << *this << std::endl;
+    std::cout << *this << '\n';
 }
