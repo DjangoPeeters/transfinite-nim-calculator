@@ -233,9 +233,10 @@ void impartial_term_algebra::accumulate_term_product(uint32_t x, uint32_t y) {
     } else {
         const uint32_t bi = basis[basis_search[y]];
         // 0 <= `y / bi` < some prime from `q_degrees`
-        const tmp_term_array product = tmp_term_array(q_power_times_term_table[basis_search[y]][(uint16_t)(y / bi)][x]);
-        for (uint32_t i = 0; i < product.terms_size; i++) {
-            accumulate_term_product(product.terms[i], y % bi);
+        //const tmp_term_array product = tmp_term_array(q_power_times_term_table[basis_search[y]][(uint16_t)(y / bi)][x]);
+        const term_array* product = &(q_power_times_term_table[basis_search[y]][(uint16_t)(y / bi)][x]);
+        for (uint32_t i = 0; i < product->terms_size; i++) {
+            accumulate_term_product(product->terms[i], y % bi);
         }
         return;
     }

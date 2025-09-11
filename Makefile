@@ -13,20 +13,26 @@ SOURCES = src/alpha_calc/calculation_logger.cpp \
 		  src/www_nim_calc/www.cpp \
 		  src/main.cpp
 OBJECTS = $(SOURCES:src/%.cpp=obj/%.o)
+DEBUG_OBJECTS = $(SOURCES:src/%.cpp=obj/debug/%.o)
 PROF_OBJECTS = $(SOURCES:src/%.cpp=obj/prof/%.o)
 TARGET = bin/main
 
 CXX = g++
 CXXFLAGS = -std=c++11 -Wall -Wextra -pthread
 # Separate targets for release and profiling
-RELEASE_FLAGS = -O2
+RELEASE_FLAGS = -O2 -DNDEBUG
+DEBUG_FLAGS = -fsanitize=address -g -O0 -DDEBUG
 PROFILE_FLAGS = -pg -O2
 
+# Default target (release build)
 all: $(TARGET)
 
 # Create necessary directories
 obj:
 	mkdir -p obj
+
+obj/debug:
+	mkdir -p obj/debug
 
 obj/prof:
 	mkdir -p obj/prof
@@ -40,6 +46,15 @@ obj/%.o: src/%.cpp | obj
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $(RELEASE_FLAGS) -c $< -o $@
 
+# Debug build
+$(TARGET)_debug: $(DEBUG_OBJECTS)
+	$(CXX) $(CXXFLAGS) $(DEBUG_FLAGS) $(DEBUG_OBJECTS) -o $(TARGET)_debug
+
+# Debug object files
+obj/debug/%.o: src/%.cpp | obj/debug
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(DEBUG_FLAGS) -c $< -o $@
+
 # Profile build
 $(TARGET)_prof: $(PROF_OBJECTS)
 	$(CXX) $(CXXFLAGS) $(PROFILE_FLAGS) $(PROF_OBJECTS) -o $(TARGET)_prof
@@ -48,6 +63,31 @@ $(TARGET)_prof: $(PROF_OBJECTS)
 obj/prof/%.o: src/%.cpp | obj/prof
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $(PROFILE_FLAGS) -c $< -o $@
+
+# Debug build shortcut
+debug: $(TARGET)_debug
+	@echo "Debug build complete: $(TARGET)_debug"
+	@echo "Run with: ./$(TARGET)_debug"
+	@echo "Debug with gdb: gdb ./$(TARGET)_debug"
+
+# Debug and run immediately  
+run-debug: $(TARGET)_debug
+	@echo "Running debug version..."
+	./$(TARGET)_debug
+
+# Debug with gdb
+gdb-debug: $(TARGET)_debug
+	@echo "Starting GDB..."
+	gdb ./$(TARGET)_debug
+
+# Debug with Valgrind (memory checking)
+valgrind-debug: $(TARGET)_debug
+	@echo "Running with Valgrind (memory check)..."
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(TARGET)_debug
+
+valgrind-release: $(TARGET)
+	@echo "Running release build with Valgrind..."
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(TARGET)
 
 # Run profiling and generate report
 profile: $(TARGET)_prof
@@ -84,6 +124,9 @@ show-files:
 	@echo "Source files found:"
 	@echo "$(SOURCES)" | tr ' ' '\n'
 	@echo ""
+	@echo "Object files (debug):"
+	@echo "$(DEBUG_OBJECTS)" | tr ' ' '\n'
+	@echo ""
 	@echo "Object files (release):"
 	@echo "$(OBJECTS)" | tr ' ' '\n'
 	@echo ""
@@ -92,9 +135,13 @@ show-files:
 
 # Clean up all generated files
 clean:
-	rm -rf obj $(TARGET) $(TARGET)_prof gmon.out profile_report.txt profile_detailed.txt; \
+	rm -rf obj $(TARGET) $(TARGET)_debug $(TARGET)_prof gmon.out profile_report.txt profile_detailed.txt; \
 	> logs/alpha_log.txt; \
 	> logs/calculation.log
+
+# Clean only debug files
+clean-debug:
+	rm -rf obj/debug $(TARGET)_debug
 
 # Clean only profiling files
 clean-profile:
@@ -103,10 +150,13 @@ clean-profile:
 # Clean and rebuild everything
 rebuild: clean all
 
+# Clean and rebuild debug version
+rebuild-debug: clean-debug debug
+
 # Clean and rebuild profile version
 rebuild-profile: clean-profile profile
 
-.PHONY: all profile profile-detailed quick-profile show-files clean clean-profile rebuild rebuild-profile
+.PHONY: all debug run-debug gdb-debug valgrind-debug profile profile-detailed quick-profile show-files clean clean-debug clean-profile rebuild rebuild-debug rebuild-profile
 
 # Dependencies
 obj/alpha_calc/calculation_logger.o: src/alpha_calc/calculation_logger.cpp src/alpha_calc/calculation_logger.hpp src/alpha_calc/ring_buffer_queue.hpp

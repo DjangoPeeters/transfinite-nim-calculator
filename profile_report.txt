@@ -1,0 +1,946 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 93.23     34.54    34.54 332161923     0.00     0.00  impartial_term_algebra::accumulate_term_product(unsigned int, unsigned int)
+  4.43     36.18     1.64    70069     0.02     0.27  impartial_term_algebra::square(term_array const&)
+  1.13     36.60     0.42    11870     0.04     1.47  impartial_term_algebra::multiply(term_array const&, term_array const&)
+  0.62     36.83     0.23  2936042     0.00     0.00  impartial_term_algebra::term_times_term(unsigned int, unsigned int)
+  0.13     36.88     0.05 10571567     0.00     0.00  impartial_term_algebra::q_power_times_term(unsigned long, unsigned short, unsigned int)
+  0.11     36.92     0.04 19173902     0.00     0.00  void std::__adjust_heap<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, unsigned short, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, long, unsigned short, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>)
+  0.11     36.96     0.04  3093244     0.00     0.00  impartial_term_algebra::q_power_times_term_calc(unsigned long, unsigned short, unsigned int)
+  0.05     36.98     0.02   342332     0.00     0.00  ring_buffer_queue<data_quad, 8192ul>::pop(data_quad&)
+  0.05     37.00     0.02                             calculation_logger::progress_calculation_logger()
+  0.05     37.02     0.02                             _init
+  0.03     37.03     0.01 14230787     0.00     0.00  std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_get_insert_unique_pos(unsigned int const&)
+  0.03     37.04     0.01    62719     0.00     0.01  impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)
+  0.03     37.05     0.01       60     0.17     0.17  impartial_term_algebra::~impartial_term_algebra()
+  0.00     37.05     0.00 11294745     0.00     0.00  std::pair<std::_Rb_tree_iterator<unsigned int>, bool> std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_insert_unique<unsigned int const&>(unsigned int const&)
+  0.00     37.05     0.00  2936042     0.00     0.00  std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<unsigned int>, unsigned int const&)
+  0.00     37.05     0.00    34929     0.00     0.00  ring_buffer_queue<data_quad, 8192ul>::push(data_quad&&)
+  0.00     37.05     0.00     4939     0.00     0.00  boost::multiprecision::backends::cpp_dec_float<100u, int, void>::from_unsigned_long_long(unsigned long long)
+  0.00     37.05     0.00     4533     0.00     0.00  nt_funcs::is_3_pow(unsigned short)
+  0.00     37.05     0.00     3740     0.00     0.00  boost::multiprecision::backends::cpp_dec_float<100u, int, void>::compare(boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&) const
+  0.00     37.05     0.00     3659     0.00     0.00  boost::multiprecision::backends::cpp_dec_float<100u, int, void>::calculate_inv()
+  0.00     37.05     0.00     3638     0.00     0.00  boost::multiprecision::backends::cpp_dec_float<100u, int, void>::cpp_dec_float(double, int)
+  0.00     37.05     0.00     3635     0.00     0.00  boost::multiprecision::backends::cpp_dec_float<100u, int, void>::isone() const
+  0.00     37.05     0.00     2239     0.00     0.00  prime_generator::primes(unsigned short, unsigned short)
+  0.00     37.05     0.00     2179     0.00     0.00  nt_funcs::prime_pow(unsigned short)
+  0.00     37.05     0.00     1730     0.00     0.00  boost::detail::lcast_ret_unsigned<std::char_traits<char>, unsigned int, char>::convert()
+  0.00     37.05     0.00     1417     0.00     0.00  std::map<unsigned short, unsigned char, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::map(std::initializer_list<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short> const&, std::allocator<std::pair<unsigned short const, unsigned char> > const&)
+  0.00     37.05     0.00     1231     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+  0.00     37.05     0.00      738     0.00     0.00  void std::__introsort_loop<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>)
+  0.00     37.05     0.00      690     0.00     0.00  important_funcs::q_set(unsigned short)
+  0.00     37.05     0.00      664     0.00     0.00  boost::multiprecision::backends::cpp_dec_float<100u, int, void>::pow2(long long)
+  0.00     37.05     0.00      601     0.00     0.00  std::_Rb_tree<unsigned short, unsigned short, std::_Identity<unsigned short>, std::less<unsigned short>, std::allocator<unsigned short> >::_M_get_insert_unique_pos(unsigned short const&)
+  0.00     37.05     0.00      480     0.00     0.00  std::pair<std::_Rb_tree_iterator<unsigned short>, bool> std::_Rb_tree<unsigned short, unsigned short, std::_Identity<unsigned short>, std::less<unsigned short>, std::allocator<unsigned short> >::_M_insert_unique<unsigned short const&>(unsigned short const&)
+  0.00     37.05     0.00      469     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > __gnu_cxx::__to_xstring<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, char>(int (*)(char*, unsigned long, char const*, __va_list_tag*), unsigned long, char const*, ...)
+  0.00     37.05     0.00      431     0.00     0.00  ring_buffer_queue<data_quad, 8192ul>::empty() const
+  0.00     37.05     0.00      398     0.00     0.05  important_funcs::excess(unsigned short)
+  0.00     37.05     0.00      345     0.00     0.00  boost::multiprecision::backends::cpp_dec_float<100u, int, void>::char_is_nonzero_predicate(char const&)
+  0.00     37.05     0.00      313     0.00     0.00  int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)
+  0.00     37.05     0.00      295     0.00     0.00  void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}>)
+  0.00     37.05     0.00      282     0.00     0.00  ww::ww(unsigned short)
+  0.00     37.05     0.00      259     0.00     0.00  important_funcs::(anonymous namespace)::finite_summand(unsigned short, unsigned short)
+  0.00     37.05     0.00      258     0.00     0.00  operator==(ww const&, ww const&)
+  0.00     37.05     0.00      226     0.00     0.00  important_funcs::(anonymous namespace)::finite_components(unsigned short, unsigned short)
+  0.00     37.05     0.00      213     0.00     0.00  void std::vector<unsigned short, std::allocator<unsigned short> >::_M_realloc_insert<unsigned short const&>(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, unsigned short const&)
+  0.00     37.05     0.00      201     0.00     0.00  impartial_term_algebra::get_q_components() const
+  0.00     37.05     0.00      194     0.00     0.00  boost::multiprecision::backends::cpp_dec_float<100u, int, void>::initializer::initializer()
+  0.00     37.05     0.00      180     0.00     0.00  std::_List_iterator<std::pair<ww, unsigned long> > std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > >::insert<std::_List_const_iterator<std::pair<ww, unsigned long> >, void>(std::_List_const_iterator<std::pair<ww, unsigned long> >, std::_List_const_iterator<std::pair<ww, unsigned long> >, std::_List_const_iterator<std::pair<ww, unsigned long> >)
+  0.00     37.05     0.00      173     0.00     0.00  std::basic_ostream<char, std::char_traits<char> >& std::operator<< <char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, std::_Put_time<char>)
+  0.00     37.05     0.00      162     0.00     0.00  www::simp_terms(std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > > const&)
+  0.00     37.05     0.00      161     0.00     0.00  std::_Rb_tree<unsigned short, std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > >, std::_Select1st<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, unsigned short const&)
+  0.00     37.05     0.00      160     0.00     0.00  std::_Rb_tree<unsigned short, std::pair<unsigned short const, unsigned char>, std::_Select1st<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<unsigned short const, unsigned char> >, unsigned short const&)
+  0.00     37.05     0.00      145     0.00     0.00  void boost::multiprecision::backends::subtract_unsigned<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, unsigned long long const&)
+  0.00     37.05     0.00      126     0.00     0.00  www::string_of_term[abi:cxx11](ww, unsigned long)
+  0.00     37.05     0.00      126     0.00     0.00  impartial_term_algebra::get_term_count() const
+  0.00     37.05     0.00      121     0.00     0.00  std::_Rb_tree<unsigned short, unsigned short, std::_Identity<unsigned short>, std::less<unsigned short>, std::allocator<unsigned short> >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<unsigned short>, unsigned short const&)
+  0.00     37.05     0.00      120     0.00     0.00  calculation_logger::~calculation_logger()
+  0.00     37.05     0.00       90     0.00     0.00  www::operator=(www const&)
+  0.00     37.05     0.00       90     0.00     0.00  www_nim::kappa(unsigned short)
+  0.00     37.05     0.00       90     0.00     0.00  www::operator+(www const&) const
+  0.00     37.05     0.00       90     0.00     0.00  void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char*>(char*, char*, std::forward_iterator_tag)
+  0.00     37.05     0.00       86     0.00     0.00  calculation_logger::write_to_console(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+  0.00     37.05     0.00       84     0.00     0.00  www::www(unsigned long)
+  0.00     37.05     0.00       76     0.00     0.00  important_funcs::(anonymous namespace)::primitive_components(unsigned short)
+  0.00     37.05     0.00       72     0.00     0.00  prime_generator::prime_pi(unsigned short)
+  0.00     37.05     0.00       72     0.00     0.00  ww::simp_terms(std::__cxx11::list<std::pair<unsigned short, unsigned short>, std::allocator<std::pair<unsigned short, unsigned short> > > const&)
+  0.00     37.05     0.00       72     0.00     0.00  ww::ww(std::__cxx11::list<std::pair<unsigned short, unsigned short>, std::allocator<std::pair<unsigned short, unsigned short> > > const&)
+  0.00     37.05     0.00       72     0.00     0.00  www::www(std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > > const&)
+  0.00     37.05     0.00       67     0.00     0.00  impartial_term_algebra::get_basis() const
+  0.00     37.05     0.00       66     0.00     1.75  www_nim::alpha(unsigned short)
+  0.00     37.05     0.00       66     0.00     0.00  nt_funcs::f(unsigned short)
+  0.00     37.05     0.00       66     0.00     0.00  www::to_string[abi:cxx11]() const
+  0.00     37.05     0.00       60     0.00     0.00  ww::operator=(ww const&)
+  0.00     37.05     0.00       60     0.00     0.00  nt_funcs::max_pow_min_prime_div(unsigned short)
+  0.00     37.05     0.00       60     0.00     0.00  std::vector<unsigned short, std::allocator<unsigned short> >::_M_erase(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >)
+  0.00     37.05     0.00       60     0.00     0.00  void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>)
+  0.00     37.05     0.00       60     0.00     0.00  operator<(ww const&, ww const&)
+  0.00     37.05     0.00       58     0.00     0.00  ww::string_of_term[abi:cxx11](unsigned short, unsigned short)
+  0.00     37.05     0.00       58     0.00     0.00  ww::get_terms[abi:cxx11]() const
+  0.00     37.05     0.00       58     0.00     0.00  ww::to_string[abi:cxx11]() const
+  0.00     37.05     0.00       56     0.00     0.00  std::vector<unsigned short, std::allocator<unsigned short> >::vector(std::vector<unsigned short, std::allocator<unsigned short> > const&)
+  0.00     37.05     0.00       55     0.00     0.00  void std::vector<unsigned int, std::allocator<unsigned int> >::_M_realloc_insert<unsigned int>(__gnu_cxx::__normal_iterator<unsigned int*, std::vector<unsigned int, std::allocator<unsigned int> > >, unsigned int&&)
+  0.00     37.05     0.00       48     0.00     0.00  std::_List_iterator<std::pair<unsigned short, unsigned short> > std::__cxx11::list<std::pair<unsigned short, unsigned short>, std::allocator<std::pair<unsigned short, unsigned short> > >::insert<std::_List_const_iterator<std::pair<unsigned short, unsigned short> >, void>(std::_List_const_iterator<std::pair<unsigned short, unsigned short> >, std::_List_const_iterator<std::pair<unsigned short, unsigned short> >, std::_List_const_iterator<std::pair<unsigned short, unsigned short> >)
+  0.00     37.05     0.00       35     0.00     0.00  boost::multiprecision::backends::cpp_dec_float<100u, int, void>::cpp_dec_float(char const*)
+  0.00     37.05     0.00       33     0.00     0.00  write_alpha(std::basic_fstream<char, std::char_traits<char> >&, unsigned short, std::vector<unsigned short, std::allocator<unsigned short> > const&, unsigned char, www const&, long)
+  0.00     37.05     0.00       33     0.00     0.00  record_values::cache_q_set(unsigned short, std::vector<unsigned short, std::allocator<unsigned short> >)
+  0.00     37.05     0.00       33     0.00     0.00  record_values::cache_excess(unsigned short, unsigned char)
+  0.00     37.05     0.00       33     0.00   287.73  important_funcs::(anonymous namespace)::kappa_set(unsigned short)
+  0.00     37.05     0.00       33     0.00     0.00  important_funcs::get_excess_cache()
+  0.00     37.05     0.00       33     0.00     0.00  prime_generator::nth_prime(unsigned long)
+  0.00     37.05     0.00       33     0.00     0.00  calculation_logger::calculation_logger(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+  0.00     37.05     0.00       33     0.00     0.00  void boost::multiprecision::backends::divide_unsigned_helper<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >*, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, unsigned long long, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&)
+  0.00     37.05     0.00       33     0.00     0.00  void boost::multiprecision::backends::divide_unsigned_helper<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >*, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&)
+  0.00     37.05     0.00       33     0.00     0.00  nt_funcs::div_2_pow_min_1(unsigned short, unsigned int)
+  0.00     37.05     0.00       33     0.00     0.00  void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}>)
+  0.00     37.05     0.00       33     0.00     0.00  void std::__introsort_loop<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}>)
+  0.00     37.05     0.00       33     0.00     0.00  operator<<(std::ostream&, www const&)
+  0.00     37.05     0.00       30     0.00     0.00  boost::multiprecision::backends::cpp_dec_float<100u, int, void>::data_elem_is_non_zero_predicate(unsigned int const&)
+  0.00     37.05     0.00       30     0.00     0.00  boost::bad_lexical_cast::~bad_lexical_cast()
+  0.00     37.05     0.00       29     0.00   328.46  void boost::multiprecision::default_ops::eval_log<boost::multiprecision::backends::cpp_dec_float<100u, int, void> >(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&)
+  0.00     37.05     0.00       29     0.00     4.11  void boost::multiprecision::backends::eval_frexp<100u, int, void>(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&, int*)
+  0.00     37.05     0.00       29     0.00     0.00  void boost::multiprecision::backends::left_shift_generic<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&, unsigned __int128)
+  0.00     37.05     0.00       27     0.00   351.50  impartial_term_algebra::degree(term_array const&)
+  0.00     37.05     0.00       27     0.00     0.00  void std::__introsort_loop<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}>)
+  0.00     37.05     0.00        4     0.00     4.05  impartial_term_algebra::power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&)
+  0.00     37.05     0.00        3     0.00     0.00  std::_Rb_tree<unsigned short, std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > >, std::_Select1st<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::_M_get_insert_unique_pos(unsigned short const&)
+  0.00     37.05     0.00        3     0.00     0.00  std::_Rb_tree<unsigned short, std::pair<unsigned short const, unsigned char>, std::_Select1st<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::_M_get_insert_unique_pos(unsigned short const&)
+  0.00     37.05     0.00        2     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > boost::multiprecision::detail::itos<int>(int)
+  0.00     37.05     0.00        2     0.00     0.00  std::map<unsigned short, std::vector<unsigned short, std::allocator<unsigned short> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::map(std::initializer_list<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short> const&, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > const&)
+  0.00     37.05     0.00        2     0.00     0.00  void std::vector<unsigned short, std::allocator<unsigned short> >::_M_realloc_insert<unsigned short>(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, unsigned short&&)
+  0.00     37.05     0.00        2     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*)
+  0.00     37.05     0.00        1     0.00     0.00  prep_alpha(std::basic_fstream<char, std::char_traits<char> >&)
+  0.00     37.05     0.00        1     0.00     0.00  boost::multiprecision::backends::cpp_dec_float<100u, int, void>::max()
+  0.00     37.05     0.00        1     0.00     0.00  boost::multiprecision::backends::cpp_dec_float<100u, int, void>::min()
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2022 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 0.03% of 37.05 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     99.4    0.00   36.82                 impartial_term_algebra::excess_power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&, term_array&) [1]
+                0.42   16.96   11861/11870       impartial_term_algebra::multiply(term_array const&, term_array const&) [4]
+                0.83    8.89   35440/70069       impartial_term_algebra::square(term_array const&) [3]
+                0.00    9.53      29/29          void boost::multiprecision::default_ops::eval_log<boost::multiprecision::backends::cpp_dec_float<100u, int, void> >(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&) [6]
+                0.00    0.20     225/11296       impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                0.00    0.00   34929/34929       ring_buffer_queue<data_quad, 8192ul>::push(data_quad&&) [34]
+                0.00    0.00     112/145         void boost::multiprecision::backends::subtract_unsigned<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, unsigned long long const&) [68]
+                0.00    0.00      56/3740        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::compare(boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&) const [37]
+                0.00    0.00      29/4939        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::from_unsigned_long_long(unsigned long long) [35]
+-----------------------------------------------
+                             3181086130             impartial_term_algebra::accumulate_term_product(unsigned int, unsigned int) [2]
+               16.97    0.00 163202177/332161923     impartial_term_algebra::multiply(term_array const&, term_array const&) [4]
+               17.57    0.00 168959746/332161923     impartial_term_algebra::square(term_array const&) [3]
+[2]     93.2   34.54    0.00 332161923+3181086130 impartial_term_algebra::accumulate_term_product(unsigned int, unsigned int) [2]
+                             3181086130             impartial_term_algebra::accumulate_term_product(unsigned int, unsigned int) [2]
+-----------------------------------------------
+                0.00    0.00      11/70069       impartial_term_algebra::power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&) [22]
+                0.81    8.68   34618/70069       impartial_term_algebra::degree(term_array const&) [8]
+                0.83    8.89   35440/70069       impartial_term_algebra::excess_power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&, term_array&) [1]
+[3]     51.8    1.64   17.57   70069         impartial_term_algebra::square(term_array const&) [3]
+               17.57    0.00 168959746/332161923     impartial_term_algebra::accumulate_term_product(unsigned int, unsigned int) [2]
+-----------------------------------------------
+                0.00    0.01       9/11870       impartial_term_algebra::power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&) [22]
+                0.42   16.96   11861/11870       impartial_term_algebra::excess_power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&, term_array&) [1]
+[4]     46.9    0.42   16.97   11870         impartial_term_algebra::multiply(term_array const&, term_array const&) [4]
+               16.97    0.00 163202177/332161923     impartial_term_algebra::accumulate_term_product(unsigned int, unsigned int) [2]
+-----------------------------------------------
+[5]     26.7    0.01    9.89   11296+57624   <cycle 2 as a whole> [5]
+                0.00    9.49      33+27          important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+                0.01    0.37   62719+5563        impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                0.00    0.02     398             important_funcs::excess(unsigned short) <cycle 2> [19]
+                0.00    0.00    3659             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::calculate_inv() <cycle 2> [38]
+                0.00    0.00     690             important_funcs::q_set(unsigned short) <cycle 2> [47]
+                0.00    0.00     664+14          boost::multiprecision::backends::cpp_dec_float<100u, int, void>::pow2(long long) <cycle 2> [48]
+                0.00    0.00     259             important_funcs::(anonymous namespace)::finite_summand(unsigned short, unsigned short) <cycle 2> [57]
+                0.00    0.00     226             important_funcs::(anonymous namespace)::finite_components(unsigned short, unsigned short) <cycle 2> [59]
+                0.00    0.00     194             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::initializer::initializer() <cycle 2> [62]
+                0.00    0.00      76+117         important_funcs::(anonymous namespace)::primitive_components(unsigned short) <cycle 2> [79]
+                0.00    0.00       1             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::min() <cycle 2> [123]
+                0.00    0.00       1             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::max() <cycle 2> [122]
+-----------------------------------------------
+                0.00    9.53      29/29          impartial_term_algebra::excess_power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&, term_array&) [1]
+[6]     25.7    0.00    9.53      29         void boost::multiprecision::default_ops::eval_log<boost::multiprecision::backends::cpp_dec_float<100u, int, void> >(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&) [6]
+                0.01    9.40   10736/11296       impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                0.00    0.12      29/29          void boost::multiprecision::backends::eval_frexp<100u, int, void>(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&, int*) [13]
+                0.00    0.00    3569/4939        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::from_unsigned_long_long(unsigned long long) [35]
+                0.00    0.00    3548/3740        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::compare(boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&) const [37]
+-----------------------------------------------
+                                  27             important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+                                  33             important_funcs::q_set(unsigned short) <cycle 2> [47]
+[7]     25.6    0.00    9.49      33+27      important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+                0.00    9.49      27/27          impartial_term_algebra::degree(term_array const&) [8]
+                0.00    0.00      27/60          impartial_term_algebra::~impartial_term_algebra() [24]
+                0.00    0.00      98/213         void std::vector<unsigned short, std::allocator<unsigned short> >::_M_realloc_insert<unsigned short const&>(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, unsigned short const&) [60]
+                0.00    0.00      93/201         impartial_term_algebra::get_q_components() const [61]
+                0.00    0.00      89/295         void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}>) [55]
+                0.00    0.00      60/60          nt_funcs::max_pow_min_prime_div(unsigned short) [88]
+                0.00    0.00      31/67          impartial_term_algebra::get_basis() const [84]
+                0.00    0.00      27/27          void std::__introsort_loop<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}>) [114]
+                0.00    0.00      27/60          std::vector<unsigned short, std::allocator<unsigned short> >::_M_erase(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >) [89]
+                0.00    0.00      27/126         impartial_term_algebra::get_term_count() const [70]
+                                  58             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::initializer::initializer() <cycle 2> [62]
+                                  31             important_funcs::(anonymous namespace)::primitive_components(unsigned short) <cycle 2> [79]
+                                  27             impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                                  27             important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+-----------------------------------------------
+                0.00    9.49      27/27          important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+[8]     25.6    0.00    9.49      27         impartial_term_algebra::degree(term_array const&) [8]
+                0.81    8.68   34618/70069       impartial_term_algebra::square(term_array const&) [3]
+-----------------------------------------------
+                                5563             impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                                   1             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::max() <cycle 2> [122]
+                                   1             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::min() <cycle 2> [123]
+                                   3             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::initializer::initializer() <cycle 2> [62]
+                                  27             important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+                                  33             important_funcs::excess(unsigned short) <cycle 2> [19]
+                                7932             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::pow2(long long) <cycle 2> [48]
+                               43654             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::calculate_inv() <cycle 2> [38]
+                0.00    0.09     107/11296       void boost::multiprecision::backends::eval_frexp<100u, int, void>(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&, int*) [13]
+                0.00    0.20     225/11296       impartial_term_algebra::excess_power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&, term_array&) [1]
+                0.01    9.40   10736/11296       void boost::multiprecision::default_ops::eval_log<boost::multiprecision::backends::cpp_dec_float<100u, int, void> >(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&) [6]
+[9]      1.0    0.01    0.37   62719+5563    impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                0.32    0.05 3093244/3093244     impartial_term_algebra::q_power_times_term(unsigned long, unsigned short, unsigned int) <cycle 1> [15]
+                0.00    0.00    1730/1730        boost::detail::lcast_ret_unsigned<std::char_traits<char>, unsigned int, char>::convert() [43]
+                0.00    0.00    1415/1417        std::map<unsigned short, unsigned char, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::map(std::initializer_list<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short> const&, std::allocator<std::pair<unsigned short const, unsigned char> > const&) [44]
+                0.00    0.00     741/4939        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::from_unsigned_long_long(unsigned long long) [35]
+                0.00    0.00     738/738         void std::__introsort_loop<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>) [46]
+                0.00    0.00     228/2179        nt_funcs::prime_pow(unsigned short) [42]
+                0.00    0.00      60/60          void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>) [90]
+                0.00    0.00      28/55          void std::vector<unsigned int, std::allocator<unsigned int> >::_M_realloc_insert<unsigned int>(__gnu_cxx::__normal_iterator<unsigned int*, std::vector<unsigned int, std::allocator<unsigned int> > >, unsigned int&&) [96]
+                0.00    0.00       1/3635        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::isone() const [40]
+                                3645             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::calculate_inv() <cycle 2> [38]
+                                 634             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::pow2(long long) <cycle 2> [48]
+                                 106             important_funcs::q_set(unsigned short) <cycle 2> [47]
+                                 106             important_funcs::excess(unsigned short) <cycle 2> [19]
+                                5563             impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+-----------------------------------------------
+[10]     1.0    0.32    0.05 3093244+13507609 <cycle 1 as a whole> [10]
+                0.23    0.04 2936042             impartial_term_algebra::term_times_term(unsigned int, unsigned int) <cycle 1> [11]
+                0.05    0.00 10571567             impartial_term_algebra::q_power_times_term(unsigned long, unsigned short, unsigned int) <cycle 1> [15]
+                0.04    0.01 3093244             impartial_term_algebra::q_power_times_term_calc(unsigned long, unsigned short, unsigned int) <cycle 1> [16]
+-----------------------------------------------
+                             2936042             impartial_term_algebra::q_power_times_term_calc(unsigned long, unsigned short, unsigned int) <cycle 1> [16]
+[11]     0.7    0.23    0.04 2936042         impartial_term_algebra::term_times_term(unsigned int, unsigned int) <cycle 1> [11]
+                0.04    0.00 17627280/19173902     void std::__adjust_heap<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, unsigned short, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, long, unsigned short, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>) [17]
+                0.00    0.01 7918986/11294745     std::pair<std::_Rb_tree_iterator<unsigned int>, bool> std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_insert_unique<unsigned int const&>(unsigned int const&) [25]
+                0.00    0.00 2936042/14230787     std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_get_insert_unique_pos(unsigned int const&) [23]
+                0.00    0.00 2936042/2936042     std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<unsigned int>, unsigned int const&) [33]
+                             7478323             impartial_term_algebra::q_power_times_term(unsigned long, unsigned short, unsigned int) <cycle 1> [15]
+-----------------------------------------------
+                                                 <spontaneous>
+[12]     0.5    0.00    0.17                 main [12]
+                0.00    0.12      66/66          www_nim::alpha(unsigned short) [14]
+                0.00    0.03      33/11296       important_funcs::excess(unsigned short) <cycle 2> [19]
+                0.00    0.03      33/11296       important_funcs::q_set(unsigned short) <cycle 2> [47]
+                0.00    0.00      33/33          prime_generator::nth_prime(unsigned long) [103]
+                0.00    0.00      33/33          operator<<(std::ostream&, www const&) [110]
+                0.00    0.00      33/33          write_alpha(std::basic_fstream<char, std::char_traits<char> >&, unsigned short, std::vector<unsigned short, std::allocator<unsigned short> > const&, unsigned char, www const&, long) [99]
+                0.00    0.00       1/1           prep_alpha(std::basic_fstream<char, std::char_traits<char> >&) [121]
+-----------------------------------------------
+                0.00    0.12      29/29          void boost::multiprecision::default_ops::eval_log<boost::multiprecision::backends::cpp_dec_float<100u, int, void> >(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&) [6]
+[13]     0.3    0.00    0.12      29         void boost::multiprecision::backends::eval_frexp<100u, int, void>(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&, int*) [13]
+                0.00    0.09     107/11296       impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                0.00    0.03      29/11296       boost::multiprecision::backends::cpp_dec_float<100u, int, void>::pow2(long long) <cycle 2> [48]
+                0.00    0.00     136/3740        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::compare(boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&) const [37]
+-----------------------------------------------
+                0.00    0.12      66/66          main [12]
+[14]     0.3    0.00    0.12      66         www_nim::alpha(unsigned short) [14]
+                0.00    0.06      66/11296       important_funcs::excess(unsigned short) <cycle 2> [19]
+                0.00    0.06      66/11296       important_funcs::q_set(unsigned short) <cycle 2> [47]
+                0.00    0.00      90/90          www_nim::kappa(unsigned short) [74]
+                0.00    0.00      90/90          www::operator+(www const&) const [75]
+                0.00    0.00      90/90          www::operator=(www const&) [73]
+                0.00    0.00      66/84          www::www(unsigned long) [78]
+-----------------------------------------------
+                             7478323             impartial_term_algebra::term_times_term(unsigned int, unsigned int) <cycle 1> [11]
+                0.32    0.05 3093244/3093244     impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+[15]     0.1    0.05    0.00 10571567         impartial_term_algebra::q_power_times_term(unsigned long, unsigned short, unsigned int) <cycle 1> [15]
+                             3093244             impartial_term_algebra::q_power_times_term_calc(unsigned long, unsigned short, unsigned int) <cycle 1> [16]
+-----------------------------------------------
+                             3093244             impartial_term_algebra::q_power_times_term(unsigned long, unsigned short, unsigned int) <cycle 1> [15]
+[16]     0.1    0.04    0.01 3093244         impartial_term_algebra::q_power_times_term_calc(unsigned long, unsigned short, unsigned int) <cycle 1> [16]
+                0.00    0.00 1546622/19173902     void std::__adjust_heap<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, unsigned short, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, long, unsigned short, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>) [17]
+                0.00    0.00 3375759/11294745     std::pair<std::_Rb_tree_iterator<unsigned int>, bool> std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_insert_unique<unsigned int const&>(unsigned int const&) [25]
+                             2936042             impartial_term_algebra::term_times_term(unsigned int, unsigned int) <cycle 1> [11]
+-----------------------------------------------
+                              555619             void std::__adjust_heap<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, unsigned short, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, long, unsigned short, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>) [17]
+                0.00    0.00 1546622/19173902     impartial_term_algebra::q_power_times_term_calc(unsigned long, unsigned short, unsigned int) <cycle 1> [16]
+                0.04    0.00 17627280/19173902     impartial_term_algebra::term_times_term(unsigned int, unsigned int) <cycle 1> [11]
+[17]     0.1    0.04    0.00 19173902+555619  void std::__adjust_heap<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, unsigned short, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, long, unsigned short, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>) [17]
+                              555619             void std::__adjust_heap<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, unsigned short, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, long, unsigned short, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>) [17]
+-----------------------------------------------
+                                                 <spontaneous>
+[18]     0.1    0.02    0.02                 calculation_logger::progress_calculation_logger() [18]
+                0.02    0.00  342332/342332      ring_buffer_queue<data_quad, 8192ul>::pop(data_quad&) [20]
+                0.00    0.00     431/431         ring_buffer_queue<data_quad, 8192ul>::empty() const [52]
+                0.00    0.00      87/120         calculation_logger::~calculation_logger() [72]
+                0.00    0.00      86/86          calculation_logger::write_to_console(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [77]
+                0.00    0.00      54/469         std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > __gnu_cxx::__to_xstring<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, char>(int (*)(char*, unsigned long, char const*, __va_list_tag*), unsigned long, char const*, ...) [51]
+-----------------------------------------------
+                                 106             impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                                 193             important_funcs::(anonymous namespace)::primitive_components(unsigned short) <cycle 2> [79]
+                0.00    0.03      33/11296       main [12]
+                0.00    0.06      66/11296       www_nim::alpha(unsigned short) [14]
+[19]     0.1    0.00    0.02     398         important_funcs::excess(unsigned short) <cycle 2> [19]
+                0.00    0.02       4/4           impartial_term_algebra::power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&) [22]
+                0.01    0.00      33/60          impartial_term_algebra::~impartial_term_algebra() [24]
+                0.00    0.00     109/213         void std::vector<unsigned short, std::allocator<unsigned short> >::_M_realloc_insert<unsigned short const&>(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, unsigned short const&) [60]
+                0.00    0.00     108/201         impartial_term_algebra::get_q_components() const [61]
+                0.00    0.00      99/126         impartial_term_algebra::get_term_count() const [70]
+                0.00    0.00      45/295         void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}>) [55]
+                0.00    0.00      36/67          impartial_term_algebra::get_basis() const [84]
+                0.00    0.00      33/33          void std::__introsort_loop<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}>) [109]
+                0.00    0.00      33/66          nt_funcs::f(unsigned short) [85]
+                0.00    0.00      33/60          std::vector<unsigned short, std::allocator<unsigned short> >::_M_erase(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >) [89]
+                0.00    0.00      33/33          calculation_logger::calculation_logger(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [104]
+                0.00    0.00      33/33          nt_funcs::div_2_pow_min_1(unsigned short, unsigned int) [107]
+                0.00    0.00      33/120         calculation_logger::~calculation_logger() [72]
+                0.00    0.00      33/145         void boost::multiprecision::backends::subtract_unsigned<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, unsigned long long const&) [68]
+                0.00    0.00      33/33          void boost::multiprecision::backends::divide_unsigned_helper<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >*, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, unsigned long long, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&) [105]
+                0.00    0.00      33/33          void boost::multiprecision::backends::divide_unsigned_helper<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >*, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&) [106]
+                0.00    0.00      33/33          void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}>) [108]
+                0.00    0.00      33/160         std::_Rb_tree<unsigned short, std::pair<unsigned short const, unsigned char>, std::_Select1st<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<unsigned short const, unsigned char> >, unsigned short const&) [67]
+                0.00    0.00      33/33          record_values::cache_excess(unsigned short, unsigned char) [101]
+                0.00    0.00      29/29          void boost::multiprecision::backends::left_shift_generic<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&, unsigned __int128) [113]
+                0.00    0.00      27/55          void std::vector<unsigned int, std::allocator<unsigned int> >::_M_realloc_insert<unsigned int>(__gnu_cxx::__normal_iterator<unsigned int*, std::vector<unsigned int, std::allocator<unsigned int> > >, unsigned int&&) [96]
+                0.00    0.00      22/4533        nt_funcs::is_3_pow(unsigned short) [36]
+                                 135             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::initializer::initializer() <cycle 2> [62]
+                                  45             important_funcs::(anonymous namespace)::primitive_components(unsigned short) <cycle 2> [79]
+                                  33             important_funcs::q_set(unsigned short) <cycle 2> [47]
+                                  33             important_funcs::(anonymous namespace)::finite_summand(unsigned short, unsigned short) <cycle 2> [57]
+                                  33             important_funcs::(anonymous namespace)::finite_components(unsigned short, unsigned short) <cycle 2> [59]
+                                  33             impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+-----------------------------------------------
+                0.02    0.00  342332/342332      calculation_logger::progress_calculation_logger() [18]
+[20]     0.1    0.02    0.00  342332         ring_buffer_queue<data_quad, 8192ul>::pop(data_quad&) [20]
+-----------------------------------------------
+                                                 <spontaneous>
+[21]     0.1    0.02    0.00                 _init [21]
+-----------------------------------------------
+                0.00    0.02       4/4           important_funcs::excess(unsigned short) <cycle 2> [19]
+[22]     0.0    0.00    0.02       4         impartial_term_algebra::power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&) [22]
+                0.00    0.01       9/11870       impartial_term_algebra::multiply(term_array const&, term_array const&) [4]
+                0.00    0.00      11/70069       impartial_term_algebra::square(term_array const&) [3]
+-----------------------------------------------
+                0.00    0.00 2936042/14230787     impartial_term_algebra::term_times_term(unsigned int, unsigned int) <cycle 1> [11]
+                0.01    0.00 11294745/14230787     std::pair<std::_Rb_tree_iterator<unsigned int>, bool> std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_insert_unique<unsigned int const&>(unsigned int const&) [25]
+[23]     0.0    0.01    0.00 14230787         std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_get_insert_unique_pos(unsigned int const&) [23]
+-----------------------------------------------
+                0.00    0.00      27/60          important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+                0.01    0.00      33/60          important_funcs::excess(unsigned short) <cycle 2> [19]
+[24]     0.0    0.01    0.00      60         impartial_term_algebra::~impartial_term_algebra() [24]
+-----------------------------------------------
+                0.00    0.00 3375759/11294745     impartial_term_algebra::q_power_times_term_calc(unsigned long, unsigned short, unsigned int) <cycle 1> [16]
+                0.00    0.01 7918986/11294745     impartial_term_algebra::term_times_term(unsigned int, unsigned int) <cycle 1> [11]
+[25]     0.0    0.00    0.01 11294745         std::pair<std::_Rb_tree_iterator<unsigned int>, bool> std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_insert_unique<unsigned int const&>(unsigned int const&) [25]
+                0.01    0.00 11294745/14230787     std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_get_insert_unique_pos(unsigned int const&) [23]
+-----------------------------------------------
+                                                 <spontaneous>
+[26]     0.0    0.00    0.00                 _GLOBAL__sub_I__ZN15important_funcs15get_q_set_cacheEv [26]
+                0.00    0.00       1/11296       boost::multiprecision::backends::cpp_dec_float<100u, int, void>::initializer::initializer() <cycle 2> [62]
+                0.00    0.00       1/295         void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}>) [55]
+-----------------------------------------------
+                0.00    0.00 2936042/2936042     impartial_term_algebra::term_times_term(unsigned int, unsigned int) <cycle 1> [11]
+[33]     0.0    0.00    0.00 2936042         std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<unsigned int>, unsigned int const&) [33]
+-----------------------------------------------
+                0.00    0.00   34929/34929       impartial_term_algebra::excess_power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&, term_array&) [1]
+[34]     0.0    0.00    0.00   34929         ring_buffer_queue<data_quad, 8192ul>::push(data_quad&&) [34]
+-----------------------------------------------
+                0.00    0.00       5/4939        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::initializer::initializer() <cycle 2> [62]
+                0.00    0.00      29/4939        impartial_term_algebra::excess_power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&, term_array&) [1]
+                0.00    0.00     595/4939        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::pow2(long long) <cycle 2> [48]
+                0.00    0.00     741/4939        impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                0.00    0.00    3569/4939        void boost::multiprecision::default_ops::eval_log<boost::multiprecision::backends::cpp_dec_float<100u, int, void> >(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&) [6]
+[35]     0.0    0.00    0.00    4939         boost::multiprecision::backends::cpp_dec_float<100u, int, void>::from_unsigned_long_long(unsigned long long) [35]
+-----------------------------------------------
+                0.00    0.00      22/4533        important_funcs::excess(unsigned short) <cycle 2> [19]
+                0.00    0.00      33/4533        prime_generator::nth_prime(unsigned long) [103]
+                0.00    0.00    4478/4533        prime_generator::primes(unsigned short, unsigned short) [41]
+[36]     0.0    0.00    0.00    4533         nt_funcs::is_3_pow(unsigned short) [36]
+                0.00    0.00       6/213         void std::vector<unsigned short, std::allocator<unsigned short> >::_M_realloc_insert<unsigned short const&>(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, unsigned short const&) [60]
+-----------------------------------------------
+                0.00    0.00      56/3740        impartial_term_algebra::excess_power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&, term_array&) [1]
+                0.00    0.00     136/3740        void boost::multiprecision::backends::eval_frexp<100u, int, void>(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&, int*) [13]
+                0.00    0.00    3548/3740        void boost::multiprecision::default_ops::eval_log<boost::multiprecision::backends::cpp_dec_float<100u, int, void> >(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&) [6]
+[37]     0.0    0.00    0.00    3740         boost::multiprecision::backends::cpp_dec_float<100u, int, void>::compare(boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&) const [37]
+-----------------------------------------------
+                                  14             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::pow2(long long) <cycle 2> [48]
+                                3645             impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+[38]     0.0    0.00    0.00    3659         boost::multiprecision::backends::cpp_dec_float<100u, int, void>::calculate_inv() <cycle 2> [38]
+                0.00    0.00    3637/3638        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::cpp_dec_float(double, int) [39]
+                0.00    0.00    3634/3635        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::isone() const [40]
+                               43654             impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+-----------------------------------------------
+                0.00    0.00       1/3638        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::initializer::initializer() <cycle 2> [62]
+                0.00    0.00    3637/3638        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::calculate_inv() <cycle 2> [38]
+[39]     0.0    0.00    0.00    3638         boost::multiprecision::backends::cpp_dec_float<100u, int, void>::cpp_dec_float(double, int) [39]
+-----------------------------------------------
+                0.00    0.00       1/3635        impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                0.00    0.00    3634/3635        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::calculate_inv() <cycle 2> [38]
+[40]     0.0    0.00    0.00    3635         boost::multiprecision::backends::cpp_dec_float<100u, int, void>::isone() const [40]
+                0.00    0.00      30/30          boost::bad_lexical_cast::~bad_lexical_cast() [112]
+-----------------------------------------------
+                0.00    0.00      60/2239        nt_funcs::max_pow_min_prime_div(unsigned short) [88]
+                0.00    0.00    2179/2239        nt_funcs::prime_pow(unsigned short) [42]
+[41]     0.0    0.00    0.00    2239         prime_generator::primes(unsigned short, unsigned short) [41]
+                0.00    0.00    4478/4533        nt_funcs::is_3_pow(unsigned short) [36]
+-----------------------------------------------
+                0.00    0.00      90/2179        www_nim::kappa(unsigned short) [74]
+                0.00    0.00     193/2179        important_funcs::(anonymous namespace)::primitive_components(unsigned short) <cycle 2> [79]
+                0.00    0.00     228/2179        impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                0.00    0.00     348/2179        void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}>) [55]
+                0.00    0.00     482/2179        void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}>) [108]
+                0.00    0.00     838/2179        void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>) [90]
+[42]     0.0    0.00    0.00    2179         nt_funcs::prime_pow(unsigned short) [42]
+                0.00    0.00    2179/2239        prime_generator::primes(unsigned short, unsigned short) [41]
+-----------------------------------------------
+                0.00    0.00    1730/1730        impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+[43]     0.0    0.00    0.00    1730         boost::detail::lcast_ret_unsigned<std::char_traits<char>, unsigned int, char>::convert() [43]
+-----------------------------------------------
+                0.00    0.00       2/1417        _GLOBAL__sub_I__Z8logs_dirB5cxx11 [125]
+                0.00    0.00    1415/1417        impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+[44]     0.0    0.00    0.00    1417         std::map<unsigned short, unsigned char, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::map(std::initializer_list<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short> const&, std::allocator<std::pair<unsigned short const, unsigned char> > const&) [44]
+                0.00    0.00     345/345         boost::multiprecision::backends::cpp_dec_float<100u, int, void>::char_is_nonzero_predicate(char const&) [53]
+                0.00    0.00      56/160         std::_Rb_tree<unsigned short, std::pair<unsigned short const, unsigned char>, std::_Select1st<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<unsigned short const, unsigned char> >, unsigned short const&) [67]
+                0.00    0.00       2/3           std::_Rb_tree<unsigned short, std::pair<unsigned short const, unsigned char>, std::_Select1st<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::_M_get_insert_unique_pos(unsigned short const&) [116]
+-----------------------------------------------
+                0.00    0.00      96/1231        www::string_of_term[abi:cxx11](ww, unsigned long) [69]
+                0.00    0.00    1135/1231        write_alpha(std::basic_fstream<char, std::char_traits<char> >&, unsigned short, std::vector<unsigned short, std::allocator<unsigned short> > const&, unsigned char, www const&, long) [99]
+[45]     0.0    0.00    0.00    1231         std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [45]
+-----------------------------------------------
+                0.00    0.00     738/738         impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+[46]     0.0    0.00    0.00     738         void std::__introsort_loop<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>) [46]
+-----------------------------------------------
+                                  33             important_funcs::excess(unsigned short) <cycle 2> [19]
+                                 106             impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                                 193             important_funcs::(anonymous namespace)::primitive_components(unsigned short) <cycle 2> [79]
+                                 259             important_funcs::(anonymous namespace)::finite_summand(unsigned short, unsigned short) <cycle 2> [57]
+                0.00    0.03      33/11296       main [12]
+                0.00    0.06      66/11296       www_nim::alpha(unsigned short) [14]
+[47]     0.0    0.00    0.00     690         important_funcs::q_set(unsigned short) <cycle 2> [47]
+                0.00    0.00      33/66          nt_funcs::f(unsigned short) [85]
+                0.00    0.00      33/33          important_funcs::get_excess_cache() [102]
+                0.00    0.00      33/33          record_values::cache_q_set(unsigned short, std::vector<unsigned short, std::allocator<unsigned short> >) [100]
+                                  33             important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+-----------------------------------------------
+                                  14             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::pow2(long long) <cycle 2> [48]
+                                   1             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::initializer::initializer() <cycle 2> [62]
+                                 634             impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                0.00    0.03      29/11296       void boost::multiprecision::backends::eval_frexp<100u, int, void>(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&, int*) [13]
+[48]     0.0    0.00    0.00     664+14      boost::multiprecision::backends::cpp_dec_float<100u, int, void>::pow2(long long) <cycle 2> [48]
+                0.00    0.00     595/4939        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::from_unsigned_long_long(unsigned long long) [35]
+                0.00    0.00      35/35          boost::multiprecision::backends::cpp_dec_float<100u, int, void>::cpp_dec_float(char const*) [98]
+                                7932             impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                                  14             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::calculate_inv() <cycle 2> [38]
+                                  14             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::pow2(long long) <cycle 2> [48]
+-----------------------------------------------
+                0.00    0.00     121/601         important_funcs::(anonymous namespace)::primitive_components(unsigned short) <cycle 2> [79]
+                0.00    0.00     480/601         std::pair<std::_Rb_tree_iterator<unsigned short>, bool> std::_Rb_tree<unsigned short, unsigned short, std::_Identity<unsigned short>, std::less<unsigned short>, std::allocator<unsigned short> >::_M_insert_unique<unsigned short const&>(unsigned short const&) [50]
+[49]     0.0    0.00    0.00     601         std::_Rb_tree<unsigned short, unsigned short, std::_Identity<unsigned short>, std::less<unsigned short>, std::allocator<unsigned short> >::_M_get_insert_unique_pos(unsigned short const&) [49]
+-----------------------------------------------
+                0.00    0.00     480/480         important_funcs::(anonymous namespace)::primitive_components(unsigned short) <cycle 2> [79]
+[50]     0.0    0.00    0.00     480         std::pair<std::_Rb_tree_iterator<unsigned short>, bool> std::_Rb_tree<unsigned short, unsigned short, std::_Identity<unsigned short>, std::less<unsigned short>, std::allocator<unsigned short> >::_M_insert_unique<unsigned short const&>(unsigned short const&) [50]
+                0.00    0.00     480/601         std::_Rb_tree<unsigned short, unsigned short, std::_Identity<unsigned short>, std::less<unsigned short>, std::allocator<unsigned short> >::_M_get_insert_unique_pos(unsigned short const&) [49]
+-----------------------------------------------
+                                   2             std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > __gnu_cxx::__to_xstring<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, char>(int (*)(char*, unsigned long, char const*, __va_list_tag*), unsigned long, char const*, ...) [51]
+                0.00    0.00      15/469         std::map<unsigned short, unsigned char, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::~map() [205]
+                0.00    0.00      15/469         std::map<unsigned short, std::vector<unsigned short, std::allocator<unsigned short> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::~map() [204]
+                0.00    0.00      54/469         calculation_logger::progress_calculation_logger() [18]
+                0.00    0.00     385/469         _GLOBAL__sub_I__Z8logs_dirB5cxx11 [125]
+[51]     0.0    0.00    0.00     469+2       std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > __gnu_cxx::__to_xstring<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, char>(int (*)(char*, unsigned long, char const*, __va_list_tag*), unsigned long, char const*, ...) [51]
+                0.00    0.00      57/90          void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char*>(char*, char*, std::forward_iterator_tag) [76]
+                                   2             std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > __gnu_cxx::__to_xstring<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, char>(int (*)(char*, unsigned long, char const*, __va_list_tag*), unsigned long, char const*, ...) [51]
+-----------------------------------------------
+                0.00    0.00     431/431         calculation_logger::progress_calculation_logger() [18]
+[52]     0.0    0.00    0.00     431         ring_buffer_queue<data_quad, 8192ul>::empty() const [52]
+-----------------------------------------------
+                0.00    0.00     345/345         std::map<unsigned short, unsigned char, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::map(std::initializer_list<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short> const&, std::allocator<std::pair<unsigned short const, unsigned char> > const&) [44]
+[53]     0.0    0.00    0.00     345         boost::multiprecision::backends::cpp_dec_float<100u, int, void>::char_is_nonzero_predicate(char const&) [53]
+-----------------------------------------------
+                0.00    0.00     313/313         _GLOBAL__sub_I__Z8logs_dirB5cxx11 [125]
+[54]     0.0    0.00    0.00     313         int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int) [54]
+-----------------------------------------------
+                0.00    0.00       1/295         _GLOBAL__sub_I__ZN15important_funcs15get_q_set_cacheEv [26]
+                0.00    0.00      45/295         important_funcs::excess(unsigned short) <cycle 2> [19]
+                0.00    0.00      89/295         important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+                0.00    0.00     160/295         important_funcs::(anonymous namespace)::primitive_components(unsigned short) <cycle 2> [79]
+[55]     0.0    0.00    0.00     295         void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}>) [55]
+                0.00    0.00     348/2179        nt_funcs::prime_pow(unsigned short) [42]
+-----------------------------------------------
+                0.00    0.00      84/282         www::www(unsigned long) [78]
+                0.00    0.00     198/282         www::string_of_term[abi:cxx11](ww, unsigned long) [69]
+[56]     0.0    0.00    0.00     282         ww::ww(unsigned short) [56]
+-----------------------------------------------
+                                  33             important_funcs::excess(unsigned short) <cycle 2> [19]
+                                 226             important_funcs::(anonymous namespace)::finite_components(unsigned short, unsigned short) <cycle 2> [59]
+[57]     0.0    0.00    0.00     259         important_funcs::(anonymous namespace)::finite_summand(unsigned short, unsigned short) <cycle 2> [57]
+                                 259             important_funcs::q_set(unsigned short) <cycle 2> [47]
+-----------------------------------------------
+                0.00    0.00      60/258         www::simp_terms(std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > > const&) [65]
+                0.00    0.00     198/258         www::string_of_term[abi:cxx11](ww, unsigned long) [69]
+[58]     0.0    0.00    0.00     258         operator==(ww const&, ww const&) [58]
+-----------------------------------------------
+                                  33             important_funcs::excess(unsigned short) <cycle 2> [19]
+                                 193             important_funcs::(anonymous namespace)::primitive_components(unsigned short) <cycle 2> [79]
+[59]     0.0    0.00    0.00     226         important_funcs::(anonymous namespace)::finite_components(unsigned short, unsigned short) <cycle 2> [59]
+                                 226             important_funcs::(anonymous namespace)::finite_summand(unsigned short, unsigned short) <cycle 2> [57]
+-----------------------------------------------
+                0.00    0.00       6/213         nt_funcs::is_3_pow(unsigned short) [36]
+                0.00    0.00      98/213         important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+                0.00    0.00     109/213         important_funcs::excess(unsigned short) <cycle 2> [19]
+[60]     0.0    0.00    0.00     213         void std::vector<unsigned short, std::allocator<unsigned short> >::_M_realloc_insert<unsigned short const&>(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, unsigned short const&) [60]
+-----------------------------------------------
+                0.00    0.00      93/201         important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+                0.00    0.00     108/201         important_funcs::excess(unsigned short) <cycle 2> [19]
+[61]     0.0    0.00    0.00     201         impartial_term_algebra::get_q_components() const [61]
+-----------------------------------------------
+                                  58             important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+                                 135             important_funcs::excess(unsigned short) <cycle 2> [19]
+                0.00    0.00       1/11296       _GLOBAL__sub_I__ZN15important_funcs15get_q_set_cacheEv [26]
+[62]     0.0    0.00    0.00     194         boost::multiprecision::backends::cpp_dec_float<100u, int, void>::initializer::initializer() <cycle 2> [62]
+                0.00    0.00       5/4939        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::from_unsigned_long_long(unsigned long long) [35]
+                0.00    0.00       1/3638        boost::multiprecision::backends::cpp_dec_float<100u, int, void>::cpp_dec_float(double, int) [39]
+                                   3             impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+                                   1             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::max() <cycle 2> [122]
+                                   1             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::min() <cycle 2> [123]
+                                   1             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::pow2(long long) <cycle 2> [48]
+-----------------------------------------------
+                0.00    0.00      90/180         www::operator=(www const&) [73]
+                0.00    0.00      90/180         www::operator+(www const&) const [75]
+[63]     0.0    0.00    0.00     180         std::_List_iterator<std::pair<ww, unsigned long> > std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > >::insert<std::_List_const_iterator<std::pair<ww, unsigned long> >, void>(std::_List_const_iterator<std::pair<ww, unsigned long> >, std::_List_const_iterator<std::pair<ww, unsigned long> >, std::_List_const_iterator<std::pair<ww, unsigned long> >) [63]
+-----------------------------------------------
+                0.00    0.00      86/173         calculation_logger::write_to_console(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [77]
+                0.00    0.00      87/173         calculation_logger::~calculation_logger() [72]
+[64]     0.0    0.00    0.00     173         std::basic_ostream<char, std::char_traits<char> >& std::operator<< <char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, std::_Put_time<char>) [64]
+-----------------------------------------------
+                                  60             www::simp_terms(std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > > const&) [65]
+                0.00    0.00      72/162         www::www(std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > > const&) [83]
+                0.00    0.00      90/162         www::operator+(www const&) const [75]
+[65]     0.0    0.00    0.00     162+60      www::simp_terms(std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > > const&) [65]
+                0.00    0.00      60/60          operator<(ww const&, ww const&) [91]
+                0.00    0.00      60/258         operator==(ww const&, ww const&) [58]
+                                  60             www::simp_terms(std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > > const&) [65]
+-----------------------------------------------
+                0.00    0.00      33/161         important_funcs::get_excess_cache() [102]
+                0.00    0.00      56/161         std::map<unsigned short, std::vector<unsigned short, std::allocator<unsigned short> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::map(std::initializer_list<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short> const&, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > const&) [118]
+                0.00    0.00      72/161         _GLOBAL__sub_I__Z8logs_dirB5cxx11 [125]
+[66]     0.0    0.00    0.00     161         std::_Rb_tree<unsigned short, std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > >, std::_Select1st<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, unsigned short const&) [66]
+-----------------------------------------------
+                0.00    0.00      33/160         important_funcs::excess(unsigned short) <cycle 2> [19]
+                0.00    0.00      56/160         std::map<unsigned short, unsigned char, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::map(std::initializer_list<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short> const&, std::allocator<std::pair<unsigned short const, unsigned char> > const&) [44]
+                0.00    0.00      71/160         _GLOBAL__sub_I__Z8logs_dirB5cxx11 [125]
+[67]     0.0    0.00    0.00     160         std::_Rb_tree<unsigned short, std::pair<unsigned short const, unsigned char>, std::_Select1st<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<unsigned short const, unsigned char> >, unsigned short const&) [67]
+-----------------------------------------------
+                0.00    0.00      33/145         important_funcs::excess(unsigned short) <cycle 2> [19]
+                0.00    0.00     112/145         impartial_term_algebra::excess_power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&, term_array&) [1]
+[68]     0.0    0.00    0.00     145         void boost::multiprecision::backends::subtract_unsigned<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, unsigned long long const&) [68]
+-----------------------------------------------
+                0.00    0.00     126/126         www::to_string[abi:cxx11]() const [86]
+[69]     0.0    0.00    0.00     126         www::string_of_term[abi:cxx11](ww, unsigned long) [69]
+                0.00    0.00     198/282         ww::ww(unsigned short) [56]
+                0.00    0.00     198/258         operator==(ww const&, ww const&) [58]
+                0.00    0.00      96/1231        std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [45]
+                0.00    0.00      58/58          ww::to_string[abi:cxx11]() const [94]
+                0.00    0.00      58/58          ww::get_terms[abi:cxx11]() const [93]
+-----------------------------------------------
+                0.00    0.00      27/126         important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+                0.00    0.00      99/126         important_funcs::excess(unsigned short) <cycle 2> [19]
+[70]     0.0    0.00    0.00     126         impartial_term_algebra::get_term_count() const [70]
+-----------------------------------------------
+                0.00    0.00     121/121         important_funcs::(anonymous namespace)::primitive_components(unsigned short) <cycle 2> [79]
+[71]     0.0    0.00    0.00     121         std::_Rb_tree<unsigned short, unsigned short, std::_Identity<unsigned short>, std::less<unsigned short>, std::allocator<unsigned short> >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<unsigned short>, unsigned short const&) [71]
+-----------------------------------------------
+                0.00    0.00      33/120         important_funcs::excess(unsigned short) <cycle 2> [19]
+                0.00    0.00      87/120         calculation_logger::progress_calculation_logger() [18]
+[72]     0.0    0.00    0.00     120         calculation_logger::~calculation_logger() [72]
+                0.00    0.00      87/173         std::basic_ostream<char, std::char_traits<char> >& std::operator<< <char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, std::_Put_time<char>) [64]
+-----------------------------------------------
+                0.00    0.00      90/90          www_nim::alpha(unsigned short) [14]
+[73]     0.0    0.00    0.00      90         www::operator=(www const&) [73]
+                0.00    0.00      90/180         std::_List_iterator<std::pair<ww, unsigned long> > std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > >::insert<std::_List_const_iterator<std::pair<ww, unsigned long> >, void>(std::_List_const_iterator<std::pair<ww, unsigned long> >, std::_List_const_iterator<std::pair<ww, unsigned long> >, std::_List_const_iterator<std::pair<ww, unsigned long> >) [63]
+                0.00    0.00      60/60          ww::operator=(ww const&) [87]
+-----------------------------------------------
+                0.00    0.00      90/90          www_nim::alpha(unsigned short) [14]
+[74]     0.0    0.00    0.00      90         www_nim::kappa(unsigned short) [74]
+                0.00    0.00      90/2179        nt_funcs::prime_pow(unsigned short) [42]
+                0.00    0.00      72/72          prime_generator::prime_pi(unsigned short) [80]
+                0.00    0.00      72/72          ww::ww(std::__cxx11::list<std::pair<unsigned short, unsigned short>, std::allocator<std::pair<unsigned short, unsigned short> > > const&) [82]
+                0.00    0.00      72/72          www::www(std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > > const&) [83]
+                0.00    0.00      18/84          www::www(unsigned long) [78]
+-----------------------------------------------
+                0.00    0.00      90/90          www_nim::alpha(unsigned short) [14]
+[75]     0.0    0.00    0.00      90         www::operator+(www const&) const [75]
+                0.00    0.00      90/180         std::_List_iterator<std::pair<ww, unsigned long> > std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > >::insert<std::_List_const_iterator<std::pair<ww, unsigned long> >, void>(std::_List_const_iterator<std::pair<ww, unsigned long> >, std::_List_const_iterator<std::pair<ww, unsigned long> >, std::_List_const_iterator<std::pair<ww, unsigned long> >) [63]
+                0.00    0.00      90/162         www::simp_terms(std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > > const&) [65]
+-----------------------------------------------
+                0.00    0.00      33/90          calculation_logger::calculation_logger(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [104]
+                0.00    0.00      57/90          std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > __gnu_cxx::__to_xstring<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, char>(int (*)(char*, unsigned long, char const*, __va_list_tag*), unsigned long, char const*, ...) [51]
+[76]     0.0    0.00    0.00      90         void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char*>(char*, char*, std::forward_iterator_tag) [76]
+-----------------------------------------------
+                0.00    0.00      86/86          calculation_logger::progress_calculation_logger() [18]
+[77]     0.0    0.00    0.00      86         calculation_logger::write_to_console(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [77]
+                0.00    0.00      86/173         std::basic_ostream<char, std::char_traits<char> >& std::operator<< <char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, std::_Put_time<char>) [64]
+-----------------------------------------------
+                0.00    0.00      18/84          www_nim::kappa(unsigned short) [74]
+                0.00    0.00      66/84          www_nim::alpha(unsigned short) [14]
+[78]     0.0    0.00    0.00      84         www::www(unsigned long) [78]
+                0.00    0.00      84/282         ww::ww(unsigned short) [56]
+-----------------------------------------------
+                                 117             important_funcs::(anonymous namespace)::primitive_components(unsigned short) <cycle 2> [79]
+                                  31             important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+                                  45             important_funcs::excess(unsigned short) <cycle 2> [19]
+[79]     0.0    0.00    0.00      76+117     important_funcs::(anonymous namespace)::primitive_components(unsigned short) <cycle 2> [79]
+                0.00    0.00     480/480         std::pair<std::_Rb_tree_iterator<unsigned short>, bool> std::_Rb_tree<unsigned short, unsigned short, std::_Identity<unsigned short>, std::less<unsigned short>, std::allocator<unsigned short> >::_M_insert_unique<unsigned short const&>(unsigned short const&) [50]
+                0.00    0.00     193/2179        nt_funcs::prime_pow(unsigned short) [42]
+                0.00    0.00     160/295         void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}>) [55]
+                0.00    0.00     121/601         std::_Rb_tree<unsigned short, unsigned short, std::_Identity<unsigned short>, std::less<unsigned short>, std::allocator<unsigned short> >::_M_get_insert_unique_pos(unsigned short const&) [49]
+                0.00    0.00     121/121         std::_Rb_tree<unsigned short, unsigned short, std::_Identity<unsigned short>, std::less<unsigned short>, std::allocator<unsigned short> >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<unsigned short>, unsigned short const&) [71]
+                                 193             important_funcs::q_set(unsigned short) <cycle 2> [47]
+                                 193             important_funcs::excess(unsigned short) <cycle 2> [19]
+                                 193             important_funcs::(anonymous namespace)::finite_components(unsigned short, unsigned short) <cycle 2> [59]
+                                 117             important_funcs::(anonymous namespace)::primitive_components(unsigned short) <cycle 2> [79]
+-----------------------------------------------
+                0.00    0.00      72/72          www_nim::kappa(unsigned short) [74]
+[80]     0.0    0.00    0.00      72         prime_generator::prime_pi(unsigned short) [80]
+-----------------------------------------------
+                0.00    0.00      72/72          ww::ww(std::__cxx11::list<std::pair<unsigned short, unsigned short>, std::allocator<std::pair<unsigned short, unsigned short> > > const&) [82]
+[81]     0.0    0.00    0.00      72         ww::simp_terms(std::__cxx11::list<std::pair<unsigned short, unsigned short>, std::allocator<std::pair<unsigned short, unsigned short> > > const&) [81]
+-----------------------------------------------
+                0.00    0.00      72/72          www_nim::kappa(unsigned short) [74]
+[82]     0.0    0.00    0.00      72         ww::ww(std::__cxx11::list<std::pair<unsigned short, unsigned short>, std::allocator<std::pair<unsigned short, unsigned short> > > const&) [82]
+                0.00    0.00      72/72          ww::simp_terms(std::__cxx11::list<std::pair<unsigned short, unsigned short>, std::allocator<std::pair<unsigned short, unsigned short> > > const&) [81]
+-----------------------------------------------
+                0.00    0.00      72/72          www_nim::kappa(unsigned short) [74]
+[83]     0.0    0.00    0.00      72         www::www(std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > > const&) [83]
+                0.00    0.00      72/162         www::simp_terms(std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > > const&) [65]
+-----------------------------------------------
+                0.00    0.00      31/67          important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+                0.00    0.00      36/67          important_funcs::excess(unsigned short) <cycle 2> [19]
+[84]     0.0    0.00    0.00      67         impartial_term_algebra::get_basis() const [84]
+-----------------------------------------------
+                0.00    0.00      33/66          important_funcs::excess(unsigned short) <cycle 2> [19]
+                0.00    0.00      33/66          important_funcs::q_set(unsigned short) <cycle 2> [47]
+[85]     0.0    0.00    0.00      66         nt_funcs::f(unsigned short) [85]
+-----------------------------------------------
+                0.00    0.00      33/66          operator<<(std::ostream&, www const&) [110]
+                0.00    0.00      33/66          write_alpha(std::basic_fstream<char, std::char_traits<char> >&, unsigned short, std::vector<unsigned short, std::allocator<unsigned short> > const&, unsigned char, www const&, long) [99]
+[86]     0.0    0.00    0.00      66         www::to_string[abi:cxx11]() const [86]
+                0.00    0.00     126/126         www::string_of_term[abi:cxx11](ww, unsigned long) [69]
+-----------------------------------------------
+                0.00    0.00      60/60          www::operator=(www const&) [73]
+[87]     0.0    0.00    0.00      60         ww::operator=(ww const&) [87]
+                0.00    0.00      48/48          std::_List_iterator<std::pair<unsigned short, unsigned short> > std::__cxx11::list<std::pair<unsigned short, unsigned short>, std::allocator<std::pair<unsigned short, unsigned short> > >::insert<std::_List_const_iterator<std::pair<unsigned short, unsigned short> >, void>(std::_List_const_iterator<std::pair<unsigned short, unsigned short> >, std::_List_const_iterator<std::pair<unsigned short, unsigned short> >, std::_List_const_iterator<std::pair<unsigned short, unsigned short> >) [97]
+-----------------------------------------------
+                0.00    0.00      60/60          important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+[88]     0.0    0.00    0.00      60         nt_funcs::max_pow_min_prime_div(unsigned short) [88]
+                0.00    0.00      60/2239        prime_generator::primes(unsigned short, unsigned short) [41]
+-----------------------------------------------
+                0.00    0.00      27/60          important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+                0.00    0.00      33/60          important_funcs::excess(unsigned short) <cycle 2> [19]
+[89]     0.0    0.00    0.00      60         std::vector<unsigned short, std::allocator<unsigned short> >::_M_erase(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >) [89]
+-----------------------------------------------
+                0.00    0.00      60/60          impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+[90]     0.0    0.00    0.00      60         void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>) [90]
+                0.00    0.00     838/2179        nt_funcs::prime_pow(unsigned short) [42]
+-----------------------------------------------
+                0.00    0.00      60/60          www::simp_terms(std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > > const&) [65]
+[91]     0.0    0.00    0.00      60         operator<(ww const&, ww const&) [91]
+-----------------------------------------------
+                0.00    0.00      58/58          ww::to_string[abi:cxx11]() const [94]
+[92]     0.0    0.00    0.00      58         ww::string_of_term[abi:cxx11](unsigned short, unsigned short) [92]
+-----------------------------------------------
+                0.00    0.00      58/58          www::string_of_term[abi:cxx11](ww, unsigned long) [69]
+[93]     0.0    0.00    0.00      58         ww::get_terms[abi:cxx11]() const [93]
+-----------------------------------------------
+                0.00    0.00      58/58          www::string_of_term[abi:cxx11](ww, unsigned long) [69]
+[94]     0.0    0.00    0.00      58         ww::to_string[abi:cxx11]() const [94]
+                0.00    0.00      58/58          ww::string_of_term[abi:cxx11](unsigned short, unsigned short) [92]
+-----------------------------------------------
+                0.00    0.00      56/56          _GLOBAL__sub_I__Z8logs_dirB5cxx11 [125]
+[95]     0.0    0.00    0.00      56         std::vector<unsigned short, std::allocator<unsigned short> >::vector(std::vector<unsigned short, std::allocator<unsigned short> > const&) [95]
+-----------------------------------------------
+                0.00    0.00      27/55          important_funcs::excess(unsigned short) <cycle 2> [19]
+                0.00    0.00      28/55          impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+[96]     0.0    0.00    0.00      55         void std::vector<unsigned int, std::allocator<unsigned int> >::_M_realloc_insert<unsigned int>(__gnu_cxx::__normal_iterator<unsigned int*, std::vector<unsigned int, std::allocator<unsigned int> > >, unsigned int&&) [96]
+-----------------------------------------------
+                0.00    0.00      48/48          ww::operator=(ww const&) [87]
+[97]     0.0    0.00    0.00      48         std::_List_iterator<std::pair<unsigned short, unsigned short> > std::__cxx11::list<std::pair<unsigned short, unsigned short>, std::allocator<std::pair<unsigned short, unsigned short> > >::insert<std::_List_const_iterator<std::pair<unsigned short, unsigned short> >, void>(std::_List_const_iterator<std::pair<unsigned short, unsigned short> >, std::_List_const_iterator<std::pair<unsigned short, unsigned short> >, std::_List_const_iterator<std::pair<unsigned short, unsigned short> >) [97]
+-----------------------------------------------
+                0.00    0.00      35/35          boost::multiprecision::backends::cpp_dec_float<100u, int, void>::pow2(long long) <cycle 2> [48]
+[98]     0.0    0.00    0.00      35         boost::multiprecision::backends::cpp_dec_float<100u, int, void>::cpp_dec_float(char const*) [98]
+-----------------------------------------------
+                0.00    0.00      33/33          main [12]
+[99]     0.0    0.00    0.00      33         write_alpha(std::basic_fstream<char, std::char_traits<char> >&, unsigned short, std::vector<unsigned short, std::allocator<unsigned short> > const&, unsigned char, www const&, long) [99]
+                0.00    0.00    1135/1231        std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [45]
+                0.00    0.00      33/66          www::to_string[abi:cxx11]() const [86]
+-----------------------------------------------
+                0.00    0.00      33/33          important_funcs::q_set(unsigned short) <cycle 2> [47]
+[100]    0.0    0.00    0.00      33         record_values::cache_q_set(unsigned short, std::vector<unsigned short, std::allocator<unsigned short> >) [100]
+-----------------------------------------------
+                0.00    0.00      33/33          important_funcs::excess(unsigned short) <cycle 2> [19]
+[101]    0.0    0.00    0.00      33         record_values::cache_excess(unsigned short, unsigned char) [101]
+-----------------------------------------------
+                0.00    0.00      33/33          important_funcs::q_set(unsigned short) <cycle 2> [47]
+[102]    0.0    0.00    0.00      33         important_funcs::get_excess_cache() [102]
+                0.00    0.00      33/161         std::_Rb_tree<unsigned short, std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > >, std::_Select1st<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, unsigned short const&) [66]
+-----------------------------------------------
+                0.00    0.00      33/33          main [12]
+[103]    0.0    0.00    0.00      33         prime_generator::nth_prime(unsigned long) [103]
+                0.00    0.00      33/4533        nt_funcs::is_3_pow(unsigned short) [36]
+-----------------------------------------------
+                0.00    0.00      33/33          important_funcs::excess(unsigned short) <cycle 2> [19]
+[104]    0.0    0.00    0.00      33         calculation_logger::calculation_logger(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [104]
+                0.00    0.00      33/90          void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char*>(char*, char*, std::forward_iterator_tag) [76]
+-----------------------------------------------
+                0.00    0.00      33/33          important_funcs::excess(unsigned short) <cycle 2> [19]
+[105]    0.0    0.00    0.00      33         void boost::multiprecision::backends::divide_unsigned_helper<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >*, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, unsigned long long, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&) [105]
+-----------------------------------------------
+                0.00    0.00      33/33          important_funcs::excess(unsigned short) <cycle 2> [19]
+[106]    0.0    0.00    0.00      33         void boost::multiprecision::backends::divide_unsigned_helper<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >*, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&) [106]
+-----------------------------------------------
+                0.00    0.00      33/33          important_funcs::excess(unsigned short) <cycle 2> [19]
+[107]    0.0    0.00    0.00      33         nt_funcs::div_2_pow_min_1(unsigned short, unsigned int) [107]
+-----------------------------------------------
+                0.00    0.00      33/33          important_funcs::excess(unsigned short) <cycle 2> [19]
+[108]    0.0    0.00    0.00      33         void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}>) [108]
+                0.00    0.00     482/2179        nt_funcs::prime_pow(unsigned short) [42]
+-----------------------------------------------
+                0.00    0.00      33/33          important_funcs::excess(unsigned short) <cycle 2> [19]
+[109]    0.0    0.00    0.00      33         void std::__introsort_loop<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}>) [109]
+-----------------------------------------------
+                0.00    0.00      33/33          main [12]
+[110]    0.0    0.00    0.00      33         operator<<(std::ostream&, www const&) [110]
+                0.00    0.00      33/66          www::to_string[abi:cxx11]() const [86]
+-----------------------------------------------
+                0.00    0.00      30/30          boost::bad_lexical_cast::~bad_lexical_cast() [112]
+[111]    0.0    0.00    0.00      30         boost::multiprecision::backends::cpp_dec_float<100u, int, void>::data_elem_is_non_zero_predicate(unsigned int const&) [111]
+-----------------------------------------------
+                0.00    0.00      30/30          boost::multiprecision::backends::cpp_dec_float<100u, int, void>::isone() const [40]
+[112]    0.0    0.00    0.00      30         boost::bad_lexical_cast::~bad_lexical_cast() [112]
+                0.00    0.00      30/30          boost::multiprecision::backends::cpp_dec_float<100u, int, void>::data_elem_is_non_zero_predicate(unsigned int const&) [111]
+-----------------------------------------------
+                0.00    0.00      29/29          important_funcs::excess(unsigned short) <cycle 2> [19]
+[113]    0.0    0.00    0.00      29         void boost::multiprecision::backends::left_shift_generic<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&, unsigned __int128) [113]
+-----------------------------------------------
+                0.00    0.00      27/27          important_funcs::(anonymous namespace)::kappa_set(unsigned short) <cycle 2> [7]
+[114]    0.0    0.00    0.00      27         void std::__introsort_loop<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}>) [114]
+-----------------------------------------------
+                0.00    0.00       1/3           _GLOBAL__sub_I__Z8logs_dirB5cxx11 [125]
+                0.00    0.00       2/3           std::map<unsigned short, std::vector<unsigned short, std::allocator<unsigned short> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::map(std::initializer_list<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short> const&, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > const&) [118]
+[115]    0.0    0.00    0.00       3         std::_Rb_tree<unsigned short, std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > >, std::_Select1st<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::_M_get_insert_unique_pos(unsigned short const&) [115]
+-----------------------------------------------
+                0.00    0.00       1/3           _GLOBAL__sub_I__Z8logs_dirB5cxx11 [125]
+                0.00    0.00       2/3           std::map<unsigned short, unsigned char, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::map(std::initializer_list<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short> const&, std::allocator<std::pair<unsigned short const, unsigned char> > const&) [44]
+[116]    0.0    0.00    0.00       3         std::_Rb_tree<unsigned short, std::pair<unsigned short const, unsigned char>, std::_Select1st<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::_M_get_insert_unique_pos(unsigned short const&) [116]
+-----------------------------------------------
+                0.00    0.00       1/2           boost::multiprecision::backends::cpp_dec_float<100u, int, void>::max() <cycle 2> [122]
+                0.00    0.00       1/2           boost::multiprecision::backends::cpp_dec_float<100u, int, void>::min() <cycle 2> [123]
+[117]    0.0    0.00    0.00       2         std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > boost::multiprecision::detail::itos<int>(int) [117]
+-----------------------------------------------
+                0.00    0.00       2/2           _GLOBAL__sub_I__Z8logs_dirB5cxx11 [125]
+[118]    0.0    0.00    0.00       2         std::map<unsigned short, std::vector<unsigned short, std::allocator<unsigned short> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::map(std::initializer_list<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short> const&, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > const&) [118]
+                0.00    0.00      56/161         std::_Rb_tree<unsigned short, std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > >, std::_Select1st<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, unsigned short const&) [66]
+                0.00    0.00       2/3           std::_Rb_tree<unsigned short, std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > >, std::_Select1st<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::_M_get_insert_unique_pos(unsigned short const&) [115]
+-----------------------------------------------
+                0.00    0.00       2/2           _GLOBAL__sub_I__Z8logs_dirB5cxx11 [125]
+[119]    0.0    0.00    0.00       2         void std::vector<unsigned short, std::allocator<unsigned short> >::_M_realloc_insert<unsigned short>(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, unsigned short&&) [119]
+-----------------------------------------------
+                0.00    0.00       2/2           _GLOBAL__sub_I__Z8logs_dirB5cxx11 [125]
+[120]    0.0    0.00    0.00       2         std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*) [120]
+-----------------------------------------------
+                0.00    0.00       1/1           main [12]
+[121]    0.0    0.00    0.00       1         prep_alpha(std::basic_fstream<char, std::char_traits<char> >&) [121]
+-----------------------------------------------
+                                   1             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::initializer::initializer() <cycle 2> [62]
+[122]    0.0    0.00    0.00       1         boost::multiprecision::backends::cpp_dec_float<100u, int, void>::max() <cycle 2> [122]
+                0.00    0.00       1/2           std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > boost::multiprecision::detail::itos<int>(int) [117]
+                                   1             impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+-----------------------------------------------
+                                   1             boost::multiprecision::backends::cpp_dec_float<100u, int, void>::initializer::initializer() <cycle 2> [62]
+[123]    0.0    0.00    0.00       1         boost::multiprecision::backends::cpp_dec_float<100u, int, void>::min() <cycle 2> [123]
+                0.00    0.00       1/2           std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > boost::multiprecision::detail::itos<int>(int) [117]
+                                   1             impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) <cycle 2> [9]
+-----------------------------------------------
+                                  56             _GLOBAL__sub_I__Z8logs_dirB5cxx11 [125]
+[125]    0.0    0.00    0.00       0+56      _GLOBAL__sub_I__Z8logs_dirB5cxx11 [125]
+                0.00    0.00     385/469         std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > __gnu_cxx::__to_xstring<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, char>(int (*)(char*, unsigned long, char const*, __va_list_tag*), unsigned long, char const*, ...) [51]
+                0.00    0.00     313/313         int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int) [54]
+                0.00    0.00      72/161         std::_Rb_tree<unsigned short, std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > >, std::_Select1st<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, unsigned short const&) [66]
+                0.00    0.00      71/160         std::_Rb_tree<unsigned short, std::pair<unsigned short const, unsigned char>, std::_Select1st<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<unsigned short const, unsigned char> >, unsigned short const&) [67]
+                0.00    0.00      56/56          std::vector<unsigned short, std::allocator<unsigned short> >::vector(std::vector<unsigned short, std::allocator<unsigned short> > const&) [95]
+                0.00    0.00       2/2           std::map<unsigned short, std::vector<unsigned short, std::allocator<unsigned short> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::map(std::initializer_list<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short> const&, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > const&) [118]
+                0.00    0.00       2/1417        std::map<unsigned short, unsigned char, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::map(std::initializer_list<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short> const&, std::allocator<std::pair<unsigned short const, unsigned char> > const&) [44]
+                0.00    0.00       2/2           std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*) [120]
+                0.00    0.00       2/2           void std::vector<unsigned short, std::allocator<unsigned short> >::_M_realloc_insert<unsigned short>(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, unsigned short&&) [119]
+                0.00    0.00       1/3           std::_Rb_tree<unsigned short, std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > >, std::_Select1st<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::_M_get_insert_unique_pos(unsigned short const&) [115]
+                0.00    0.00       1/3           std::_Rb_tree<unsigned short, std::pair<unsigned short const, unsigned char>, std::_Select1st<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::_M_get_insert_unique_pos(unsigned short const&) [116]
+                                  56             _GLOBAL__sub_I__Z8logs_dirB5cxx11 [125]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2022 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+ [121] prep_alpha(std::basic_fstream<char, std::char_traits<char> >&) [83] www::www(std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > > const&) [40] boost::multiprecision::backends::cpp_dec_float<100u, int, void>::isone() const
+  [99] write_alpha(std::basic_fstream<char, std::char_traits<char> >&, unsigned short, std::vector<unsigned short, std::allocator<unsigned short> > const&, unsigned char, www const&, long) [73] www::operator=(www const&) [37] boost::multiprecision::backends::cpp_dec_float<100u, int, void>::compare(boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&) const
+ [100] record_values::cache_q_set(unsigned short, std::vector<unsigned short, std::allocator<unsigned short> >) [6] void boost::multiprecision::default_ops::eval_log<boost::multiprecision::backends::cpp_dec_float<100u, int, void> >(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&) [118] std::map<unsigned short, std::vector<unsigned short, std::allocator<unsigned short> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::map(std::initializer_list<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short> const&, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > const&)
+ [101] record_values::cache_excess(unsigned short, unsigned char) [117] std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > boost::multiprecision::detail::itos<int>(int) [44] std::map<unsigned short, unsigned char, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::map(std::initializer_list<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short> const&, std::allocator<std::pair<unsigned short const, unsigned char> > const&)
+  [57] important_funcs::(anonymous namespace)::finite_summand(unsigned short, unsigned short) [13] void boost::multiprecision::backends::eval_frexp<100u, int, void>(boost::multiprecision::backends::cpp_dec_float<100u, int, void>&, boost::multiprecision::backends::cpp_dec_float<100u, int, void> const&, int*) [96] void std::vector<unsigned int, std::allocator<unsigned int> >::_M_realloc_insert<unsigned int>(__gnu_cxx::__normal_iterator<unsigned int*, std::vector<unsigned int, std::allocator<unsigned int> > >, unsigned int&&)
+  [59] important_funcs::(anonymous namespace)::finite_components(unsigned short, unsigned short) [62] boost::multiprecision::backends::cpp_dec_float<100u, int, void>::initializer::initializer() [60] void std::vector<unsigned short, std::allocator<unsigned short> >::_M_realloc_insert<unsigned short const&>(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, unsigned short const&)
+  [79] important_funcs::(anonymous namespace)::primitive_components(unsigned short) [38] boost::multiprecision::backends::cpp_dec_float<100u, int, void>::calculate_inv() [119] void std::vector<unsigned short, std::allocator<unsigned short> >::_M_realloc_insert<unsigned short>(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, unsigned short&&)
+   [7] important_funcs::(anonymous namespace)::kappa_set(unsigned short) [35] boost::multiprecision::backends::cpp_dec_float<100u, int, void>::from_unsigned_long_long(unsigned long long) [89] std::vector<unsigned short, std::allocator<unsigned short> >::_M_erase(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >)
+ [102] important_funcs::get_excess_cache() [53] boost::multiprecision::backends::cpp_dec_float<100u, int, void>::char_is_nonzero_predicate(char const&) [95] std::vector<unsigned short, std::allocator<unsigned short> >::vector(std::vector<unsigned short, std::allocator<unsigned short> > const&)
+  [47] important_funcs::q_set(unsigned short) [111] boost::multiprecision::backends::cpp_dec_float<100u, int, void>::data_elem_is_non_zero_predicate(unsigned int const&) [76] void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char*>(char*, char*, std::forward_iterator_tag)
+  [19] important_funcs::excess(unsigned short) [122] boost::multiprecision::backends::cpp_dec_float<100u, int, void>::max() [63] std::_List_iterator<std::pair<ww, unsigned long> > std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > >::insert<std::_List_const_iterator<std::pair<ww, unsigned long> >, void>(std::_List_const_iterator<std::pair<ww, unsigned long> >, std::_List_const_iterator<std::pair<ww, unsigned long> >, std::_List_const_iterator<std::pair<ww, unsigned long> >)
+  [41] prime_generator::primes(unsigned short, unsigned short) [123] boost::multiprecision::backends::cpp_dec_float<100u, int, void>::min() [97] std::_List_iterator<std::pair<unsigned short, unsigned short> > std::__cxx11::list<std::pair<unsigned short, unsigned short>, std::allocator<std::pair<unsigned short, unsigned short> > >::insert<std::_List_const_iterator<std::pair<unsigned short, unsigned short> >, void>(std::_List_const_iterator<std::pair<unsigned short, unsigned short> >, std::_List_const_iterator<std::pair<unsigned short, unsigned short> >, std::_List_const_iterator<std::pair<unsigned short, unsigned short> >)
+  [80] prime_generator::prime_pi(unsigned short) [48] boost::multiprecision::backends::cpp_dec_float<100u, int, void>::pow2(long long) [25] std::pair<std::_Rb_tree_iterator<unsigned int>, bool> std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_insert_unique<unsigned int const&>(unsigned int const&)
+ [103] prime_generator::nth_prime(unsigned long) [98] boost::multiprecision::backends::cpp_dec_float<100u, int, void>::cpp_dec_float(char const*) [23] std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_get_insert_unique_pos(unsigned int const&)
+  [20] ring_buffer_queue<data_quad, 8192ul>::pop(data_quad&) [39] boost::multiprecision::backends::cpp_dec_float<100u, int, void>::cpp_dec_float(double, int) [33] std::_Rb_tree<unsigned int, unsigned int, std::_Identity<unsigned int>, std::less<unsigned int>, std::allocator<unsigned int> >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<unsigned int>, unsigned int const&)
+  [34] ring_buffer_queue<data_quad, 8192ul>::push(data_quad&&) [68] void boost::multiprecision::backends::subtract_unsigned<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, unsigned long long const&) [115] std::_Rb_tree<unsigned short, std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > >, std::_Select1st<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::_M_get_insert_unique_pos(unsigned short const&)
+  [77] calculation_logger::write_to_console(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [113] void boost::multiprecision::backends::left_shift_generic<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&, unsigned __int128) [66] std::_Rb_tree<unsigned short, std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > >, std::_Select1st<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<unsigned short const, std::vector<unsigned short, std::allocator<unsigned short> > > >, unsigned short const&)
+  [18] calculation_logger::progress_calculation_logger() [105] void boost::multiprecision::backends::divide_unsigned_helper<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >*, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, unsigned long long, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&) [116] std::_Rb_tree<unsigned short, std::pair<unsigned short const, unsigned char>, std::_Select1st<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::_M_get_insert_unique_pos(unsigned short const&)
+ [104] calculation_logger::calculation_logger(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [106] void boost::multiprecision::backends::divide_unsigned_helper<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > >(boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >*, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> > const&, boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >&) [67] std::_Rb_tree<unsigned short, std::pair<unsigned short const, unsigned char>, std::_Select1st<std::pair<unsigned short const, unsigned char> >, std::less<unsigned short>, std::allocator<std::pair<unsigned short const, unsigned char> > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<unsigned short const, unsigned char> >, unsigned short const&)
+  [72] calculation_logger::~calculation_logger() [112] boost::bad_lexical_cast::~bad_lexical_cast() [50] std::pair<std::_Rb_tree_iterator<unsigned short>, bool> std::_Rb_tree<unsigned short, unsigned short, std::_Identity<unsigned short>, std::less<unsigned short>, std::allocator<unsigned short> >::_M_insert_unique<unsigned short const&>(unsigned short const&)
+  [11] impartial_term_algebra::term_times_term(unsigned int, unsigned int) [43] boost::detail::lcast_ret_unsigned<std::char_traits<char>, unsigned int, char>::convert() [49] std::_Rb_tree<unsigned short, unsigned short, std::_Identity<unsigned short>, std::less<unsigned short>, std::allocator<unsigned short> >::_M_get_insert_unique_pos(unsigned short const&)
+  [15] impartial_term_algebra::q_power_times_term(unsigned long, unsigned short, unsigned int) [14] www_nim::alpha(unsigned short) [71] std::_Rb_tree<unsigned short, unsigned short, std::_Identity<unsigned short>, std::less<unsigned short>, std::allocator<unsigned short> >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<unsigned short>, unsigned short const&)
+   [2] impartial_term_algebra::accumulate_term_product(unsigned int, unsigned int) [74] www_nim::kappa(unsigned short) [17] void std::__adjust_heap<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, unsigned short, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, long, unsigned short, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>)
+  [16] impartial_term_algebra::q_power_times_term_calc(unsigned long, unsigned short, unsigned int) [107] nt_funcs::div_2_pow_min_1(unsigned short, unsigned int) [55] void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}>)
+  [22] impartial_term_algebra::power(term_array const&, boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0u, 0u, (boost::multiprecision::cpp_integer_type)1, (boost::multiprecision::cpp_int_check_type)0, std::allocator<unsigned long long> >, (boost::multiprecision::expression_template_option)1> const&) [85] nt_funcs::f(unsigned short) [108] void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}>)
+   [8] impartial_term_algebra::degree(term_array const&) [88] nt_funcs::max_pow_min_prime_div(unsigned short) [90] void std::__insertion_sort<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>)
+   [3] impartial_term_algebra::square(term_array const&) [36] nt_funcs::is_3_pow(unsigned short) [114] void std::__introsort_loop<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::(anonymous namespace)::kappa_set(unsigned short)::{lambda(unsigned short, unsigned short)#1}>)
+   [4] impartial_term_algebra::multiply(term_array const&, term_array const&) [42] nt_funcs::prime_pow(unsigned short) [109] void std::__introsort_loop<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<important_funcs::excess(unsigned short)::{lambda(unsigned short, unsigned short)#1}>)
+   [9] impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&) [51] std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > __gnu_cxx::__to_xstring<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, char>(int (*)(char*, unsigned long, char const*, __va_list_tag*), unsigned long, char const*, ...) [46] void std::__introsort_loop<__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}> >(__gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, __gnu_cxx::__normal_iterator<unsigned short*, std::vector<unsigned short, std::allocator<unsigned short> > >, long, __gnu_cxx::__ops::_Iter_comp_iter<impartial_term_algebra::impartial_term_algebra(ring_buffer_queue<data_quad, 8192ul>&, std::atomic<bool>&, std::vector<unsigned short, std::allocator<unsigned short> >&)::{lambda(unsigned short, unsigned short)#1}>)
+  [24] impartial_term_algebra::~impartial_term_algebra() [54] int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int) [64] std::basic_ostream<char, std::char_traits<char> >& std::operator<< <char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, std::_Put_time<char>)
+  [81] ww::simp_terms(std::__cxx11::list<std::pair<unsigned short, unsigned short>, std::allocator<std::pair<unsigned short, unsigned short> > > const&) [52] ring_buffer_queue<data_quad, 8192ul>::empty() const [45] std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+  [92] ww::string_of_term[abi:cxx11](unsigned short, unsigned short) [70] impartial_term_algebra::get_term_count() const [120] std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*)
+  [82] ww::ww(std::__cxx11::list<std::pair<unsigned short, unsigned short>, std::allocator<std::pair<unsigned short, unsigned short> > > const&) [61] impartial_term_algebra::get_q_components() const [58] operator==(ww const&, ww const&)
+  [56] ww::ww(unsigned short) [84] impartial_term_algebra::get_basis() const [110] operator<<(std::ostream&, www const&)
+  [87] ww::operator=(ww const&) [93] ww::get_terms[abi:cxx11]() const [91] operator<(ww const&, ww const&)
+  [65] www::simp_terms(std::__cxx11::list<std::pair<ww, unsigned long>, std::allocator<std::pair<ww, unsigned long> > > const&) [94] ww::to_string[abi:cxx11]() const [21] _init
+  [69] www::string_of_term[abi:cxx11](ww, unsigned long) [86] www::to_string[abi:cxx11]() const [10] <cycle 1>
+  [78] www::www(unsigned long) [75] www::operator+(www const&) const [5] <cycle 2>

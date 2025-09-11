@@ -59,6 +59,18 @@
             "detail": "Build with debug symbols and no optimization"
         },
         {
+            "label": "Build Profile with Make",
+            "type": "shell",
+            "command": "make",
+            "args": ["profile"],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": ["$gcc"],
+            "group": "build",
+            "detail": "Build with profiling using Makefile "
+        },
+        {
             "label": "Run Program",
             "type": "shell",
             "command": "${fileDirname}/bin/main",
@@ -68,6 +80,17 @@
             "group": "test",
             "dependsOn": "Build with Make",
             "detail": "Build and run the multithreaded calculator"
+        },
+        {
+            "label": "Run Program Profile",
+            "type": "shell",
+            "command": "${fileDirname}/bin/main_prof",
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "group": "test",
+            "dependsOn": "Build Profile with Make",
+            "detail": "Build and run the multithreaded calculator with profiling"
         },
         {
             "label": "Clean with Make",
@@ -89,6 +112,16 @@
             ],
             "group": "test",
             "detail": "Build the project and run it immediately"
+        },
+        {
+            "label": "Build and Run Profile",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Build Profile with Make",
+                "Run Program Profile"
+            ],
+            "group": "test",
+            "detail": "Build the project and run it immediately with profiling"
         }
     ],
     "version": "2.0.0"

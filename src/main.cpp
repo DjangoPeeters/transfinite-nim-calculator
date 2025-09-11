@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     uint16_t p;
     time_t t;
     unsigned n = 2; // `alpha(nth_prime(1))` (a.k.a. `alpha(2)`) is a dummy value
-    while (1) {
+    while (n < 35) {
         p = nth_prime(n);
         checkpoint_time = time(nullptr);
         cout << "===== Calculating alpha(" << p << "). =====\n";
