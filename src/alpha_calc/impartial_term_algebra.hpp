@@ -123,6 +123,7 @@ class impartial_term_algebra {
         inline void clear_accumulator();
         void accumulate_term_product(uint32_t x, uint32_t y);
         term_array square_term_calc(uint32_t x);
+        void square_with_table(term_array& a);
     public:
         impartial_term_algebra(ring_buffer_calculation_queue& log_queue, std::atomic<bool>& calculation_done,
             vector<uint16_t>& q_components);

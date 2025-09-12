@@ -296,6 +296,27 @@ term_array impartial_term_algebra::square_term_calc(uint32_t x) {
     return result;
 }
 
+void impartial_term_algebra::square_with_table(term_array& a) {
+    clear_accumulator();
+    tmp_term_array square_term;
+    for (uint32_t i = 0; i < a.terms_size; i++) {
+        square_term = tmp_term_array(square_term_table[a.terms[i]]);
+        for (uint32_t j = 0; j < square_term.terms_size; j++) {
+            flip_accumulator_term(square_term.terms[j]);
+        }
+    }
+
+    a = term_array(accumulate_size);
+    uint32_t j = 0;
+    for (uint32_t i = 0; i < term_count; i++) {
+        if (accumulator_contains(i)) {
+            a.terms[j] = i;
+            j++;
+        }
+    }
+    return;
+}
+
 // a must already be sorted
 term_array impartial_term_algebra::square(const term_array& a) {
     clear_accumulator();
@@ -393,7 +414,7 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     size_t ip1 = (size_t)msbnp1, s = 0, u = 0, pow2 = 0;
     while (ip1 > 0) {
         if (!vn[ip1-1]) {
-            result = square(result);
+            square_with_table(result);
             index++;
             if (!(index & MASK)) { // Send progress update
                 while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
@@ -409,7 +430,7 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
             }
             while (!vn[s]) s++;
             for (size_t h = s; h < ip1; h++) {
-                result = square(result);
+                square_with_table(result);
                 index++;
                 if (!(index & MASK)) { // Send progress update
                     while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
@@ -445,14 +466,36 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     */
 
     term_array* term_times_a = new term_array[term_count];
+    term_array term_as_array(1);
+    for (uint32_t term = 0; term < term_count; term++) {
+        term_as_array.terms[0] = term;
+        term_times_a[term] = multiply(term_as_array, a);
+    }
+    cout << "Precomputed values done." << '\n';
+
     while (!log_queue_.push({0, msbnp1, curpow.terms_size, result.terms_size})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     size_t ip1 = (size_t)msbnp1;
+    tmp_term_array tmp;
     while (ip1 > 0) {
-        result = square(result);
+        square_with_table(result);
         if (vn[ip1-1]) {
-            result = multiply(result, a);
+            clear_accumulator();
+            for (uint32_t i = 0; i < result.terms_size; i++) {
+                tmp = tmp_term_array(term_times_a[result.terms[i]]);
+                for (uint32_t j = 0; j < tmp.terms_size; j++) {
+                    flip_accumulator_term(tmp.terms[j]);
+                }
+            }
+            result = term_array(accumulate_size);
+            uint32_t j = 0;
+            for (uint32_t i = 0; i < term_count; i++) {
+                if (accumulator_contains(i)) {
+                    result.terms[j] = i;
+                    j++;
+                }
+            }
         }
         index++;
         if (!(index & MASK)) { // Send progress update
