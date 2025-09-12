@@ -103,6 +103,11 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
         while (term < basis[index]) index--;
         basis_search[term] = index;
     }
+
+    square_term_table = new term_array[term_count];
+    for (uint32_t term = 0; term < term_count; term++) {
+        square_term_table[term] = square_term_calc(term);
+    }
 }
 
 impartial_term_algebra::~impartial_term_algebra() {
@@ -127,6 +132,8 @@ impartial_term_algebra::~impartial_term_algebra() {
     q_degrees = nullptr;
     delete[] basis_search;
     basis_search = nullptr;
+    delete[] square_term_table;
+    square_term_table = nullptr;
 }
 
 term_array impartial_term_algebra::q_power_times_term(size_t q_index, uint16_t q_exponent, uint32_t term) {
@@ -233,10 +240,10 @@ void impartial_term_algebra::accumulate_term_product(uint32_t x, uint32_t y) {
     } else {
         const uint32_t bi = basis[basis_search[y]];
         // 0 <= `y / bi` < some prime from `q_degrees`
-        //const tmp_term_array product = tmp_term_array(q_power_times_term_table[basis_search[y]][(uint16_t)(y / bi)][x]);
-        const term_array* product = &(q_power_times_term_table[basis_search[y]][(uint16_t)(y / bi)][x]);
-        for (uint32_t i = 0; i < product->terms_size; i++) {
-            accumulate_term_product(product->terms[i], y % bi);
+        const tmp_term_array product = tmp_term_array(q_power_times_term_table[basis_search[y]][(uint16_t)(y / bi)][x]);
+        //const term_array* product = &(q_power_times_term_table[basis_search[y]][(uint16_t)(y / bi)][x]);
+        for (uint32_t i = 0; i < product.terms_size; i++) {
+            accumulate_term_product(product.terms[i], y % bi);
         }
         return;
     }
@@ -274,11 +281,30 @@ term_array impartial_term_algebra::multiply(const term_array& a, const term_arra
     return result;
 }
 
+term_array impartial_term_algebra::square_term_calc(uint32_t x) {
+    clear_accumulator();
+    accumulate_term_product(x, x);
+
+    term_array result(accumulate_size);
+    uint32_t j = 0;
+    for (uint32_t i = 0; i < term_count; i++) {
+        if (accumulator_contains(i)) {
+            result.terms[j] = i;
+            j++;
+        }
+    }
+    return result;
+}
+
 // a must already be sorted
 term_array impartial_term_algebra::square(const term_array& a) {
     clear_accumulator();
+    tmp_term_array square_term;
     for (uint32_t i = 0; i < a.terms_size; i++) {
-        accumulate_term_product(a.terms[i], a.terms[i]);
+        square_term = tmp_term_array(square_term_table[a.terms[i]]);
+        for (uint32_t j = 0; j < square_term.terms_size; j++) {
+            flip_accumulator_term(square_term.terms[j]);
+        }
     }
 
     term_array result(accumulate_size);
@@ -337,11 +363,9 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     for (unsigned i = 0; i < msbnp1; i++) {
         vn[i] = bit_test(n, i);
     }
-    while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
-        std::this_thread::sleep_for(std::chrono::microseconds(10));
-    }
     
     //TODO optimize (maybe multithreading the multiplication of powers of `tmp`)
+    /* test: sliding-window; doesn't really help nor hurt...
     cpp_dec_float_100 lnnm1 = log(cpp_dec_float_100(n)) - 1;
     cpp_int twotokp1 = 4, fourtok = 4;
     size_t k = 1;
@@ -362,17 +386,20 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
         }
     }
     cout << "Precomputed values done." << '\n';
-    
+
+    while (!log_queue_.push({0, msbnp1, curpow.terms_size, result.terms_size})) {
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+    }
     size_t ip1 = (size_t)msbnp1, s = 0, u = 0, pow2 = 0;
     while (ip1 > 0) {
         if (!vn[ip1-1]) {
             result = square(result);
-            if (index & MASK) { // Send progress update
+            index++;
+            if (!(index & MASK)) { // Send progress update
                 while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
                     std::this_thread::sleep_for(std::chrono::microseconds(10));
                 }
             }
-            index++;
             ip1--;
         } else {
             if (ip1 > k) {
@@ -383,12 +410,12 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
             while (!vn[s]) s++;
             for (size_t h = s; h < ip1; h++) {
                 result = square(result);
-                if (index & MASK) { // Send progress update
+                index++;
+                if (!(index & MASK)) { // Send progress update
                     while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
                         std::this_thread::sleep_for(std::chrono::microseconds(10));
                     }
                 }
-                index++;
             }
             u = 0;
             pow2 = 1;
@@ -406,24 +433,53 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
             ip1 = s;
         }
     }
-    while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
+    while (!log_queue_.push({msbnp1, msbnp1, curpow.terms_size, result.terms_size})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     calculation_done_ = true;
     while (!log_queue_.push({UNSIGNED_MAX, 0, 0, 0})) { // Signal completion to logger
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
-
     delete[] odd_powers;
     odd_powers = nullptr;
+    */
+
+    term_array* term_times_a = new term_array[term_count];
+    while (!log_queue_.push({0, msbnp1, curpow.terms_size, result.terms_size})) {
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+    }
+    size_t ip1 = (size_t)msbnp1;
+    while (ip1 > 0) {
+        result = square(result);
+        if (vn[ip1-1]) {
+            result = multiply(result, a);
+        }
+        index++;
+        if (!(index & MASK)) { // Send progress update
+            while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
+            }
+        }
+        ip1--;
+    }
+    while (!log_queue_.push({msbnp1, msbnp1, curpow.terms_size, result.terms_size})) {
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+    }
+    calculation_done_ = true;
+    while (!log_queue_.push({UNSIGNED_MAX, 0, 0, 0})) { // Signal completion to logger
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+    }
+    delete[] term_times_a;
+    term_times_a = nullptr;
+
     res = result;
     return;
 }
 
 // a must already be sorted
-uint64_t impartial_term_algebra::degree(const term_array& a) {
+uint32_t impartial_term_algebra::degree(const term_array& a) {
     term_array respow = square(a);
-    uint64_t result = 1;
+    uint32_t result = 1;
     while (respow != a) {
         respow = square(respow);
         result++;
@@ -431,14 +487,31 @@ uint64_t impartial_term_algebra::degree(const term_array& a) {
     return result;
 }
 
-//TODO let calculation_logger also handle this
 // a must already be sorted
-void impartial_term_algebra::q_set_degree(const term_array& a, uint64_t& res) {
+void impartial_term_algebra::q_set_degree(const term_array& a, uint32_t& res) {
     term_array respow = square(a);
-    uint64_t result = 1;
+    uint32_t result = 1;
+    constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
+
+    while (!log_queue_.push({0, 0, respow.terms_size, 0})) {
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+    }
     while (respow != a) {
         respow = square(respow);
         result++;
+        if (!(result & MASK)) { // Send progress update
+            while (!log_queue_.push({result, 0, respow.terms_size, 0})) {
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
+            }
+        }
     }
+    while (!log_queue_.push({result, result, respow.terms_size, 0})) {
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+    }
+    calculation_done_ = true;
+    while (!log_queue_.push({UNSIGNED_MAX, 0, 0, 0})) { // Signal completion to logger
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+    }
+
     res = result; return;
 }

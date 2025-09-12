@@ -80,9 +80,19 @@ struct tmp_term_array { // only for transferring `term_array`'s
     uint32_t terms_size;
     uint32_t* terms;
 
+    tmp_term_array(): terms_size(0), terms(nullptr) {}
+
     tmp_term_array(const term_array& other): terms_size(other.terms_size), terms(other.terms) {}
 
     ~tmp_term_array() {}
+
+    tmp_term_array& operator=(const tmp_term_array& other) {
+        if (this != &other) {
+            terms_size = other.terms_size;
+            terms = other.terms;
+        }
+        return *this;
+    }
 };
 
 /* q is used when something is related to non-trivial prime powers */
@@ -102,6 +112,7 @@ class impartial_term_algebra {
         term_array*** q_power_times_term_table; // ditto
         // maybe give q_power_times_term_table type uint32_t**** and keep sizes in a new member
         uint32_t* basis_search;
+        term_array* square_term_table;
 
         term_array q_power_times_term(size_t q_index, uint16_t q_exponent, uint32_t term); // same `uint16_t` as for `q_degrees`
         term_array q_power_times_term_calc(size_t q_index, uint16_t q_exponent, uint32_t term); // ditto
@@ -111,6 +122,7 @@ class impartial_term_algebra {
         inline bool accumulator_contains(uint32_t x);
         inline void clear_accumulator();
         void accumulate_term_product(uint32_t x, uint32_t y);
+        term_array square_term_calc(uint32_t x);
     public:
         impartial_term_algebra(ring_buffer_calculation_queue& log_queue, std::atomic<bool>& calculation_done,
             vector<uint16_t>& q_components);
@@ -124,8 +136,8 @@ class impartial_term_algebra {
         term_array square(const term_array& a);
         term_array power(const term_array& a, const cpp_int& n);
         void excess_power(const term_array&a, const cpp_int& n, term_array& res);
-        uint64_t degree(const term_array& a); // not sure how much space is adequate for the result
-        void q_set_degree(const term_array& a, uint64_t& res);
+        uint32_t degree(const term_array& a); // not sure how much space is adequate for the result
+        void q_set_degree(const term_array& a, uint32_t& res);
 };
 
 #endif

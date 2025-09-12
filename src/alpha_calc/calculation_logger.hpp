@@ -15,6 +15,7 @@ private:
     std::atomic<bool>& calculation_done_;
     std::string log_file_name_;
     std::ofstream log_file_;
+    // maybe add adjustable waiting time for crowded message stream
     
     void write_to_console(const std::string& message);
     void write_to_file(const std::string& message);

@@ -111,20 +111,20 @@ namespace important_funcs {
                                         });
             components.erase(unique(components.begin(), components.end()), components.end());
 
-            cout << "Computing the degree of kappa(" << g << ") (components = {" << components[0];
-            for (size_t i = 1; i < components.size(); i++) {
-                cout << ", " << components[i];
-            }
-            cout << "})." << '\n';
+            cout << "Computing the degree of kappa(" << g << ").\n";
 
             // Shared resources
             ring_buffer_calculation_queue log_queue;
             std::atomic<bool> calculation_done{false};
 
+            cout << "Constructing algebra (components = {" << components[0];
+            for (size_t i = 1; i < components.size(); i++) {
+                cout << ", " << components[i];
+            }
+            cout << "}).\n";
             // Create objects
             impartial_term_algebra algebra(log_queue, calculation_done, components);
-            // no multithread needed yet
-            // calculation_logger logger(log_queue, calculation_done); // no logger file needed yet
+            calculation_logger logger(log_queue, calculation_done, logs_dir + "/calculation.log");
 
             cout << "Field has exponent " << algebra.get_term_count() << "." << '\n';
             term_array kappag_in_algebra((uint32_t)kappag_set.size());
@@ -135,7 +135,22 @@ namespace important_funcs {
                 i++;
             }
 
-            uint64_t degree = algebra.degree(kappag_in_algebra); //TODO use logger for this
+            uint32_t degree = 0;
+            if (algebra.get_term_count() < ((uint32_t)1 << 14)) {
+                degree = algebra.degree(kappag_in_algebra);
+            } else {
+                cout << "Starting multithreaded calculation..." << '\n';
+
+                // Start threads
+                std::thread calc_thread(&impartial_term_algebra::q_set_degree, &algebra, kappag_in_algebra, std::ref(degree));
+                std::thread log_thread(&calculation_logger::progress_calculation_logger, &logger);
+
+                // Wait for completion
+                calc_thread.join();
+                log_thread.join();
+
+                cout << "All threads completed. Check calculation.log for full log." << '\n';
+            }
             cout << "Degree is " << degree << "." << '\n';
 
             if (degree % q == 0) {
@@ -221,6 +236,11 @@ namespace important_funcs {
             ring_buffer_calculation_queue log_queue;
             std::atomic<bool> calculation_done{false};
 
+            cout << "[p = " << p << "] Constructing algebra (components = {" << components[0];
+            for (size_t i = 1; i < components.size(); i++) {
+                cout << ", " << components[i];
+            }
+            cout << "})." << '\n';
             // Create objects
             impartial_term_algebra algebra(log_queue, calculation_done, components); //TODO make constructor faster?
             calculation_logger logger(log_queue, calculation_done, logs_dir + "/calculation.log");
@@ -262,7 +282,7 @@ namespace important_funcs {
                 }
 
                 term_array respow = term_array();
-                if (testpow < 128) {
+                if (testpow < 1 << 7) {
                     respow = algebra.power(alpha_terms, testpow);
                 } else {
                     cout << "Starting multithreaded calculation..." << '\n';

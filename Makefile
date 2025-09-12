@@ -24,6 +24,8 @@ RELEASE_FLAGS = -O2 -DNDEBUG
 DEBUG_FLAGS = -fsanitize=address -g -O0 -DDEBUG
 PROFILE_FLAGS = -pg -O2
 
+#TODO use include directory for proper dependency handling
+
 # Default target (release build)
 all: $(TARGET)
 
@@ -172,3 +174,31 @@ obj/www_nim_calc/ww.o: src/www_nim_calc/ww.cpp src/www_nim_calc/ww.hpp
 obj/www_nim_calc/www_nim.o: src/www_nim_calc/www_nim.cpp src/www_nim_calc/www_nim.hpp src/number_theory/prime_generator.hpp src/number_theory/nt_funcs.hpp src/alpha_calc/important_funcs.hpp src/www_nim_calc/fin_nim.hpp src/www_nim_calc/ww.hpp src/www_nim_calc/www.hpp src/www_nim_calc/kappa_component.hpp
 obj/www_nim_calc/www.o: src/www_nim_calc/www.cpp src/www_nim_calc/www.hpp src/www_nim_calc/ww.hpp
 obj/main.o: src/main.cpp src/alpha_calc/calculation_logger.hpp src/alpha_calc/important_funcs.hpp src/number_theory/prime_generator.hpp src/www_nim_calc/ww.hpp src/www_nim_calc/www.hpp src/www_nim_calc/www_nim.hpp
+
+obj/debug/alpha_calc/calculation_logger.o: src/alpha_calc/calculation_logger.cpp src/alpha_calc/calculation_logger.hpp src/alpha_calc/ring_buffer_queue.hpp
+obj/debug/alpha_calc/constants.o: src/alpha_calc/constants.cpp src/alpha_calc/constants.hpp src/alpha_calc/calculation_logger.hpp
+obj/debug/alpha_calc/impartial_term_algebra.o: src/alpha_calc/impartial_term_algebra.cpp src/alpha_calc/impartial_term_algebra.hpp src/number_theory/nt_funcs.hpp src/alpha_calc/important_funcs.hpp
+obj/debug/alpha_calc/important_funcs.o: src/alpha_calc/important_funcs.cpp src/alpha_calc/important_funcs.hpp src/number_theory/nt_funcs.hpp src/alpha_calc/impartial_term_algebra.hpp src/alpha_calc/constants.hpp src/alpha_calc/ring_buffer_queue.hpp src/alpha_calc/calculation_logger.hpp
+obj/debug/alpha_calc/ring_buffer_queue.o: src/alpha_calc/ring_buffer_queue.cpp src/alpha_calc/ring_buffer_queue.hpp
+obj/debug/number_theory/nt_funcs.o: src/number_theory/nt_funcs.cpp src/number_theory/nt_funcs.hpp src/number_theory/prime_generator.hpp
+obj/debug/number_theory/prime_generator.o: src/number_theory/prime_generator.cpp src/number_theory/prime_generator.hpp
+obj/debug/www_nim_calc/fin_nim.o: src/www_nim_calc/fin_nim.cpp src/www_nim_calc/fin_nim.hpp
+obj/debug/www_nim_calc/kappa_component.o: src/www_nim_calc/kappa_component.cpp src/www_nim_calc/kappa_component.hpp src/number_theory/prime_generator.hpp
+obj/debug/www_nim_calc/ww.o: src/www_nim_calc/ww.cpp src/www_nim_calc/ww.hpp
+obj/debug/www_nim_calc/www_nim.o: src/www_nim_calc/www_nim.cpp src/www_nim_calc/www_nim.hpp src/number_theory/prime_generator.hpp src/number_theory/nt_funcs.hpp src/alpha_calc/important_funcs.hpp src/www_nim_calc/fin_nim.hpp src/www_nim_calc/ww.hpp src/www_nim_calc/www.hpp src/www_nim_calc/kappa_component.hpp
+obj/debug/www_nim_calc/www.o: src/www_nim_calc/www.cpp src/www_nim_calc/www.hpp src/www_nim_calc/ww.hpp
+obj/debug/main.o: src/main.cpp src/alpha_calc/calculation_logger.hpp src/alpha_calc/important_funcs.hpp src/number_theory/prime_generator.hpp src/www_nim_calc/ww.hpp src/www_nim_calc/www.hpp src/www_nim_calc/www_nim.hpp
+
+obj/prof/alpha_calc/calculation_logger.o: src/alpha_calc/calculation_logger.cpp src/alpha_calc/calculation_logger.hpp src/alpha_calc/ring_buffer_queue.hpp
+obj/prof/alpha_calc/constants.o: src/alpha_calc/constants.cpp src/alpha_calc/constants.hpp src/alpha_calc/calculation_logger.hpp
+obj/prof/alpha_calc/impartial_term_algebra.o: src/alpha_calc/impartial_term_algebra.cpp src/alpha_calc/impartial_term_algebra.hpp src/number_theory/nt_funcs.hpp src/alpha_calc/important_funcs.hpp
+obj/prof/alpha_calc/important_funcs.o: src/alpha_calc/important_funcs.cpp src/alpha_calc/important_funcs.hpp src/number_theory/nt_funcs.hpp src/alpha_calc/impartial_term_algebra.hpp src/alpha_calc/constants.hpp src/alpha_calc/ring_buffer_queue.hpp src/alpha_calc/calculation_logger.hpp
+obj/prof/alpha_calc/ring_buffer_queue.o: src/alpha_calc/ring_buffer_queue.cpp src/alpha_calc/ring_buffer_queue.hpp
+obj/prof/number_theory/nt_funcs.o: src/number_theory/nt_funcs.cpp src/number_theory/nt_funcs.hpp src/number_theory/prime_generator.hpp
+obj/prof/number_theory/prime_generator.o: src/number_theory/prime_generator.cpp src/number_theory/prime_generator.hpp
+obj/prof/www_nim_calc/fin_nim.o: src/www_nim_calc/fin_nim.cpp src/www_nim_calc/fin_nim.hpp
+obj/prof/www_nim_calc/kappa_component.o: src/www_nim_calc/kappa_component.cpp src/www_nim_calc/kappa_component.hpp src/number_theory/prime_generator.hpp
+obj/prof/www_nim_calc/ww.o: src/www_nim_calc/ww.cpp src/www_nim_calc/ww.hpp
+obj/prof/www_nim_calc/www_nim.o: src/www_nim_calc/www_nim.cpp src/www_nim_calc/www_nim.hpp src/number_theory/prime_generator.hpp src/number_theory/nt_funcs.hpp src/alpha_calc/important_funcs.hpp src/www_nim_calc/fin_nim.hpp src/www_nim_calc/ww.hpp src/www_nim_calc/www.hpp src/www_nim_calc/kappa_component.hpp
+obj/prof/www_nim_calc/www.o: src/www_nim_calc/www.cpp src/www_nim_calc/www.hpp src/www_nim_calc/ww.hpp
+obj/prof/main.o: src/main.cpp src/alpha_calc/calculation_logger.hpp src/alpha_calc/important_funcs.hpp src/number_theory/prime_generator.hpp src/www_nim_calc/ww.hpp src/www_nim_calc/www.hpp src/www_nim_calc/www_nim.hpp
