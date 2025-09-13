@@ -39,8 +39,12 @@ namespace previously_known_values { // known at 1 january 2025
 };
 
 namespace record_values {
+    std::mutex q_set_cache_mutex;
+    std::mutex excess_cache_mutex;
+
     namespace {
         map<uint16_t, vector<uint16_t>> q_set_records() {
+            std::lock_guard<std::mutex> lock(q_set_cache_mutex);
             std::ifstream file;
             file.open(logs_dir + "/q_set_records.txt");
             map<uint16_t, vector<uint16_t>> result{};
@@ -68,6 +72,7 @@ namespace record_values {
         };
 
         map<uint16_t, uint8_t> excess_records() {
+            std::lock_guard<std::mutex> lock(excess_cache_mutex);
             std::ifstream file;
             file.open(logs_dir + "/excess_records.txt");
             map<uint16_t, uint8_t> result{};
@@ -87,8 +92,6 @@ namespace record_values {
 
     map<uint16_t, vector<uint16_t>> q_set_cache(q_set_records());
     map<uint16_t, uint8_t> excess_cache(excess_records());
-    std::mutex q_set_cache_mutex;
-    std::mutex excess_cache_mutex;
 
     void cache_q_set(uint16_t p, vector<uint16_t> q_set_p) {
         std::lock_guard<std::mutex> lock(q_set_cache_mutex);
