@@ -20,7 +20,7 @@ TARGET = bin/main
 CXX = g++
 CXXFLAGS = -std=c++11 -Wall -Wextra -pthread
 # Separate targets for release and profiling
-RELEASE_FLAGS = -O2 -DNDEBUG
+RELEASE_FLAGS = -O3 -DNDEBUG
 DEBUG_FLAGS = -fsanitize=address -g -O0 -DDEBUG
 PROFILE_FLAGS = -pg -O2
 
