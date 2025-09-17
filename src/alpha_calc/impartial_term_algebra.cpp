@@ -296,6 +296,7 @@ term_array impartial_term_algebra::square_term_calc(uint32_t x) {
     return result;
 }
 
+// a must have enough allocated memory for the result
 void impartial_term_algebra::square_with_table(term_array& a) {
     clear_accumulator();
     tmp_term_array square_term;
@@ -306,7 +307,7 @@ void impartial_term_algebra::square_with_table(term_array& a) {
         }
     }
 
-    a = term_array(accumulate_size);
+    a.terms_size = accumulate_size;
     uint32_t j = 0;
     for (uint32_t i = 0; i < term_count; i++) {
         if (accumulator_contains(i)) {
@@ -365,7 +366,8 @@ term_array impartial_term_algebra::power(const term_array& a, const cpp_int& n) 
 //TODO optimize
 // a must already be sorted
 void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, term_array& res) {
-    term_array result(1);
+    term_array result(term_count);
+    result.terms_size = 1; // feels hacky but very useful
     result.terms[0] = 0;
     if(n.is_zero()) {
         res = result;
@@ -488,7 +490,7 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
                     flip_accumulator_term(tmp.terms[j]);
                 }
             }
-            result = term_array(accumulate_size);
+            result.terms_size = accumulate_size;
             uint32_t j = 0;
             for (uint32_t i = 0; i < term_count; i++) {
                 if (accumulator_contains(i)) {
