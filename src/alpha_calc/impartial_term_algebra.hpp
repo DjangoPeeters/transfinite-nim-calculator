@@ -84,7 +84,10 @@ struct tmp_term_array { // only for transferring `term_array`'s
 
     tmp_term_array(const term_array& other): terms_size(other.terms_size), terms(other.terms) {}
 
-    ~tmp_term_array() {}
+    ~tmp_term_array() {
+        terms_size = 0;
+        terms = nullptr;
+    }
 
     tmp_term_array& operator=(const tmp_term_array& other) {
         if (this != &other) {
@@ -92,6 +95,29 @@ struct tmp_term_array { // only for transferring `term_array`'s
             terms = other.terms;
         }
         return *this;
+    }
+};
+
+struct flattened_table {
+    term_array* data;
+    size_t* component_offsets;
+    uint32_t term_count;
+
+    flattened_table(): data(nullptr), component_offsets(nullptr), term_count(0) {}
+
+    ~flattened_table() {
+        if (data != nullptr) delete[] data;
+        data = nullptr;
+        if (component_offsets != nullptr) delete[] component_offsets;
+        component_offsets = nullptr;
+        term_count = 0;
+    }
+    
+    term_array& get(size_t component, size_t degree, size_t term_idx) {
+        size_t offset = component_offsets[component] + 
+                       term_count*(degree-1) + // we ignore degree=0 because this corresponds to the trivial case with result 1 = term_array({0})
+                       term_idx;
+        return data[offset];
     }
 };
 
@@ -109,8 +135,7 @@ class impartial_term_algebra {
         uint64_t* accumulator; // using uint64_t to represent 64 contiguous bits
         uint32_t accumulate_size;
         term_array* kappa_table; // some entries come from `basis`
-        term_array*** q_power_times_term_table; // ditto
-        // maybe give q_power_times_term_table type uint32_t**** and keep sizes in a new member
+        flattened_table q_power_times_term_table; // ditto
         uint32_t* basis_search;
         term_array* square_term_table;
 

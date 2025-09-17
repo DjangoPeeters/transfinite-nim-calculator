@@ -31,8 +31,7 @@ constexpr unsigned PUSH_INTERVAL = 6;
 impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& log_queue, std::atomic<bool>& calculation_done,
     vector<uint16_t>& q_components_): log_queue_(log_queue), calculation_done_(calculation_done),
     q_components(q_components_), q_degrees(new uint16_t[q_components.size()]),
-    basis(new uint32_t[q_components.size() + 1]), accumulate_size(0), kappa_table(new term_array[q_components.size()]),
-    q_power_times_term_table(new term_array**[q_components.size()]) {
+    basis(new uint32_t[q_components.size() + 1]), accumulate_size(0), kappa_table(new term_array[q_components.size()]) {
     
     sort(q_components.begin(), q_components.end(), [](uint16_t a, uint16_t b)
                                         {
@@ -80,12 +79,25 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
         }
     }
 
-    for (size_t i = 0; i < q_components.size(); i++) {
-        q_power_times_term_table[i] = new term_array*[q_degrees[i]];
-        for (size_t j = 0; j < q_degrees[i]; j++) {
-            q_power_times_term_table[i][j] = new term_array[term_count];
+    q_power_times_term_table.component_offsets = new size_t[q_components.size()];
+    q_power_times_term_table.term_count = term_count;
+    q_power_times_term_table.component_offsets[0] = 0;
+    size_t q_power_times_term_table_size = 0;
+    for (size_t q_index = 0; q_index < q_components.size()-1; q_index++) {
+        q_power_times_term_table.component_offsets[q_index+1] = q_power_times_term_table.component_offsets[q_index];
+        for (size_t q_exp = 1; q_exp < q_degrees[q_index]; q_exp++) {
+            for (size_t term = 0; term < term_count; term++) {
+                q_power_times_term_table.component_offsets[q_index+1]++;
+                q_power_times_term_table_size++;
+            }
         }
     }
+    for (size_t q_exp = 1; q_exp < q_degrees[q_components.size()-1]; q_exp++) {
+        for (size_t term = 0; term < term_count; term++) {
+            q_power_times_term_table_size++;
+        }
+    }
+    q_power_times_term_table.data = new term_array[q_power_times_term_table_size];
 
     for (size_t q_index = 0; q_index < q_components.size(); q_index++) {
         for (size_t q_exp = 1; q_exp < q_degrees[q_index]; q_exp++) {
@@ -111,19 +123,8 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
 }
 
 impartial_term_algebra::~impartial_term_algebra() {
-    for (size_t q_index = 0; q_index < q_components.size(); q_index++) {
-        for (size_t q_exp = 0; q_exp < q_degrees[q_index]; q_exp++) {
-            delete[] q_power_times_term_table[q_index][q_exp];
-            q_power_times_term_table[q_index][q_exp] = nullptr;
-        }
-        delete[] q_power_times_term_table[q_index];
-        q_power_times_term_table[q_index] = nullptr;
-    }
-    delete[] q_power_times_term_table;
-    q_power_times_term_table = nullptr;
     delete[] kappa_table;
     kappa_table = nullptr;
-
     delete[] accumulator;
     accumulator = nullptr;
     delete[] basis;
@@ -137,11 +138,11 @@ impartial_term_algebra::~impartial_term_algebra() {
 }
 
 term_array impartial_term_algebra::q_power_times_term(size_t q_index, uint16_t q_exponent, uint32_t term) {
-    if (q_power_times_term_table[q_index][q_exponent][term].terms != nullptr) {
-        return q_power_times_term_table[q_index][q_exponent][term];
+    if (q_power_times_term_table.get(q_index, q_exponent, term).terms != nullptr) {
+        return q_power_times_term_table.get(q_index, q_exponent, term);
     } else {
         const term_array result = q_power_times_term_calc(q_index, q_exponent, term);
-        q_power_times_term_table[q_index][q_exponent][term] = result;
+        q_power_times_term_table.get(q_index, q_exponent, term) = result;
         return result;
     }
 }
@@ -240,8 +241,7 @@ void impartial_term_algebra::accumulate_term_product(uint32_t x, uint32_t y) {
     } else {
         const uint32_t bi = basis[basis_search[y]];
         // 0 <= `y / bi` < some prime from `q_degrees`
-        const tmp_term_array product = tmp_term_array(q_power_times_term_table[basis_search[y]][(uint16_t)(y / bi)][x]);
-        //const term_array* product = &(q_power_times_term_table[basis_search[y]][(uint16_t)(y / bi)][x]);
+        const tmp_term_array product = tmp_term_array(q_power_times_term_table.get(basis_search[y], (uint16_t)(y / bi), x));
         for (uint32_t i = 0; i < product.terms_size; i++) {
             accumulate_term_product(product.terms[i], y % bi);
         }
