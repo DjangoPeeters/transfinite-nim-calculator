@@ -27,7 +27,7 @@ using std::cout;
 using boost::multiprecision::msb;
 using namespace nt_funcs;
 
-constexpr bool TEST_MODE = true;
+constexpr bool TEST_MODE = false;
 
 namespace important_funcs {
     namespace {

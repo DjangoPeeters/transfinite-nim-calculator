@@ -49,7 +49,13 @@ test 11:  35 seconds for alpha(47) :))      (tweak push interval from calculatin
 test 12:   3 seconds for alpha(47) :)))     (only square result and keep multiplier small)
 */
 
-// most important file for the calculation: important_funcs.cpp (`TEST_MODE = true` initializes the cache empty except for `p = 2`)
+// most important file for the calculation: important_funcs.cpp (`TEST_MODE = true` initializes the caches empty except for `p = 2`)
+
+/*
+To calculate alpha(719), the next unknown alpha at the time of writing this, we'd need at least about 200 GB in memory.
+I don't know how long this will take, but my best guess says it'll take at least 3 years and 3 months...
+unless we find a way to go about doing this calculation in a smarter way.
+*/
 
 void prep_alpha(fstream& file) {
     file.open(logs_dir + "/alpha_log.txt", ios::app);
