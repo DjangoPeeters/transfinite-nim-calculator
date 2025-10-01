@@ -162,7 +162,7 @@ namespace important_funcs {
         }
     }
 
-    std::map<uint16_t, std::vector<uint16_t>>& get_q_set_cache() {
+    const std::map<uint16_t, std::vector<uint16_t>>& get_q_set_cache() {
         std::lock_guard<std::mutex> lock(q_set_cache_mutex);
         return q_set_cache;
     }
@@ -182,7 +182,7 @@ namespace important_funcs {
         return result;
     }
 
-    std::map<uint16_t, uint8_t>& get_excess_cache() {
+    const std::map<uint16_t, uint8_t>& get_excess_cache() {
         std::lock_guard<std::mutex> lock(excess_cache_mutex);
         return excess_cache;
     }

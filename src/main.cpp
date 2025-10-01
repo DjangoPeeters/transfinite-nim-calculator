@@ -89,14 +89,9 @@ void write_alpha(fstream& file, uint16_t p,
 
 //TODO optimize
 //TODO split calculating into more threads
-int main(int argc, char *argv[])
-{
-    cout << "argc == " << argc << '\n';
-    for (int ndx{}; ndx != argc; ++ndx) {
-        cout << "argv[" << ndx << "] == " << argv[ndx] << '\n';
-    }
-    cout << "argv[" << argc << "] == " << static_cast<void*>(argv[argc]) << '\n';
-    if (1 < argc) logs_dir = argv[1];
+void alphas(const char* logs_dir_) {
+    if (logs_dir_ != NULL) logs_dir = logs_dir_;
+    cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
  
     fstream file;
     prep_alpha(file);
@@ -113,6 +108,55 @@ int main(int argc, char *argv[])
         cout << "===== Time is " << t << " seconds. =====\n\n";
         write_alpha(file, p, q_set(p), excess(p), alpha(p), t);
         n++;
+    }
+}
+
+uint16_t strtou16(const char* str) {
+    size_t i = 0;
+    uint16_t r = 0;
+    while (str[i] != (char)0) {
+        r = 10*r + (str[i] - '0');
+        i++;
+    }
+    return r;
+}
+
+int main(int argc, char* argv[]) {
+    cout << "argc == " << argc << '\n';
+    for (int ndx{}; ndx != argc; ++ndx) {
+        cout << "argv[" << ndx << "] == " << argv[ndx] << '\n';
+    }
+    cout << "argv[" << argc << "] == " << static_cast<void*>(argv[argc]) << '\n';
+    if (1 < argc) {
+        if (argv[1] == string("alphas")) {
+            if (2 < argc) {
+                alphas(argv[2]);
+            } else {
+                alphas(NULL);
+            }
+        } else if(argv[1] == string("alpha")) {
+            if (2 < argc) {
+                uint16_t p = strtou16(argv[2]);
+                time_t checkpoint_time = time(nullptr);
+                cout << "===== Calculating alpha(" << p << "). =====\n";
+                cout << alpha(p) << '\n';
+                time_t t = time(nullptr) - checkpoint_time;
+                cout << "===== Time is " << t << " seconds. =====\n\n";
+            } else {
+                unsigned n = 2;
+                uint16_t p = nth_prime(n);
+                while (get_excess_cache().find(p) != get_excess_cache().end()
+                    && get_q_set_cache().find(p) != get_q_set_cache().end()) {
+                        n++;
+                        p = nth_prime(n);
+                }
+                time_t checkpoint_time = time(nullptr);
+                cout << "===== Calculating alpha(" << p << "). =====\n";
+                cout << alpha(p) << '\n';
+                time_t t = time(nullptr) - checkpoint_time;
+                cout << "===== Time is " << t << " seconds. =====\n\n";
+            }
+        }
     }
 
     return 0;
