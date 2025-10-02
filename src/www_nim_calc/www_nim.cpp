@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <ostream>
 #include <vector>
 #include <list>
 #include <utility>
@@ -16,6 +17,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/integer.hpp>
 
+using std::cout;
 using std::size_t;
 using std::vector;
 using std::list;
@@ -27,12 +29,12 @@ using namespace prime_generator;
 
 namespace www_nim {
     namespace {
-        vector<uint8_t> fin_to_2_pow(uint64_t n) {
+        vector<uint8_t> fin_to_2_pow(uint256_t n) {
             if (n == 0) return {};
             
             vector<uint8_t> result{};
             for (uint8_t i = msb(n); i > 0; i--) {
-                if ((n & (((uint64_t)1) << i)) != 0) {
+                if ((n & (((uint256_t)1) << i)) != 0) {
                     result.push_back(i);
                 }
             }
@@ -58,7 +60,7 @@ namespace www_nim {
                 temp = 1;
                 for (const auto& ab : xi.get_terms()) {
                     if (ab.first == 0) {
-                        temp = temp * (((uint64_t)1) << ab.second);
+                        temp = temp * (((uint256_t)1) << ab.second);
                     } else {
                         temp = temp * www({{ww({{ab.first - 1, ab.second}}), 1}});
                     }
@@ -95,7 +97,7 @@ namespace www_nim {
             return result;
         }
 
-        www www_of_kappa_components(const vector<kappa_component>& components, uint64_t coefficient) {
+        www www_of_kappa_components(const vector<kappa_component>& components, uint256_t coefficient) {
             list<std::pair<uint16_t, uint16_t>> terms{};
             uint16_t temp1, temp2;
             for (const auto& component : components) {
@@ -107,7 +109,7 @@ namespace www_nim {
             return www({{ww(terms), coefficient}});
         }
 
-        vector<kappa_component> kappa_components_of_term(const std::pair<ww, uint64_t>& a) {
+        vector<kappa_component> kappa_components_of_term(const std::pair<ww, uint256_t>& a) {
             vector<kappa_component> result{};
             for (const auto& expcoeff : a.first.get_terms()) {
                 uint16_t k = expcoeff.first;
@@ -129,7 +131,7 @@ namespace www_nim {
         }
 
         www reduce_components(const vector<kappa_component>& components,
-            const vector<kappa_component>& processed_components, uint64_t coefficient) {
+            const vector<kappa_component>& processed_components, uint256_t coefficient) {
             if (components.empty()) return www_of_kappa_components(processed_components, coefficient);
             if (components.size() > 1 && components[0].get_k() == components[1].get_k() && components[0].get_n() == components[1].get_n()) {
                 auto a = components[0], b = components[1];
@@ -153,7 +155,12 @@ namespace www_nim {
                         sort(new_components.begin(), new_components.end());
                         return reduce_components(new_components, processed_components, coefficient);
                     } else {
-                        www alpha1 = alpha(nth_prime(a.get_k() + 2));
+                        alpha_return ar = alpha(nth_prime(a.get_k() + 2));
+                        if (ar.failed) {
+                            cout << "reduce_components failed because alpha failed\n";
+                            return 0;
+                        }
+                        www alpha1 = ar.result;
 
                         www result(0);
                         for (const auto& expcoef : alpha1.get_terms()) {
@@ -194,7 +201,7 @@ namespace www_nim {
             return reduce_components(new_components, new_processed_components, coefficient);
         }
 
-        www www_nim_mul_term(const std::pair<ww, uint64_t>& a, const std::pair<ww, uint64_t>& b) {
+        www www_nim_mul_term(const std::pair<ww, uint256_t>& a, const std::pair<ww, uint256_t>& b) {
             vector<kappa_component> components = kappa_components_of_term(a), other = kappa_components_of_term(b);
             components.insert(components.end(), other.begin(), other.end());
             sort(components.begin(), components.end());
@@ -248,7 +255,7 @@ namespace www_nim {
         uint16_t n = pn.second;
         if (p == 2) {
             // Fermat 2-power
-            return www(((uint64_t)1)<<(((uint16_t)1)<<(n-1)));
+            return www(((uint256_t)1)<<(((uint16_t)1)<<(n-1)));
         }
         uint16_t k = (uint16_t)prime_pi(p) - 1; // 0-indexed for historical reasons
         uint16_t pn1 = 1;
@@ -256,11 +263,15 @@ namespace www_nim {
         return www({{ww({{k-1, pn1}}), 1}});
     }
 
-    www alpha(uint16_t p) {
-        www result(important_funcs::excess(p));
+    alpha_return alpha(uint16_t p) {
+        excess_return exr = important_funcs::excess(p);
+        if (exr.failed) {
+            return alpha_return(true, 0, exr.term_count);
+        }
+        www result(exr.result);
         for (const uint16_t q : important_funcs::q_set(p)) {
             result = kappa(q) + result;
         }
-        return result;
+        return alpha_return(false, result, 0);
     }
 };

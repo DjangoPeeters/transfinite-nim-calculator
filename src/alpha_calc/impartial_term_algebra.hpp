@@ -121,6 +121,8 @@ struct flattened_table {
     }
 };
 
+uint32_t term_count_calc(vector<uint16_t>& q_components);
+
 /* q is used when something is related to non-trivial prime powers */
 class impartial_term_algebra {
     private:

@@ -5,6 +5,8 @@
 #include <string>
 #include <iostream>
 #include <list>
+#include <boost/multiprecision/cpp_int.hpp>
+using uint256_t = boost::multiprecision::uint256_t;
 
 using std::string;
 using std::ostream;
@@ -12,13 +14,19 @@ using std::list;
 
 www::www(): terms({{ww(), 1}}) {}
 
-www::www(uint64_t a): terms({{0, a}}) {
+www::www(uint256_t a): terms({{0, a}}) {
     if (a == 0) { // we can simplify more
         terms = {};
     }
 }
 
-www::www(ww a): terms(list<std::pair<ww, uint64_t>>(a.get_terms().size())) {
+www::www(unsigned int a): terms({{0, uint256_t(a)}}) {
+    if (a == 0) {
+        terms = {};
+    }
+}
+
+www::www(ww a): terms(list<std::pair<ww, uint256_t>>(a.get_terms().size())) {
     auto ita = a.get_terms().begin();
     for (auto it = terms.begin(); it != terms.end(); it++) {
         *it = {ww(ita->first), ita->second};
@@ -26,9 +34,9 @@ www::www(ww a): terms(list<std::pair<ww, uint64_t>>(a.get_terms().size())) {
     }
 }
 
-www::www(const list<std::pair<ww, uint64_t>>& terms): terms(www::simp_terms(terms)) {}
+www::www(const list<std::pair<ww, uint256_t>>& terms): terms(www::simp_terms(terms)) {}
 
-list<std::pair<ww, uint64_t>> www::simp_terms(const list<std::pair<ww, uint64_t>>& terms) {
+list<std::pair<ww, uint256_t>> www::simp_terms(const list<std::pair<ww, uint256_t>>& terms) {
     if (terms.empty()) {
         return {};
     } else if (terms.size() == 1) {
@@ -42,11 +50,11 @@ list<std::pair<ww, uint64_t>> www::simp_terms(const list<std::pair<ww, uint64_t>
         auto it = terms.begin();
         it++;
         if (result0.second == 0) {
-            return simp_terms(list<std::pair<ww, uint64_t>>(it, terms.end()));
+            return simp_terms(list<std::pair<ww, uint256_t>>(it, terms.end()));
         }
 
         // recursively let smaller values get gobbled up by bigger ones on the right
-        auto tail = simp_terms(list<std::pair<ww, uint64_t>>(it, terms.end()));
+        auto tail = simp_terms(list<std::pair<ww, uint256_t>>(it, terms.end()));
         auto tail_start = tail.begin();
         while (tail_start != tail.end()) {
             if (result0.first < tail_start->first) { // absorbing
@@ -59,20 +67,24 @@ list<std::pair<ww, uint64_t>> www::simp_terms(const list<std::pair<ww, uint64_t>
                 break;
             }
         }
-        list<std::pair<ww, uint64_t>> result = {result0};
+        list<std::pair<ww, uint256_t>> result = {result0};
         result.insert(result.end(), tail_start, tail.end());
         return result;
     }
 }
 
-string www::string_of_term(ww a, uint64_t b) {
+string www::string_of_term(ww a, uint256_t b) {
+    string bstr = b.str();
+    if (bstr.length() > 3) {
+        bstr = "2^" + std::to_string(msb(b));
+    }
     if (a == 0 || b == 0) {
-        return std::to_string(b);
+        return bstr;
     } else if (a == 1) {
         if (b == 1) {
             return "w";
         } else {
-            return "w*" + std::to_string(b);
+            return "w*" + bstr;
         }
     } else {
         string stra = a.to_string();
@@ -80,7 +92,7 @@ string www::string_of_term(ww a, uint64_t b) {
         if (b == 1) {
             return "w^" + stra;
         } else {
-            return "w^" + stra + "*" + std::to_string(b);
+            return "w^" + stra + "*" + bstr;
         }
     }
 }
@@ -100,7 +112,7 @@ string www::to_string() const {
     }
 }
 
-const list<std::pair<ww, uint64_t>>& www::get_terms() const {
+const list<std::pair<ww, uint256_t>>& www::get_terms() const {
     return terms;
 }
 
@@ -110,27 +122,27 @@ www& www::operator=(const www& other) {
 }
 
 www www::operator+(const www& other) const {
-    auto result = list<std::pair<ww, uint64_t>>(this->terms);
+    auto result = list<std::pair<ww, uint256_t>>(this->terms);
     result.insert(result.end(), other.get_terms().begin(), other.get_terms().end());
     return result;
 }
 
 www www::operator*(const www& other) const {
     if (terms.empty() || other.get_terms().empty()) return 0;
-    if (terms == list<std::pair<ww, uint64_t>>{{0, 1}}) return www(other);
-    if (other.get_terms() == list<std::pair<ww, uint64_t>>{{0, 1}}) return www(*this);
+    if (terms == list<std::pair<ww, uint256_t>>{{0, 1}}) return www(other);
+    if (other.get_terms() == list<std::pair<ww, uint256_t>>{{0, 1}}) return www(*this);
 
     auto oterms = other.get_terms();
     if (oterms.size() > 1) { // left-distributivity
         www result(0);
-        for (const std::pair<ww, uint64_t>& term : oterms) {
+        for (const std::pair<ww, uint256_t>& term : oterms) {
             result += *this * www({term});
         }
         return result;
     } else { // more absorbing
         auto oterm0 = oterms.front();
         if (oterm0.first == 0) {
-            auto rterms = list<std::pair<ww, uint64_t>>(terms);
+            auto rterms = list<std::pair<ww, uint256_t>>(terms);
             rterms.front().second *= oterm0.second;
             return www(rterms);
         } else {

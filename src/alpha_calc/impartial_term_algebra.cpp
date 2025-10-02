@@ -28,6 +28,20 @@ using namespace nt_funcs;
 
 constexpr unsigned PUSH_INTERVAL = 6;
 
+uint32_t term_count_calc(vector<uint16_t>& q_components_) {
+    vector<uint16_t> q_components = q_components_;
+    sort(q_components.begin(), q_components.end(), [](uint16_t a, uint16_t b)
+                                        {
+                                            return prime_pow(a) < prime_pow(b);
+                                        });
+    q_components.erase(unique(q_components.begin(), q_components.end()), q_components.end());
+    uint32_t term_count = 1;
+    for (size_t i = 0; i < q_components.size(); i++) {
+        term_count *= prime_pow(q_components[i]).first;
+    }
+    return term_count;
+}
+
 impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& log_queue, std::atomic<bool>& calculation_done,
     vector<uint16_t>& q_components_): log_queue_(log_queue), calculation_done_(calculation_done),
     q_components(q_components_), q_degrees(new uint16_t[q_components.size()]),
@@ -59,7 +73,27 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
         } else if (q_components[i] == q_degrees[i]) {
             const uint16_t p = q_degrees[i];
             const vector<uint16_t> q_set(important_funcs::q_set(p));
-            const uint16_t excess = important_funcs::excess(p);
+            excess_return exr = important_funcs::excess(p);
+            if (exr.failed) {
+                cout << "constructing algebra failed\n";
+                accumulate_size = 0;
+                accumulator = 0;
+                accumulator_size = 0;
+                if (basis != nullptr) delete[] basis;
+                basis = nullptr;
+                if (basis_search != nullptr) delete[] basis_search;
+                basis_search = nullptr;
+                if (kappa_table != nullptr) delete[] kappa_table;
+                kappa_table = nullptr;
+                if (q_degrees != nullptr) delete[] q_degrees;
+                q_degrees = nullptr;
+                if (square_term_table != nullptr) delete[] square_term_table;
+                square_term_table = nullptr;
+                cout << "term_count was " << term_count << "\n";
+                term_count = 0;
+                return;
+            }
+            const uint16_t excess = exr.result;
 
             vector<uint32_t> kappa_blocks(vector<uint32_t>(q_set.size()));
             for (size_t j = 0; j < q_set.size(); j++) {
@@ -123,17 +157,17 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
 }
 
 impartial_term_algebra::~impartial_term_algebra() {
-    delete[] kappa_table;
+    if (kappa_table != nullptr) delete[] kappa_table;
     kappa_table = nullptr;
-    delete[] accumulator;
+    if (accumulator != nullptr) delete[] accumulator;
     accumulator = nullptr;
-    delete[] basis;
+    if (basis != nullptr) delete[] basis;
     basis = nullptr;
-    delete[] q_degrees;
+    if (q_degrees != nullptr) delete[] q_degrees;
     q_degrees = nullptr;
-    delete[] basis_search;
+    if (basis_search != nullptr) delete[] basis_search;
     basis_search = nullptr;
-    delete[] square_term_table;
+    if (square_term_table != nullptr) delete[] square_term_table;
     square_term_table = nullptr;
 }
 

@@ -16,7 +16,7 @@
 #include <mutex>
 #include <atomic>
 #include <iostream>
-#include <boost/multiprecision/integer.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 
 using std::vector;
 using std::set;
@@ -24,10 +24,12 @@ using std::map;
 using std::sort;
 using std::unique;
 using std::cout;
+using uint256_t = boost::multiprecision::uint256_t;
 using boost::multiprecision::msb;
 using namespace nt_funcs;
 
 constexpr bool TEST_MODE = false;
+constexpr uint32_t MAX_TERM_COUNT = 10000000;
 
 namespace important_funcs {
     namespace {
@@ -54,22 +56,22 @@ namespace important_funcs {
             }
         };
 
-        uint64_t finite_summand(uint16_t p, uint16_t excess) {
+        uint256_t finite_summand(uint16_t p, uint16_t excess) {
             const vector<uint16_t> q_set1 = q_set(p);
-            uint64_t base_finite_summand = 0;
+            uint256_t base_finite_summand = 0;
             if (!q_set1.empty() && (q_set1[0] & 1) == 0) {
-                base_finite_summand = ((uint64_t)1) << (q_set1[0] >> 1);
+                base_finite_summand = ((uint256_t)1) << (q_set1[0] >> 1);
             }
-            return base_finite_summand + (uint64_t)excess;
+            return base_finite_summand + (uint256_t)excess;
         }
 
         vector<uint16_t> finite_components(uint16_t p, uint16_t excess) {
-            uint64_t finite_summand1 = finite_summand(p, excess);
+            uint256_t finite_summand1 = finite_summand(p, excess);
             if (finite_summand1 <= 1) {
                 return {};
             } else {
                 vector<uint16_t> result;
-                for (uint8_t k = 0; k <= msb(msb(finite_summand1)); k++) result.push_back(((uint16_t)1) << (k + 1)); // k <= 5 because we chose `uint64_t`
+                for (uint8_t k = 0; k <= msb(msb(finite_summand1)); k++) result.push_back(((uint16_t)1) << (k + 1)); // k <= 7 because we chose `uint256_t`
                 return result;
             }
         }
@@ -88,7 +90,13 @@ namespace important_funcs {
                     components.insert(q2);
                 }
             }
-            const vector<uint16_t> fin_comps = finite_components(p, (uint16_t)excess(p));
+            excess_return ex = excess(p);
+            if (ex.failed) {
+                cout << "primitive_components failed\n";
+                return {};
+            }
+            uint16_t exr = ex.result;
+            const vector<uint16_t> fin_comps = finite_components(p, exr);
             components.insert(fin_comps.begin(), fin_comps.end());
             return components;
         }
@@ -187,13 +195,19 @@ namespace important_funcs {
         return excess_cache;
     }
     
-    uint8_t excess(uint16_t p) {
+    excess_return excess(uint16_t p) {
         if (p == 2) {
-            return 0U;
+            excess_return r;
+            r.failed = false;
+            r.result = 0U;
+            return r;
         }
         std::lock_guard<std::mutex> lock(excess_cache_mutex);
         if (excess_cache.find(p) != excess_cache.end()) {
-            return excess_cache[p];
+            excess_return r;
+            r.failed = false;
+            r.result = excess_cache[p];
+            return r;
         }
         lock.~lock_guard();
 
@@ -227,28 +241,43 @@ namespace important_funcs {
         bool done = false;
         term_array one(1);
         one.terms[0] = 0;
+        vector<uint16_t> q_components{};
         while (!done) {
-            uint64_t finite_summand1 = finite_summand(p, excess1);
+            uint256_t finite_summand1 = finite_summand(p, excess1);
             const vector<uint16_t> finite_components1(finite_components(p, excess1));
-            components.insert(components.end(), finite_components1.begin(), finite_components1.end());
+            q_components = components;
+            q_components.insert(q_components.end(), finite_components1.begin(), finite_components1.end());
 
             // Shared resources
             ring_buffer_calculation_queue log_queue;
             std::atomic<bool> calculation_done{false};
 
-            cout << "[p = " << p << "] Constructing algebra (components = {" << components[0];
-            for (size_t i = 1; i < components.size(); i++) {
-                cout << ", " << components[i];
+            cout << "[p = " << p << "] Constructing algebra (components = {" << q_components[0];
+            for (size_t i = 1; i < q_components.size(); i++) {
+                cout << ", " << q_components[i];
             }
             cout << "})." << '\n';
+
+            // Check if term_count won't be too big
+            uint32_t term_count_check = term_count_calc(q_components);
+            if (term_count_check > MAX_TERM_COUNT) { // roughly more than 100 days of computing time needed at the time of writing
+                cout << "constructing algebra failed due to imposed size limit\n";
+                cout << "term_count would have been " << term_count_check << "\n";
+                
+                excess_return r;
+                r.failed = true;
+                r.term_count = term_count_check;
+                return r;
+            }
+
             // Create objects
-            impartial_term_algebra algebra(log_queue, calculation_done, components); //TODO make constructor faster?
+            impartial_term_algebra algebra(log_queue, calculation_done, q_components); //TODO make constructor faster?
             calculation_logger logger(log_queue, calculation_done, logs_dir + "/calculation.log");
             
             vector<uint32_t> alpha1{}; // actually alpha_finite_terms, but reused later for saving space
             if (finite_summand1 != 0) {
-                for (uint8_t i = 0; i <= msb(finite_summand1); i++) {
-                    if ((finite_summand1 & (((uint64_t)1) << i)) != 0) {
+                for (uint32_t i = 0; i <= msb(finite_summand1); i++) {
+                    if ((finite_summand1 & (((uint256_t)1) << i)) != 0) {
                         alpha1.push_back(i);
                     }
                 }
@@ -308,6 +337,9 @@ namespace important_funcs {
         }
 
         cache_excess(p, excess1);
-        return excess1;
+        excess_return r;
+        r.failed = false;
+        r.result = excess1;
+        return r;
     }
 };
