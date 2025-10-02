@@ -121,6 +121,15 @@ uint16_t strtou16(const char* str) {
     return r;
 }
 
+size_t strtosize(const char* str) {
+    size_t i = 0, r = 0;
+    while (str[i] != (char)0) {
+        r = 10*r + (str[i] - '0');
+        i++;
+    }
+    return r;
+}
+
 int main(int argc, char* argv[]) {
     cout << "argc == " << argc << '\n';
     for (int ndx{}; ndx != argc; ++ndx) {
@@ -136,7 +145,12 @@ int main(int argc, char* argv[]) {
             }
         } else if(argv[1] == string("alpha")) {
             if (2 < argc) {
-                uint16_t p = strtou16(argv[2]);
+                uint16_t p;
+                if (argv[2] == string("nth_prime") && 3 < argc) {
+                    p = nth_prime(strtosize(argv[3]));
+                } else {
+                    p = strtou16(argv[2]);
+                }
                 time_t checkpoint_time = time(nullptr);
                 cout << "===== Calculating alpha(" << p << "). =====\n";
                 cout << alpha(p) << '\n';
