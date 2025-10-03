@@ -28,8 +28,10 @@ using uint256_t = boost::multiprecision::uint256_t;
 using boost::multiprecision::msb;
 using namespace nt_funcs;
 
-constexpr bool TEST_MODE = false;
-constexpr uint32_t MAX_TERM_COUNT = 10000000;
+constexpr bool TEST_MODE = true;
+uint32_t MAX_TERM_COUNT = 10000000;
+
+//TODO check when calculations failed and report so appropriately
 
 namespace important_funcs {
     namespace {
@@ -107,6 +109,7 @@ namespace important_funcs {
 
             uint16_t g = h/q;
             vector<uint16_t> kappag_set(kappa_set(g));
+            if (kappag_set.empty()) return {};
             vector<uint16_t> components{};
             for (auto q1 : kappag_set) {
                 for (auto n : primitive_components(q1)) {
@@ -130,6 +133,16 @@ namespace important_funcs {
                 cout << ", " << components[i];
             }
             cout << "}).\n";
+
+            // Check if term_count won't be too big
+            uint32_t term_count_check = term_count_calc(components);
+            if (term_count_check > MAX_TERM_COUNT) { // roughly more than 100 days of computing time needed at the time of writing
+                cout << "constructing algebra failed due to imposed size limit\n";
+                cout << "term_count would have been " << term_count_check << "\n";
+                
+                return {};
+            }
+
             // Create objects
             impartial_term_algebra algebra(log_queue, calculation_done, components);
             calculation_logger logger(log_queue, calculation_done, logs_dir + "/calculation.log");
@@ -186,7 +199,7 @@ namespace important_funcs {
         lock.~lock_guard();
 
         const vector<uint16_t> result = kappa_set(f(p));
-        cache_q_set(p, result);
+        if (!result.empty()) cache_q_set(p, result);
         return result;
     }
 
@@ -200,6 +213,7 @@ namespace important_funcs {
             excess_return r;
             r.failed = false;
             r.result = 0U;
+            r.used_cache = false;
             return r;
         }
         std::lock_guard<std::mutex> lock(excess_cache_mutex);
@@ -207,11 +221,19 @@ namespace important_funcs {
             excess_return r;
             r.failed = false;
             r.result = excess_cache[p];
+            r.used_cache = true;
             return r;
         }
         lock.~lock_guard();
 
-        const vector<uint16_t> q_set1 = q_set(p); // can't be empty because now p != 2
+        const vector<uint16_t> q_set1 = q_set(p);
+        if (q_set1.empty()) {
+            excess_return r;
+            r.failed = true;
+            r.term_count = 0;
+            r.used_cache = false;
+            return r;
+        }
         cout << "[p = " << p << "] Computing excess (Q-Set = {" << q_set1[0];
         for (size_t i = 1; i < q_set1.size(); i++) {
             cout << ", " << q_set1[i];
@@ -267,6 +289,7 @@ namespace important_funcs {
                 excess_return r;
                 r.failed = true;
                 r.term_count = term_count_check;
+                r.used_cache = false;
                 return r;
             }
 
@@ -340,6 +363,7 @@ namespace important_funcs {
         excess_return r;
         r.failed = false;
         r.result = excess1;
+        r.used_cache = false;
         return r;
     }
 };

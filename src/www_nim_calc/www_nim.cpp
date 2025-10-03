@@ -6,14 +6,17 @@
 #include "../number_theory/prime_generator.hpp"
 #include "../number_theory/nt_funcs.hpp"
 #include "../alpha_calc/important_funcs.hpp"
+#include "../alpha_calc/calculation_logger.hpp"
 
 #include <cstddef>
 #include <cstdint>
+#include <ctime>
 #include <ostream>
 #include <vector>
 #include <list>
 #include <utility>
 #include <algorithm>
+#include <mutex>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/integer.hpp>
 
@@ -22,24 +25,114 @@ using std::size_t;
 using std::vector;
 using std::list;
 using std::sort;
+using std::to_string;
 using boost::multiprecision::cpp_int;
 using boost::multiprecision::msb;
 using boost::multiprecision::bit_test;
 using namespace prime_generator;
+using namespace fin_nim;
 
 namespace www_nim {
     namespace {
-        vector<uint8_t> fin_to_2_pow(uint256_t n) {
-            if (n == 0) return {};
-            
-            vector<uint8_t> result{};
-            for (uint8_t i = msb(n); i > 0; i--) {
-                if ((n & (((uint256_t)1) << i)) != 0) {
-                    result.push_back(i);
+        std::mutex alpha_cache_mutex;
+
+        void cache_alpha(uint16_t p, alpha_return alpha_p, time_t t) {
+            size_t index = prime_pi(p)-2; // 0-based indexing starting from prime 3
+            string s_p = to_string(p);
+            string line = "";
+            string s_alpha_p = "";
+            string s_t = "";
+            size_t line_length = 76;
+            // construct line we want to print
+            if (alpha_p.failed) {
+                line = "Skipping " + s_p + " (exponent " + to_string(alpha_p.term_count) + ")";
+            } else {
+                while (s_p.length() < 5) s_p = " " + s_p;
+                const vector<uint16_t>& q_set_p = important_funcs::get_q_set_cache().at(p);
+                string s_q_set_p = "[";
+                if (!q_set_p.empty()) {
+                    s_q_set_p += to_string(q_set_p[0]);
+                    for (size_t i = 1; i < q_set_p.size(); i++) {
+                        s_q_set_p += ", " + to_string(q_set_p[i]);
+                    }
+                }
+                s_q_set_p += "]"; while (s_q_set_p.length() < 15) s_q_set_p = " " + s_q_set_p;
+                uint8_t excess_p = important_funcs::get_excess_cache().at(p);
+                string s_excess_p = to_string(excess_p); while (s_excess_p.length() < 6) s_excess_p = " " + s_excess_p;
+                s_alpha_p = alpha_p.result.to_string(); while (s_alpha_p.length() < 40) s_alpha_p = " " + s_alpha_p;
+                if (s_alpha_p.length() > 40) s_alpha_p = s_alpha_p.substr(0, 40);
+                s_t = to_string(t); while (s_t.length() < 6) s_t = " " + s_t;
+                line = s_p + " " + s_q_set_p + " " + s_excess_p + " " + s_alpha_p + " " + s_t;
+            }
+            if (line.length() > line_length) {
+                line = line.substr(0, line_length);
+            } else {
+                line.append(line_length - line.length(), ' ');
+            }
+            line += '\n';
+
+            // editing the file
+            std::lock_guard<std::mutex> lock(alpha_cache_mutex);
+            std::fstream file;
+            file.open(logs_dir + "/alpha_records.txt", std::ios::in | std::ios::out | std::ios::ate);
+            file.clear(); // Clear any error flags
+
+            // Determine current number of lines
+            file.seekg(0, std::ios::end);
+            std::streampos fileSize = file.tellg();
+            size_t currentLineIndex = fileSize / (line_length + 1);
+
+            // Fill gaps if needed
+            if (currentLineIndex < index) {
+                file.seekp(currentLineIndex * (line_length + 1));
+                for (size_t i = currentLineIndex; i < index; i++) {
+                    uint16_t temp_p = nth_prime(i + 2); // corresponding odd prime with 0-based index i
+                    string temp_line = "Skipping " + to_string(temp_p);
+                    if (temp_line.length() > line_length) {
+                        temp_line = temp_line.substr(0, line_length);
+                    } else {
+                        temp_line.append(line_length - temp_line.length(), ' ');
+                    }
+                    file << temp_line << '\n';
+                }
+                file.flush();
+            }
+
+            // Now read/write at the target index
+            std::streampos targetPos = index * (line_length + 1);
+            file.seekg(targetPos);
+
+            string currentLine;
+            bool lineExists = static_cast<bool>(std::getline(file, currentLine));
+
+            if (!lineExists || currentLine[0] == 'S') {
+                // Line doesn't exist or was skipped - write new data
+                file.seekp(targetPos);
+                file << line;
+            } else {
+                // Compare with existing data
+                string s_old_alpha_p = currentLine.substr(29, 40);
+                if (s_alpha_p != s_old_alpha_p) {
+                    cout << "calculated alphas were inconsistent\n";
+                    exit(1);
+                }
+
+                // Check if new calculation was faster
+                string s_old_t = currentLine.substr(line_length - 6, 6);
+                uint32_t old_t = 0;
+                for (int i = 0; i < 6; i++) {
+                    old_t = 10*old_t;
+                    if ('0' <= s_old_t[i] && s_old_t[i] <= '9') old_t += (s_old_t[i] - '0');
+                }
+                uint32_t new_t = (uint32_t)t;
+
+                if (new_t < old_t) {
+                    file.seekp(targetPos);
+                    file << line;
                 }
             }
-            if ((n & 1) != 0) result.push_back(0);
-            return result;
+
+            file.close();
         }
 
         vector<ww> www_to_2_pow(const www& x) {
@@ -172,7 +265,7 @@ namespace www_nim {
                                 new_components.insert(new_components.end(), it, components.end());
 
                                 result = www_nim_add(result, reduce_components(new_components, processed_components,
-                                    fin_nim::fin_nim_mul(coefficient, coef)));
+                                    fin_nim_mul(coefficient, coef)));
                             } else {
                                 auto kappa_comps = kappa_components_of_term({exp, coef});
                                 new_components.insert(new_components.end(), kappa_comps.begin(), kappa_comps.end());
@@ -205,7 +298,7 @@ namespace www_nim {
             vector<kappa_component> components = kappa_components_of_term(a), other = kappa_components_of_term(b);
             components.insert(components.end(), other.begin(), other.end());
             sort(components.begin(), components.end());
-            return reduce_components(components, {}, fin_nim::fin_nim_mul(a.second, b.second));
+            return reduce_components(components, {}, fin_nim_mul(a.second, b.second));
         }
     }
 
@@ -264,14 +357,19 @@ namespace www_nim {
     }
 
     alpha_return alpha(uint16_t p) {
+        time_t start = time(nullptr);
         excess_return exr = important_funcs::excess(p);
         if (exr.failed) {
-            return alpha_return(true, 0, exr.term_count);
+            alpha_return ar(true, 0, exr.term_count);
+            return ar;
         }
         www result(exr.result);
         for (const uint16_t q : important_funcs::q_set(p)) {
             result = kappa(q) + result;
         }
-        return alpha_return(false, result, 0);
+        time_t t = time(nullptr) - start;
+        alpha_return ar(false, result, 0);
+        if (!exr.used_cache && p != 2) cache_alpha(p, ar, t);
+        return ar;
     }
 };

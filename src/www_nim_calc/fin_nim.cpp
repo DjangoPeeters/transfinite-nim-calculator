@@ -45,4 +45,17 @@ namespace fin_nim {
         return fin_nim_add(fin_nim_add(fin_nim_mul_pows(ahb, bhb), fin_nim_mul(al, bh)),
             fin_nim_add(fin_nim_mul(ah, bl), fin_nim_mul(al, bl)));
     }
+
+    vector<uint8_t> fin_to_2_pow(uint256_t n) {
+        if (n == 0) return {};
+        
+        vector<uint8_t> result{};
+        for (uint8_t i = msb(n); i > 0; i--) {
+            if ((n & (((uint256_t)1) << i)) != 0) {
+                result.push_back(i);
+            }
+        }
+        if ((n & 1) != 0) result.push_back(0);
+        return result;
+    }
 };

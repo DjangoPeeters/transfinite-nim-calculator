@@ -5,12 +5,15 @@
 #include <vector>
 #include <map>
 
+extern uint32_t MAX_TERM_COUNT;
+
 typedef struct {
     bool failed;
     union {
         uint8_t result;
         uint32_t term_count;
     };
+    bool used_cache;
 } excess_return;
 
 namespace important_funcs {

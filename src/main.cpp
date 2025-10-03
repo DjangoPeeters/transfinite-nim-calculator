@@ -68,7 +68,7 @@ void prep_alpha(fstream& file) {
 void write_alpha(fstream& file, uint16_t p,
     const vector<uint16_t>& q_set_p, const excess_return& excess_p, const alpha_return& alpha_p, time_t t) {
     
-    string s_p = to_string(p); while (s_p.length() < 5) s_p = " " + s_p;
+    string s_p = to_string(p);
     if (alpha_p.failed) {
         file.open(logs_dir + "/alpha_log.txt", std::ios::in | std::ios::out | std::ios::ate);
         file.seekp(-59, std::ios::end);
@@ -77,6 +77,7 @@ void write_alpha(fstream& file, uint16_t p,
         file.close();
         return;
     }
+    while (s_p.length() < 5) s_p = " " + s_p;
     string s_q_set_p = "[";
     if (!q_set_p.empty()) {
         s_q_set_p += to_string(q_set_p[0]);
@@ -88,7 +89,7 @@ void write_alpha(fstream& file, uint16_t p,
     // now we must have excess_p.failed == false
     string s_excess_p = to_string(excess_p.result); while (s_excess_p.length() < 6) s_excess_p = " " + s_excess_p;
     string s_alpha_p = alpha_p.result.to_string(); while (s_alpha_p.length() < 20) s_alpha_p = " " + s_alpha_p;
-    string s_t = to_string(t); while (s_t.length() < 6) s_t = " " + s_t;
+    string s_t = excess_p.used_cache?"-":to_string(t); while (s_t.length() < 6) s_t = " " + s_t;
     file.open(logs_dir + "/alpha_log.txt", std::ios::in | std::ios::out | std::ios::ate);
     file.seekp(-59, std::ios::end);
     file << s_p << " " << s_q_set_p << " " << s_excess_p << " " << s_alpha_p << " " << s_t << '\n';
@@ -136,6 +137,16 @@ uint16_t strtou16(const char* str) {
     return r;
 }
 
+uint32_t strtou32(const char* str) {
+    size_t i = 0;
+    uint32_t r = 0;
+    while (str[i] != (char)0) {
+        r = 10*r + (str[i] - '0');
+        i++;
+    }
+    return r;
+}
+
 size_t strtosize(const char* str) {
     size_t i = 0, r = 0;
     while (str[i] != (char)0) {
@@ -154,6 +165,8 @@ int main(int argc, char* argv[]) {
     if (1 < argc) {
         if (argv[1] == string("alphas")) {
             if (2 < argc) {
+                if (3 < argc) MAX_TERM_COUNT = strtou32(argv[3]);
+                cout << "setting MAX_TERM_COUNT to " << MAX_TERM_COUNT << "\n";
                 alphas(argv[2]);
             } else {
                 alphas(NULL);

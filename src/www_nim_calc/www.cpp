@@ -1,5 +1,6 @@
 #include "www.hpp"
 #include "ww.hpp"
+#include "fin_nim.hpp"
 
 #include <cstdint>
 #include <string>
@@ -76,7 +77,13 @@ list<std::pair<ww, uint256_t>> www::simp_terms(const list<std::pair<ww, uint256_
 string www::string_of_term(ww a, uint256_t b) {
     string bstr = b.str();
     if (bstr.length() > 3) {
-        bstr = "2^" + std::to_string(msb(b));
+        vector<uint8_t> bv = fin_nim::fin_to_2_pow(b);
+        bstr = "2^" + std::to_string(bv[0]);
+        if (bv.size() > 1) {
+            for (size_t i = 1; i < bv.size(); i++) {
+                bstr += " + 2^" + std::to_string(bv[i]);
+            }
+        }
     }
     if (a == 0 || b == 0) {
         return bstr;
