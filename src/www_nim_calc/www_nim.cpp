@@ -74,8 +74,11 @@ namespace www_nim {
             // editing the file
             std::lock_guard<std::mutex> lock(alpha_cache_mutex);
             std::fstream file;
-            file.open(logs_dir + "/alpha_records.txt", std::ios::in | std::ios::out | std::ios::ate);
-            file.clear(); // Clear any error flags
+            file.open(logs_dir + "/alpha_records.txt", std::ios::in | std::ios::out);
+            if (!file.is_open()) {
+                cout << "failed to open alpha_records.txt\n";
+                exit(1);
+            }
 
             // Determine current number of lines
             file.seekg(0, std::ios::end);
@@ -84,6 +87,7 @@ namespace www_nim {
 
             // Fill gaps if needed
             if (currentLineIndex < index) {
+                cout << "filling gaps...\n";
                 file.seekp(currentLineIndex * (line_length + 1));
                 for (size_t i = currentLineIndex; i < index; i++) {
                     uint16_t temp_p = nth_prime(i + 2); // corresponding odd prime with 0-based index i
@@ -104,31 +108,36 @@ namespace www_nim {
 
             string currentLine;
             bool lineExists = static_cast<bool>(std::getline(file, currentLine));
+            file.clear(); // stupid error flags not saying anything
 
             if (!lineExists || currentLine[0] == 'S') {
                 // Line doesn't exist or was skipped - write new data
                 file.seekp(targetPos);
                 file << line;
+                file.flush();
             } else {
-                // Compare with existing data
-                string s_old_alpha_p = currentLine.substr(29, 40);
-                if (s_alpha_p != s_old_alpha_p) {
-                    cout << "calculated alphas were inconsistent\n";
-                    exit(1);
-                }
+                if (!alpha_p.failed) { // If the calculation failed and we already have a record for when it didn't fail, we shouldn't alter this line
+                    // Compare with existing data
+                    string s_old_alpha_p = currentLine.substr(29, 40);
+                    if (s_alpha_p != s_old_alpha_p) {
+                        cout << "calculated alphas were inconsistent\n";
+                        exit(1);
+                    }
+                
+                    // Check if new calculation was faster
+                    string s_old_t = currentLine.substr(line_length - 6, 6);
+                    uint32_t old_t = 0;
+                    for (int i = 0; i < 6; i++) {
+                        old_t = 10*old_t;
+                        if ('0' <= s_old_t[i] && s_old_t[i] <= '9') old_t += (s_old_t[i] - '0');
+                    }
+                    uint32_t new_t = (uint32_t)t;
 
-                // Check if new calculation was faster
-                string s_old_t = currentLine.substr(line_length - 6, 6);
-                uint32_t old_t = 0;
-                for (int i = 0; i < 6; i++) {
-                    old_t = 10*old_t;
-                    if ('0' <= s_old_t[i] && s_old_t[i] <= '9') old_t += (s_old_t[i] - '0');
-                }
-                uint32_t new_t = (uint32_t)t;
-
-                if (new_t < old_t) {
-                    file.seekp(targetPos);
-                    file << line;
+                    if (new_t < old_t) {
+                        file.seekp(targetPos);
+                        file << line;
+                        file.flush();
+                    }
                 }
             }
 
@@ -357,18 +366,27 @@ namespace www_nim {
     }
 
     alpha_return alpha(uint16_t p) {
-        time_t start = time(nullptr);
-        excess_return exr = important_funcs::excess(p);
+        const time_t start = time(nullptr);
+        const excess_return exr = important_funcs::excess(p);
         if (exr.failed) {
+            cout << "alpha failed\n";
             alpha_return ar(true, 0, exr.term_count);
+            if (p != 2) cache_alpha(p, ar, 0);
             return ar;
         }
         www result(exr.result);
-        for (const uint16_t q : important_funcs::q_set(p)) {
+        const auto q_set_r = important_funcs::q_set(p);
+        if (q_set_r.first != 0) {
+            cout << "alpha failed\n";
+            alpha_return ar(true, 0, q_set_r.first);
+            if (p != 2) cache_alpha(p, ar, 0);
+            return ar;
+        }
+        for (const uint16_t q : q_set_r.second) {
             result = kappa(q) + result;
         }
-        time_t t = time(nullptr) - start;
-        alpha_return ar(false, result, 0);
+        const time_t t = time(nullptr) - start;
+        const alpha_return ar(false, result, 0);
         if (!exr.used_cache && p != 2) cache_alpha(p, ar, t);
         return ar;
     }

@@ -55,81 +55,17 @@
 Skipping 263 (exponent 102180)                                              
   269            [67]      1                             w^(w^17) + 1     28
   271         [27, 5]      0                                w^w + w^9      0
-  277            [23]      1                              w^(w^7) + 1      1
+  277            [23]      1                              w^(w^7) + 1      0
   281          [5, 7]      0                            w^(w^2) + w^w      0
-Skipping 283                                                                
-  293         [4, 73]      0                             w^(w^19) + 4      0
+Skipping 283 (exponent 237820)                                              
+  293         [4, 73]      0                             w^(w^19) + 4      1
   307         [3, 17]      0                              w^(w^5) + w      0
   311            [31]      1                              w^(w^9) + 1      0
   313            [13]      1                              w^(w^4) + 1      0
-Skipping 317                                                                
+Skipping 317 (exponent 12324)                                               
   331          [3, 5]      0                                  w^w + w      0
   337             [7]      1                              w^(w^2) + 1      0
-Skipping 347                                                                
+Skipping 347 (exponent 624876)                                              
   349            [29]      1                              w^(w^8) + 1      1
   353         [8, 11]      0                             w^(w^3) + 16      0
-Skipping 359                                                                
-Skipping 367                                                                
-Skipping 373                                                                
-Skipping 379                                                                
-Skipping 383                                                                
-Skipping 389                                                                
-Skipping 397                                                                
-Skipping 401                                                                
-Skipping 409                                                                
-Skipping 419                                                                
-Skipping 421                                                                
-Skipping 431                                                                
-Skipping 433                                                                
-Skipping 439                                                                
-Skipping 443                                                                
-Skipping 449                                                                
-Skipping 457                                                                
-Skipping 461                                                                
-Skipping 463                                                                
-Skipping 467                                                                
-Skipping 479                                                                
-Skipping 487                                                                
-Skipping 491                                                                
-Skipping 499                                                                
-Skipping 503                                                                
-Skipping 509                                                                
-Skipping 521                                                                
-Skipping 523                                                                
-Skipping 541                                                                
-Skipping 547                                                                
-Skipping 557                                                                
-Skipping 563                                                                
-Skipping 569                                                                
-Skipping 571                                                                
-Skipping 577                                                                
-Skipping 587                                                                
-Skipping 593                                                                
-Skipping 599                                                                
-Skipping 601                                                                
-Skipping 607                                                                
-Skipping 613                                                                
-Skipping 617                                                                
-Skipping 619                                                                
-Skipping 631                                                                
-Skipping 641                                                                
-Skipping 643                                                                
-Skipping 647                                                                
-Skipping 653                                                                
-Skipping 659                                                                
-Skipping 661                                                                
-Skipping 673                                                                
-Skipping 677                                                                
-Skipping 683                                                                
-Skipping 691                                                                
-Skipping 701                                                                
-Skipping 709                                                                
-Skipping 719                                                                
-Skipping 727                                                                
-Skipping 733                                                                
-Skipping 739                                                                
-Skipping 743                                                                
-Skipping 751                                                                
-Skipping 757                                                                
-Skipping 761                                                                
-Skipping 769                                                                
+Skipping 359 (exponent 19580)                                               

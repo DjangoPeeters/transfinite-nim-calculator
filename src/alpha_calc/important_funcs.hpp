@@ -2,6 +2,7 @@
 #define IMPORTANT_FUNCS_HPP
 
 #include <cstdint>
+#include <utility>
 #include <vector>
 #include <map>
 
@@ -18,7 +19,7 @@ typedef struct {
 
 namespace important_funcs {
     const std::map<uint16_t, std::vector<uint16_t>>& get_q_set_cache();
-    std::vector<uint16_t> q_set(uint16_t p);
+    std::pair<uint32_t, std::vector<uint16_t>> q_set(uint16_t p);
 
     const std::map<uint16_t, uint8_t>& get_excess_cache();
     excess_return excess(uint16_t p); // every excess for primes p <= 257 is at most 4

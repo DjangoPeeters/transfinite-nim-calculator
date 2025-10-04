@@ -72,9 +72,9 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
             kappa_table[i].terms[1] = basis[i];
         } else if (q_components[i] == q_degrees[i]) {
             const uint16_t p = q_degrees[i];
-            const vector<uint16_t> q_set(important_funcs::q_set(p));
-            excess_return exr = important_funcs::excess(p);
-            if (exr.failed) {
+            const auto q_set_r = important_funcs::q_set(p);
+            const excess_return exr = important_funcs::excess(p);
+            if (q_set_r.first != 0 || exr.failed) {
                 cout << "constructing algebra failed\n";
                 accumulate_size = 0;
                 accumulator = 0;
@@ -93,6 +93,7 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
                 term_count = 0;
                 return;
             }
+            const vector<uint16_t> q_set = q_set_r.second;
             const uint16_t excess = exr.result;
 
             vector<uint32_t> kappa_blocks(vector<uint32_t>(q_set.size()));

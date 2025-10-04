@@ -32,6 +32,7 @@ constexpr bool TEST_MODE = true;
 uint32_t MAX_TERM_COUNT = 10000000;
 
 //TODO check when calculations failed and report so appropriately
+// only succesful calculations will return a pair with first component =0, otherwise term_count which caused problems
 
 namespace important_funcs {
     namespace {
@@ -58,28 +59,38 @@ namespace important_funcs {
             }
         };
 
-        uint256_t finite_summand(uint16_t p, uint16_t excess) {
-            const vector<uint16_t> q_set1 = q_set(p);
+        std::pair<uint32_t, uint256_t> finite_summand(uint16_t p, uint16_t excess) {
+            const auto q_set_r = q_set(p);
+            if (q_set_r.first != 0) {
+                cout << "finite_summand failed\n";
+                return {q_set_r.first, 0};
+            }
+            const vector<uint16_t> q_set1 = q_set_r.second;
             uint256_t base_finite_summand = 0;
             if (!q_set1.empty() && (q_set1[0] & 1) == 0) {
                 base_finite_summand = ((uint256_t)1) << (q_set1[0] >> 1);
             }
-            return base_finite_summand + (uint256_t)excess;
+            return {0, base_finite_summand + (uint256_t)excess};
         }
 
-        vector<uint16_t> finite_components(uint16_t p, uint16_t excess) {
-            uint256_t finite_summand1 = finite_summand(p, excess);
+        std::pair<uint32_t, vector<uint16_t>> finite_components(uint16_t p, uint16_t excess) {
+            const auto finite_summand_r = finite_summand(p, excess);
+            if (finite_summand_r.first != 0) {
+                cout << "finite_components failed\n";
+                return {finite_summand_r.first, {}};
+            }
+            const uint256_t finite_summand1 = finite_summand_r.second;
             if (finite_summand1 <= 1) {
-                return {};
+                return {0, {}};
             } else {
                 vector<uint16_t> result;
                 for (uint8_t k = 0; k <= msb(msb(finite_summand1)); k++) result.push_back(((uint16_t)1) << (k + 1)); // k <= 7 because we chose `uint256_t`
-                return result;
+                return {0, result};
             }
         }
 
-        set<uint16_t> primitive_components(uint16_t q) {
-            uint16_t p = prime_pow(q).first;
+        std::pair<uint32_t, set<uint16_t>> primitive_components(uint16_t q) {
+            const uint16_t p = prime_pow(q).first;
             set<uint16_t> components;
             uint16_t pn = 1;
             while (pn < q) {
@@ -87,32 +98,56 @@ namespace important_funcs {
                 components.insert(pn);
             }
 
-            for (const uint16_t q1 : q_set(p)) {
-                for (const uint16_t q2 : primitive_components(q1)) {
+            const auto q_set_r = q_set(p);
+            if (q_set_r.first != 0) {
+                cout << "primitive_components failed\n";
+                return {q_set_r.first, {}};
+            }
+            for (const uint16_t q1 : q_set_r.second) {
+                const auto prqr = primitive_components(q1);
+                if (prqr.first != 0) {
+                    cout << "primitive_components failed\n";
+                    return {prqr.first, {}};
+                }
+                for (const uint16_t q2 : prqr.second) {
                     components.insert(q2);
                 }
             }
-            excess_return ex = excess(p);
+            const excess_return ex = excess(p);
             if (ex.failed) {
                 cout << "primitive_components failed\n";
-                return {};
+                return {ex.term_count, {}};
             }
-            uint16_t exr = ex.result;
-            const vector<uint16_t> fin_comps = finite_components(p, exr);
+            const uint16_t exr = ex.result;
+            const auto fin_comps_r = finite_components(p, exr);
+            if (fin_comps_r.first != 0) {
+                cout << "primitive_components failed\n";
+                return {fin_comps_r.first, {}};
+            }
+            const vector<uint16_t> fin_comps = fin_comps_r.second;
             components.insert(fin_comps.begin(), fin_comps.end());
-            return components;
+            return {0, components};
         }
 
-        vector<uint16_t> kappa_set(uint16_t h) {
-            uint16_t q = max_pow_min_prime_div(h).second;
-            if (h == q) return {h};
+        std::pair<uint32_t, vector<uint16_t>> kappa_set(uint16_t h) {
+            const uint16_t q = max_pow_min_prime_div(h).second;
+            if (h == q) return {0, {h}};
 
-            uint16_t g = h/q;
-            vector<uint16_t> kappag_set(kappa_set(g));
-            if (kappag_set.empty()) return {};
+            const uint16_t g = h/q;
+            const auto kappag_set_r = kappa_set(g);
+            if (kappag_set_r.first != 0) {
+                cout << "kappa_set failed\n";
+                return {kappag_set_r.first, {}};
+            }
+            vector<uint16_t> kappag_set(kappag_set_r.second);
             vector<uint16_t> components{};
-            for (auto q1 : kappag_set) {
-                for (auto n : primitive_components(q1)) {
+            for (const auto q1 : kappag_set) {
+                const auto prqr = primitive_components(q1);
+                if (prqr.first != 0) {
+                    cout << "kappa_set failed\n";
+                    return {prqr.first, {}};
+                }
+                for (const auto n : prqr.second) {
                     components.push_back(n);
                 }
             }
@@ -124,10 +159,6 @@ namespace important_funcs {
 
             cout << "Computing the degree of kappa(" << g << ").\n";
 
-            // Shared resources
-            ring_buffer_calculation_queue log_queue;
-            std::atomic<bool> calculation_done{false};
-
             cout << "Constructing algebra (components = {" << components[0];
             for (size_t i = 1; i < components.size(); i++) {
                 cout << ", " << components[i];
@@ -135,13 +166,17 @@ namespace important_funcs {
             cout << "}).\n";
 
             // Check if term_count won't be too big
-            uint32_t term_count_check = term_count_calc(components);
+            const uint32_t term_count_check = term_count_calc(components);
             if (term_count_check > MAX_TERM_COUNT) { // roughly more than 100 days of computing time needed at the time of writing
                 cout << "constructing algebra failed due to imposed size limit\n";
                 cout << "term_count would have been " << term_count_check << "\n";
-                
-                return {};
+                cout << "kappa_set failed\n";
+                return {term_count_check, {}};
             }
+
+            // Shared resources
+            ring_buffer_calculation_queue log_queue;
+            std::atomic<bool> calculation_done{false};
 
             // Create objects
             impartial_term_algebra algebra(log_queue, calculation_done, components);
@@ -175,10 +210,10 @@ namespace important_funcs {
             cout << "Degree is " << degree << "." << '\n';
 
             if (degree % q == 0) {
-                return kappag_set;
+                return {0, kappag_set};
             } else {
                 kappag_set.insert(kappag_set.begin(), q); // prime powers are stored from lowest prime to highest prime
-                return kappag_set;
+                return {0, kappag_set};
             }
         }
     }
@@ -188,18 +223,19 @@ namespace important_funcs {
         return q_set_cache;
     }
 
-    vector<uint16_t> q_set(uint16_t p) {
+    std::pair<uint32_t, vector<uint16_t>> q_set(uint16_t p) {
         if (p == 2) {
-            return {};
+            return {0, {}};
         }
         std::lock_guard<std::mutex> lock(q_set_cache_mutex);
         if (q_set_cache.find(p) != q_set_cache.end()) {
-            return q_set_cache[p];
+            return {0, q_set_cache[p]};
         }
         lock.~lock_guard();
 
-        const vector<uint16_t> result = kappa_set(f(p));
-        if (!result.empty()) cache_q_set(p, result);
+        const std::pair<uint32_t, vector<uint16_t>> result = kappa_set(f(p));
+        if (result.first == 0) cache_q_set(p, result.second);
+        else cout << "q_set failed\n";
         return result;
     }
 
@@ -226,14 +262,16 @@ namespace important_funcs {
         }
         lock.~lock_guard();
 
-        const vector<uint16_t> q_set1 = q_set(p);
-        if (q_set1.empty()) {
+        const auto q_set_r = q_set(p);
+        if (q_set_r.first != 0) {
+            cout << "excess failed\n";
             excess_return r;
             r.failed = true;
-            r.term_count = 0;
+            r.term_count = q_set_r.first;
             r.used_cache = false;
             return r;
         }
+        const vector<uint16_t> q_set1 = q_set_r.second;
         cout << "[p = " << p << "] Computing excess (Q-Set = {" << q_set1[0];
         for (size_t i = 1; i < q_set1.size(); i++) {
             cout << ", " << q_set1[i];
@@ -241,8 +279,17 @@ namespace important_funcs {
         cout << "})." << '\n';
 
         vector<uint16_t> components = {};
-        for (auto q : q_set1) {
-            for (auto n : primitive_components(q)) {
+        for (const auto q : q_set1) {
+            const auto prqr = primitive_components(q);
+            if (prqr.first != 0) {
+                cout << "excess failed\n";
+                excess_return r;
+                r.failed = true;
+                r.term_count = prqr.first;
+                r.used_cache = false;
+                return r;
+            }
+            for (const auto n : prqr.second) {
                 components.push_back(n);
             }
         }
@@ -253,7 +300,7 @@ namespace important_funcs {
         components.erase(unique(components.begin(), components.end()), components.end());
 
         uint8_t excess1 = 0;
-        uint16_t fp = f(p);
+        const uint16_t fp = f(p);
         if (fp != 2 && (fp & 1) == 0 && is_3_pow(fp >> 1)) {
             excess1 = 4;
         } else if (q_set1.size() == 1 && (q_set1[0] & 1) != 0) {
@@ -265,14 +312,28 @@ namespace important_funcs {
         one.terms[0] = 0;
         vector<uint16_t> q_components{};
         while (!done) {
-            uint256_t finite_summand1 = finite_summand(p, excess1);
-            const vector<uint16_t> finite_components1(finite_components(p, excess1));
+            const auto fin_sum_r = finite_summand(p, excess1);
+            if (fin_sum_r.first != 0) {
+                cout << "excess failed\n";
+                excess_return r;
+                r.failed = true;
+                r.term_count = fin_sum_r.first;
+                r.used_cache = false;
+                return r;
+            }
+            const uint256_t finite_summand1 = fin_sum_r.second;
+            const auto fin_comps_r = finite_components(p, excess1);
+            if (fin_comps_r.first != 0) {
+                cout << "excess failed\n";
+                excess_return r;
+                r.failed = true;
+                r.term_count = fin_comps_r.first;
+                r.used_cache = false;
+                return r;
+            }
+            const vector<uint16_t> finite_components1(fin_comps_r.second);
             q_components = components;
             q_components.insert(q_components.end(), finite_components1.begin(), finite_components1.end());
-
-            // Shared resources
-            ring_buffer_calculation_queue log_queue;
-            std::atomic<bool> calculation_done{false};
 
             cout << "[p = " << p << "] Constructing algebra (components = {" << q_components[0];
             for (size_t i = 1; i < q_components.size(); i++) {
@@ -281,17 +342,21 @@ namespace important_funcs {
             cout << "})." << '\n';
 
             // Check if term_count won't be too big
-            uint32_t term_count_check = term_count_calc(q_components);
+            const uint32_t term_count_check = term_count_calc(q_components);
             if (term_count_check > MAX_TERM_COUNT) { // roughly more than 100 days of computing time needed at the time of writing
                 cout << "constructing algebra failed due to imposed size limit\n";
                 cout << "term_count would have been " << term_count_check << "\n";
-                
+                cout << "excess failed\n";
                 excess_return r;
                 r.failed = true;
                 r.term_count = term_count_check;
                 r.used_cache = false;
                 return r;
             }
+
+            // Shared resources
+            ring_buffer_calculation_queue log_queue;
+            std::atomic<bool> calculation_done{false};
 
             // Create objects
             impartial_term_algebra algebra(log_queue, calculation_done, q_components); //TODO make constructor faster?

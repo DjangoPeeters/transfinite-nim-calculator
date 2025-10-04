@@ -118,11 +118,16 @@ void alphas(const char* logs_dir_) {
         t = time(nullptr) - checkpoint_time;
         if (ar.failed) {
             cout << "calculating alpha(" << p << ") failed\n\n";
+            excess_return dummy;
+            dummy.failed = true;
+            dummy.term_count = ar.term_count;
+            dummy.used_cache = false;
+            write_alpha(file, p, {}, dummy, ar, t);
         } else {
             cout << ar.result << '\n';
             cout << "===== Time is " << t << " seconds. =====\n\n";
+            write_alpha(file, p, q_set(p).second, excess(p), ar, t);
         }
-        write_alpha(file, p, q_set(p), excess(p), ar, t);
         n++;
     }
 }
