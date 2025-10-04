@@ -69,7 +69,6 @@ namespace www_nim {
             } else {
                 line.append(line_length - line.length(), ' ');
             }
-            line += '\n';
 
             // editing the file
             std::lock_guard<std::mutex> lock(alpha_cache_mutex);
@@ -77,6 +76,7 @@ namespace www_nim {
             file.open(logs_dir + "/alpha_records.txt", std::ios::in | std::ios::out);
             if (!file.is_open()) {
                 cout << "failed to open alpha_records.txt\n";
+                file.close();
                 exit(1);
             }
 
@@ -113,14 +113,15 @@ namespace www_nim {
             if (!lineExists || currentLine[0] == 'S') {
                 // Line doesn't exist or was skipped - write new data
                 file.seekp(targetPos);
-                file << line;
+                file << line << "\n";
                 file.flush();
             } else {
                 if (!alpha_p.failed) { // If the calculation failed and we already have a record for when it didn't fail, we shouldn't alter this line
                     // Compare with existing data
                     string s_old_alpha_p = currentLine.substr(29, 40);
                     if (s_alpha_p != s_old_alpha_p) {
-                        cout << "calculated alphas were inconsistent\n";
+                        cout << "calculated alphas were inconsistent:\nwas " << s_old_alpha_p << " and would be " << s_alpha_p << "\n";
+                        file.close();
                         exit(1);
                     }
                 
@@ -135,7 +136,7 @@ namespace www_nim {
 
                     if (new_t < old_t) {
                         file.seekp(targetPos);
-                        file << line;
+                        file << line << "\n";
                         file.flush();
                     }
                 }

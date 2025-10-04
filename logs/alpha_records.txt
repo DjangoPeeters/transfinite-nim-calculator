@@ -72,7 +72,7 @@
   367            [61]      1                             w^(w^16) + 1      0
   373         [3, 31]      0                              w^(w^9) + w      0
   379         [27, 7]      0                            w^(w^2) + w^9      0
-  383           [191]      1                             w^(w^41) + 1   5547                                       
+  383           [191]      1                             w^(w^41) + 1   5547
   389            [97]      1                             w^(w^23) + 1      1
   397            [11]      1                              w^(w^3) + 1      0
   401         [8, 25]      0                             w^(w*5) + 16      0
@@ -88,26 +88,26 @@ Skipping 419 (exponent 37620)
   461            [23]      1                              w^(w^7) + 1      1
   463         [7, 11]      0                        w^(w^3) + w^(w^2)      0
   467           [233]      1                             w^(w^49) + 1   5221
-  479           [239]      1                             w^(w^50) + 1   6843        
+  479           [239]      1                             w^(w^50) + 1   6843
   487           [243]      1                                 w^81 + 1      0
-  491         [5, 49]      0                          w^(w^2*7) + w^w      1
+  491         [5, 49]      0                          w^(w^2*7) + w^w      0
 Skipping 499 (exponent 68060)                                               
 Skipping 503 (exponent 25100)                                               
-Skipping 509 (exponent 10668)                                               
+  509        [4, 127]      0                             w^(w^29) + 4      3
   521         [5, 13]      0                            w^(w^4) + w^w      0
-  523         [9, 29]      0                            w^(w^8) + w^3      3
+  523         [9, 29]      0                            w^(w^8) + w^3      1
   541         [27, 5]      0                                w^w + w^9      0
   547         [7, 13]      0                        w^(w^4) + w^(w^2)      0
   557           [139]      1                             w^(w^32) + 1  69754
 Skipping 563 (exponent 118020)                                              
 Skipping 569 (exponent 29820)                                               
-  571            [19]      1                              w^(w^6) + 1      1
+  571            [19]      1                              w^(w^6) + 1      0
   577         [16, 9]      0                                w^3 + 256      0
   587           [293]      1                             w^(w^60) + 1   8615
   593            [37]      1                             w^(w^10) + 1      0
 Skipping 599 (exponent 197340)                                              
   601            [25]      1                              w^(w*5) + 1      0
-Skipping 607 (exponent 10100)                                               
+Skipping 607 (exponent 30300)                                               
   613         [9, 17]      0                            w^(w^5) + w^3      0
   617         [7, 11]      0                        w^(w^3) + w^(w^2)      1
 Skipping 619 (exponent 42024)                                               
@@ -121,80 +121,80 @@ Skipping 653 (exponent 52812)
   673         [16, 3]      0                                  w + 256      0
   677           [169]      1                           w^(w^4*13) + 1      0
   683            [11]      1                              w^(w^3) + 1      0
-  691            [23]      1                              w^(w^7) + 1      2
+  691            [23]      1                              w^(w^7) + 1      1
   701         [25, 7]      0                        w^(w^2) + w^(w*5)      0
 Skipping 709 (exponent 143724)                                              
-Skipping 719 (exponent 19580)                                               
+Skipping 719 (exponent 3504820)                                             
   727           [121]      1                           w^(w^3*11) + 1      0
-  733            [61]      1                             w^(w^16) + 1      1
-  739         [3, 41]      0                             w^(w^11) + w      1
+  733            [61]      1                             w^(w^16) + 1      0
+  739         [3, 41]      0                             w^(w^11) + w      0
 Skipping 743 (exponent 57876)                                               
   751        [3, 125]      0                             w^(w*25) + w      0
   757      [4, 27, 7]      0                        w^(w^2) + w^9 + 4      0
   761         [5, 19]      0                            w^(w^6) + w^w      0
   769        [128, 3]      0                                 w + 2^64      0
-Skipping 773 (exponent 18528)                                               
+  773           [193]      1                             w^(w^42) + 1     13
 Skipping 787 (exponent 102180)                                              
 Skipping 797 (exponent 394020)                                              
-Skipping 809 (exponent 10100)                                               
+  809           [101]      1                             w^(w^24) + 1      2
   811         [27, 5]      0                                w^w + w^9      0
   821            [41]      1                             w^(w^11) + 1      0
-Skipping 823 (exponent 18632)                                               
+Skipping 823 (exponent 55896)                                               
 Skipping 827 (exponent 143724)                                              
 Skipping 829 (exponent 45540)                                               
 Skipping 839 (exponent 37620)                                               
 Skipping 853 (exponent 29820)                                               
 Skipping 857 (exponent 884676)                                              
-  859        [11, 13]      0                        w^(w^4) + w^(w^3)      3
+  859        [11, 13]      0                        w^(w^4) + w^(w^3)      1
 Skipping 863 (exponent 778386)                                              
-  877         [4, 73]      0                             w^(w^19) + 4      1
+  877         [4, 73]      0                             w^(w^19) + 4      0
   881            [11]      1                              w^(w^3) + 1      0
   883         [9, 49]      0                          w^(w^2*7) + w^3      0
 Skipping 887 (exponent 2349672)                                             
-  907           [151]      1                             w^(w^34) + 1      7
+  907           [151]      1                             w^(w^34) + 1      3
   911         [7, 13]      0                        w^(w^4) + w^(w^2)      0
   919         [9, 17]      0                            w^(w^5) + w^3      0
-  929        [16, 29]      0                            w^(w^8) + 256      5
+  929        [16, 29]      0                            w^(w^8) + 256      2
   937         [9, 13]      0                            w^(w^4) + w^3      0
 Skipping 941 (exponent 237820)                                              
 Skipping 947 (exponent 198660)                                              
   953            [17]      1                              w^(w^5) + 1      0
 Skipping 967 (exponent 106260)                                              
-  971            [97]      1                             w^(w^23) + 1      2
-  977         [8, 61]      0                            w^(w^16) + 16      3
+  971            [97]      1                             w^(w^23) + 1      0
+  977         [8, 61]      0                            w^(w^16) + 16      1
 Skipping 983 (exponent 1443540)                                             
   991         [9, 11]      0                            w^(w^3) + w^3      0
 Skipping 997 (exponent 68060)                                               
  1009       [8, 9, 7]      0                       w^(w^2) + w^3 + 16      0
- 1013            [23]      1                              w^(w^7) + 1      1
-Skipping 1019 (exponent 10668)                                              
+ 1013            [23]      1                              w^(w^7) + 1      0
+Skipping 1019 (exponent 5430012)                                            
  1021         [5, 17]      0                            w^(w^5) + w^w      0
 Skipping 1031 (exponent 42024)                                              
  1033            [43]      1                             w^(w^12) + 1      0
 Skipping 1039 (exponent 624876)                                             
 Skipping 1049 (exponent 102180)                                             
- 1051         [25, 7]      0                        w^(w^2) + w^(w*5)      1
+ 1051         [25, 7]      0                        w^(w^2) + w^(w*5)      0
 Skipping 1061 (exponent 41340)                                              
 Skipping 1063 (exponent 143724)                                             
-Skipping 1069 (exponent 19580)                                              
+ 1069            [89]      1                             w^(w^22) + 1      7
 Skipping 1087 (exponent 32580)                                              
-Skipping 1091 (exponent 19620)                                              
+ 1091        [5, 109]      0                           w^(w^27) + w^w      7
  1093         [7, 13]      0                        w^(w^4) + w^(w^2)      0
-Skipping 1097 (exponent 18632)                                              
+ 1097           [137]      1                             w^(w^31) + 1      7
  1103            [29]      1                              w^(w^8) + 1      0
 Skipping 1109 (exponent 1401620)                                            
- 1117         [9, 31]      0                            w^(w^9) + w^3      2
+ 1117         [9, 31]      0                            w^(w^9) + w^3      1
 Skipping 1123 (exponent 22440)                                              
 Skipping 1129 (exponent 237820)                                             
 Skipping 1151 (exponent 25300)                                              
  1153         [32, 9]      0                               w^3 + 2^16      0
 Skipping 1163 (exponent 68060)                                              
- 1171      [9, 5, 13]      0                      w^(w^4) + w^w + w^3      1
+ 1171      [9, 5, 13]      0                      w^(w^4) + w^w + w^3      0
 Skipping 1181 (exponent 143724)                                             
 Skipping 1187 (exponent 789876)                                             
 Skipping 1193 (exponent 198468)                                             
  1201         [3, 25]      0                              w^(w*5) + w      0
-Skipping 1213 (exponent 10100)                                              
+Skipping 1213 (exponent 30300)                                              
  1217         [8, 19]      0                             w^(w^6) + 16      0
 Skipping 1223 (exponent 237820)                                             
 Skipping 1229 (exponent 125256)                                             
@@ -206,75 +206,372 @@ Skipping 1277 (exponent 133980)
 Skipping 1279 (exponent 29820)                                              
 Skipping 1283 (exponent 41024)                                              
 Skipping 1289 (exponent 106260)                                             
-Skipping 1291 (exponent 18060)                                              
+ 1291         [5, 43]      0                           w^(w^12) + w^w      6
  1297         [8, 81]      0                                w^27 + 16      0
  1301        [25, 13]      0                        w^(w^4) + w^(w*5)      0
-Skipping 1303 (exponent 13020)                                              
+ 1303         [7, 31]      0                        w^(w^9) + w^(w^2)      3
 Skipping 1307 (exponent 52812)                                              
 Skipping 1319 (exponent 237820)                                             
  1321          [3, 5]      0                                  w^w + w      0
- 1327        [13, 17]      0                        w^(w^5) + w^(w^4)      1
+ 1327        [13, 17]      0                        w^(w^5) + w^(w^4)      0
  1361         [5, 17]      0                            w^(w^5) + w^w      0
 Skipping 1367 (exponent 150260)                                             
- 1373        [4, 343]      0                           w^(w^2*49) + 4      1
-Skipping 1381 (exponent 15180)                                              
+ 1373        [4, 343]      0                           w^(w^2*49) + 4      0
+ 1381         [3, 23]      0                              w^(w^7) + w      4
 Skipping 1399 (exponent 567588)                                             
  1409        [64, 11]      0                           w^(w^3) + 2^32      1
-Skipping 1423 (exponent 12324)                                              
+ 1423            [79]      1                             w^(w^20) + 1      3
 Skipping 1427 (exponent 156860)                                             
  1429          [4, 7]      0                              w^(w^2) + 4      0
-Skipping 1433 (exponent 19580)                                              
-Skipping 1439 (exponent 19580)                                              
- 1447           [241]      1                             w^(w^51) + 1      4
+Skipping 1433 (exponent 3504820)                                            
+Skipping 1439 (exponent 3504820)                                            
+ 1447           [241]      1                             w^(w^51) + 1      2
 Skipping 1451 (exponent 60900)                                              
- 1453        [3, 121]      0                           w^(w^3*11) + w      2
+ 1453        [3, 121]      0                           w^(w^3*11) + w      0
  1459           [243]      4                                 w^81 + 4      0
  1471         [5, 49]      0                          w^(w^2*7) + w^w      1
- 1481         [5, 37]      0                           w^(w^10) + w^w      2
- 1483        [13, 19]      0                        w^(w^6) + w^(w^4)      4
+ 1481         [5, 37]      0                           w^(w^10) + w^w      0
+ 1483        [13, 19]      0                        w^(w^6) + w^(w^4)      2
 Skipping 1487 (exponent 57876)                                              
- 1489      [8, 3, 31]      0                         w^(w^9) + w + 16      1
+ 1489      [8, 3, 31]      0                         w^(w^9) + w + 16      0
 Skipping 1493 (exponent 693780)                                             
 Skipping 1499 (exponent 884676)                                             
- 1511           [151]      1                             w^(w^34) + 1      5
+ 1511           [151]      1                             w^(w^34) + 1      2
 Skipping 1523 (exponent 2602620)                                            
- 1531      [9, 5, 17]      0                      w^(w^5) + w^w + w^3      2
-Skipping 1543 (exponent 12336)                                              
-Skipping 1549 (exponent 10836)                                              
- 1553            [97]      1                             w^(w^23) + 1      2
+ 1531      [9, 5, 17]      0                      w^(w^5) + w^w + w^3      1
+ 1543        [3, 257]      0                             w^(w^53) + w      4
+ 1549      [4, 9, 43]      0                       w^(w^12) + w^3 + 4      2
+ 1553            [97]      1                             w^(w^23) + 1      1
 Skipping 1559 (exponent 140220)                                             
 Skipping 1567 (exponent 21924)                                              
 Skipping 1571 (exponent 24492)                                              
 Skipping 1579 (exponent 102180)                                             
- 1583           [113]      1                             w^(w^28) + 1      6
+ 1583           [113]      1                             w^(w^28) + 1      2
  1597         [7, 19]      0                        w^(w^6) + w^(w^2)      1
  1601        [16, 25]      0                            w^(w*5) + 256      0
 Skipping 1607 (exponent 144540)                                             
 Skipping 1609 (exponent 44220)                                              
  1613            [13]      1                              w^(w^4) + 1      0
-Skipping 1619 (exponent 10100)                                              
+Skipping 1619 (exponent 8170900)                                            
  1621         [81, 5]      0                               w^w + w^27      0
 Skipping 1627 (exponent 146340)                                             
 Skipping 1637 (exponent 166872)                                             
- 1657            [23]      1                              w^(w^7) + 1      2
+ 1657            [23]      1                              w^(w^7) + 1      0
 Skipping 1663 (exponent 1401620)                                            
-Skipping 1667 (exponent 19992)                                              
-Skipping 1669 (exponent 15180)                                              
+ 1667        [49, 17]      0                      w^(w^5) + w^(w^2*7)      7
+Skipping 1669 (exponent 2110020)                                            
 Skipping 1693 (exponent 237820)                                             
 Skipping 1697 (exponent 33072)                                              
 Skipping 1699 (exponent 237820)                                             
- 1709            [61]      1                             w^(w^16) + 1      1
-Skipping 1721 (exponent 18060)                                              
-Skipping 1723 (exponent 17220)                                              
+ 1709            [61]      1                             w^(w^16) + 1      0
+ 1721         [5, 43]      0                           w^(w^12) + w^w      5
+ 1723         [7, 41]      0                       w^(w^11) + w^(w^2)      5
 Skipping 1733 (exponent 31176)                                              
-Skipping 1741 (exponent 12180)                                              
-Skipping 1747 (exponent 13968)                                              
- 1753            [73]      1                             w^(w^19) + 1      1
+ 1741         [5, 29]      0                            w^(w^8) + w^w      3
+ 1747         [9, 97]      0                           w^(w^23) + w^3      6
+ 1753            [73]      1                             w^(w^19) + 1      0
 Skipping 1759 (exponent 770004)                                             
  1777            [37]      1                             w^(w^10) + 1      0
-Skipping 1783 (exponent 17820)                                              
+ 1783        [81, 11]      0                           w^(w^3) + w^27      4
 Skipping 1787 (exponent 237820)                                             
 Skipping 1789 (exponent 198468)                                             
  1801            [25]      1                              w^(w*5) + 1      0
 Skipping 1811 (exponent 32580)                                              
 Skipping 1823 (exponent 994812)                                             
+ 1831            [61]      1                             w^(w^16) + 1      0
+Skipping 1847 (exponent 29820)                                              
+ 1861         [3, 31]      0                              w^(w^9) + w      0
+Skipping 1867 (exponent 192820)                                             
+ 1871        [11, 17]      0                        w^(w^5) + w^(w^3)      1
+ 1873      [8, 9, 13]      0                       w^(w^4) + w^3 + 16      0
+Skipping 1877 (exponent 44220)                                              
+Skipping 1879 (exponent 48828)                                              
+Skipping 1889 (exponent 143724)                                             
+ 1901        [25, 19]      0                        w^(w^6) + w^(w*5)      5
+Skipping 1907 (exponent 129608)                                             
+Skipping 1913 (exponent 682584)                                             
+Skipping 1931 (exponent 92640)                                              
+Skipping 1933 (exponent 106260)                                             
+Skipping 1949 (exponent 236682)                                             
+ 1951        [25, 13]      0                        w^(w^4) + w^(w*5)      0
+Skipping 1973 (exponent 82824)                                              
+Skipping 1979 (exponent 4569180)                                            
+ 1987           [331]      1                             w^(w^65) + 1     13
+Skipping 1993 (exponent 68060)                                              
+Skipping 1997 (exponent 68060)                                              
+ 1999            [37]      1                             w^(w^10) + 1      1
+ 2003        [11, 13]      0                        w^(w^4) + w^(w^3)      1
+Skipping 2011 (exponent 44220)                                              
+ 2017         [16, 7]      0                            w^(w^2) + 256      0
+Skipping 2027 (exponent 5125780)                                            
+ 2029           [169]      1                           w^(w^4*13) + 1      0
+Skipping 2039 (exponent 5430012)                                            
+ 2053        [27, 19]      0                            w^(w^6) + w^9      0
+Skipping 2063 (exponent 42024)                                              
+Skipping 2069 (exponent 237820)                                             
+ 2081     [16, 5, 13]      0                      w^(w^4) + w^w + 256      0
+Skipping 2083 (exponent 624876)                                             
+Skipping 2087 (exponent 198468)                                             
+ 2089            [29]      1                              w^(w^8) + 1      0
+Skipping 2099 (exponent 102180)                                             
+Skipping 2111 (exponent 88620)                                              
+ 2113            [11]      1                              w^(w^3) + 1      0
+ 2129         [7, 19]      0                        w^(w^6) + w^(w^2)      1
+Skipping 2131 (exponent 29820)                                              
+Skipping 2137 (exponent 58740)                                              
+Skipping 2141 (exponent 884676)                                             
+ 2143         [3, 17]      0                              w^(w^5) + w      0
+Skipping 2153 (exponent 44220)                                              
+ 2161      [8, 27, 5]      0                           w^w + w^9 + 16      0
+ 2179        [3, 121]      0                           w^(w^3*11) + w      1
+Skipping 2203 (exponent 1343220)                                            
+Skipping 2207 (exponent 2686908)                                            
+Skipping 2213 (exponent 86268)                                              
+ 2221         [5, 37]      0                           w^(w^10) + w^w      2
+Skipping 2237 (exponent 46956)                                              
+Skipping 2239 (exponent 693780)                                             
+Skipping 2243 (exponent 143724)                                             
+ 2251        [3, 125]      0                             w^(w*25) + w      0
+Skipping 2267 (exponent 42024)                                              
+ 2269      [4, 81, 7]      0                       w^(w^2) + w^27 + 4      0
+Skipping 2273 (exponent 29820)                                              
+ 2281         [5, 19]      0                            w^(w^6) + w^w      0
+ 2287           [127]      1                             w^(w^29) + 1      1
+Skipping 2293 (exponent 653220)                                             
+ 2297         [7, 41]      0                       w^(w^11) + w^(w^2)      5
+Skipping 2309 (exponent 83088)                                              
+ 2311         [7, 11]      0                        w^(w^3) + w^(w^2)      0
+Skipping 2333 (exponent 454740)                                             
+Skipping 2339 (exponent 68060)                                              
+ 2341         [5, 13]      0                            w^(w^4) + w^w      0
+Skipping 2347 (exponent 172040)                                             
+Skipping 2351 (exponent 237820)                                             
+Skipping 2357 (exponent 106020)                                             
+Skipping 2371 (exponent 61620)                                              
+ 2377        [27, 11]      0                            w^(w^3) + w^9      1
+ 2381         [7, 17]      0                        w^(w^5) + w^(w^2)      0
+Skipping 2383 (exponent 87340)                                              
+Skipping 2389 (exponent 394020)                                             
+Skipping 2393 (exponent 197340)                                             
+Skipping 2399 (exponent 215820)                                             
+ 2411           [241]      1                             w^(w^51) + 1      2
+ 2417        [8, 151]      0                            w^(w^34) + 16      7
+Skipping 2423 (exponent 624876)                                             
+ 2437            [29]      1                              w^(w^8) + 1      0
+ 2441            [61]      1                             w^(w^16) + 1      0
+Skipping 2447 (exponent 237820)                                             
+Skipping 2459 (exponent 125256)                                             
+Skipping 2467 (exponent 167688)                                             
+Skipping 2473 (exponent 42024)                                              
+Skipping 2477 (exponent 42024)                                              
+Skipping 2503 (exponent 2110020)                                            
+ 2521       [9, 5, 7]      0                      w^(w^2) + w^w + w^3      0
+ 2531            [23]      1                              w^(w^7) + 1      0
+Skipping 2539 (exponent 237820)                                             
+Skipping 2543 (exponent 25420)                                              
+ 2549        [49, 13]      0                      w^(w^4) + w^(w^2*7)      1
+ 2551     [3, 25, 17]      0                    w^(w^5) + w^(w*5) + w      2
+Skipping 2557 (exponent 29820)                                              
+Skipping 2579 (exponent 106260)                                             
+Skipping 2591 (exponent 46620)                                              
+ 2593            [81]      1                                 w^27 + 1      0
+Skipping 2609 (exponent 52812)                                              
+ 2617           [109]      1                             w^(w^27) + 1      1
+Skipping 2621 (exponent 102180)                                             
+Skipping 2633 (exponent 237820)                                             
+ 2647        [27, 49]      0                          w^(w^2*7) + w^9      0
+Skipping 2657 (exponent 68060)                                              
+Skipping 2659 (exponent 2349672)                                            
+Skipping 2663 (exponent 26620)                                              
+ 2671            [89]      1                             w^(w^22) + 1      7
+Skipping 2677 (exponent 297036)                                             
+Skipping 2683 (exponent 198468)                                             
+ 2687            [79]      1                             w^(w^20) + 1      2
+ 2689         [32, 7]      0                           w^(w^2) + 2^16      0
+Skipping 2693 (exponent 32304)                                              
+Skipping 2699 (exponent 29820)                                              
+Skipping 2707 (exponent 27060)                                              
+Skipping 2711 (exponent 146340)                                             
+ 2713           [113]      1                             w^(w^28) + 1      3
+Skipping 2719 (exponent 27180)                                              
+ 2729        [11, 31]      0                        w^(w^9) + w^(w^3)      1
+ 2731            [13]      1                              w^(w^4) + 1      0
+Skipping 2741 (exponent 93160)                                              
+Skipping 2749 (exponent 156636)                                             
+Skipping 2753 (exponent 28896)                                              
+Skipping 2767 (exponent 2332660)                                            
+Skipping 2777 (exponent 624876)                                             
+Skipping 2789 (exponent 27880)                                              
+ 2791         [3, 31]      0                              w^(w^9) + w      1
+Skipping 2797 (exponent 567588)                                             
+ 2801      [8, 25, 7]      0                   w^(w^2) + w^(w*5) + 16      0
+Skipping 2803 (exponent 567588)                                             
+Skipping 2819 (exponent 4959680)                                            
+Skipping 2833 (exponent 143724)                                             
+Skipping 2837 (exponent 143724)                                             
+ 2843        [49, 29]      0                      w^(w^8) + w^(w^2*7)      5
+ 2851        [25, 19]      0                        w^(w^6) + w^(w*5)      5
+ 2857         [3, 17]      0                              w^(w^5) + w      0
+ 2861        [11, 13]      0                        w^(w^4) + w^(w^3)      1
+Skipping 2879 (exponent 3504820)                                            
+ 2887        [13, 37]      0                       w^(w^10) + w^(w^4)      5
+Skipping 2897 (exponent 32580)                                              
+Skipping 2903 (exponent 60900)                                              
+Skipping 2909 (exponent 1759340)                                            
+ 2917        [4, 243]      0                                 w^81 + 4      0
+Skipping 2927 (exponent 37620)                                              
+Skipping 2939 (exponent 123396)                                             
+ 2953         [3, 41]      0                             w^(w^11) + w      0
+Skipping 2957 (exponent 1817940)                                            
+Skipping 2963 (exponent 9863460)                                            
+Skipping 2969 (exponent 57876)                                              
+ 2971            [11]      1                              w^(w^3) + 1      0
+Skipping 2999 (exponent 884676)                                             
+ 3001        [3, 125]      0                             w^(w*25) + w      0
+ 3011         [5, 43]      0                           w^(w^12) + w^w      6
+Skipping 3019 (exponent 25100)                                              
+Skipping 3023 (exponent 13689660)                                           
+ 3037         [3, 23]      0                              w^(w^7) + w      4
+ 3041     [16, 5, 19]      0                      w^(w^6) + w^w + 256      4
+ 3049           [127]      1                             w^(w^29) + 1      1
+ 3061         [3, 17]      0                              w^(w^5) + w      0
+ 3067         [7, 73]      0                       w^(w^19) + w^(w^2)      2
+ 3079        [81, 19]      0                           w^(w^6) + w^27      0
+Skipping 3083 (exponent 44220)                                              
+ 3089           [193]      1                             w^(w^42) + 1     13
+ 3109            [37]      1                             w^(w^10) + 1      0
+Skipping 3119 (exponent 140220)                                             
+ 3121            [13]      1                              w^(w^4) + 1      0
+ 3137        [16, 49]      0                          w^(w^2*7) + 256      0
+Skipping 3163 (exponent 21080)                                              
+Skipping 3167 (exponent 15025836)                                           
+ 3169     [16, 9, 11]      0                      w^(w^3) + w^3 + 256      2
+Skipping 3181 (exponent 41340)                                              
+Skipping 3187 (exponent 143724)                                             
+ 3191            [11]      1                              w^(w^3) + 1      0
+Skipping 3203 (exponent 640400)                                             
+Skipping 3209 (exponent 80200)                                              
+Skipping 3217 (exponent 44220)                                              
+Skipping 3221 (exponent 106260)                                             
+Skipping 3229 (exponent 44220)                                              
+ 3251        [25, 13]      0                        w^(w^4) + w^(w*5)      0
+Skipping 3253 (exponent 146340)                                             
+Skipping 3257 (exponent 73260)                                              
+Skipping 3259 (exponent 32580)                                              
+ 3271        [5, 109]      0                           w^(w^27) + w^w      6
+Skipping 3299 (exponent 79152)                                              
+ 3301         [3, 11]      0                              w^(w^3) + w      0
+Skipping 3307 (exponent 138852)                                             
+Skipping 3313 (exponent 45540)                                              
+Skipping 3319 (exponent 86268)                                              
+Skipping 3323 (exponent 99660)                                              
+ 3329       [128, 13]      0                           w^(w^4) + 2^64      1
+ 3331            [37]      1                             w^(w^10) + 1      0
+Skipping 3343 (exponent 2110020)                                            
+Skipping 3347 (exponent 682584)                                             
+Skipping 3359 (exponent 3324420)                                            
+ 3361          [8, 7]      0                             w^(w^2) + 16      0
+Skipping 3371 (exponent 141540)                                             
+Skipping 3373 (exponent 118020)                                             
+ 3389           [121]      1                           w^(w^3*11) + 1      0
+ 3391           [113]      1                             w^(w^28) + 1      2
+Skipping 3407 (exponent 102180)                                             
+Skipping 3413 (exponent 29820)                                              
+ 3433        [11, 13]      0                        w^(w^4) + w^(w^3)      1
+Skipping 3449 (exponent 778386)                                             
+ 3457         [64, 9]      0                               w^3 + 2^32      0
+Skipping 3461 (exponent 624876)                                             
+Skipping 3463 (exponent 83088)                                              
+Skipping 3467 (exponent 31176)                                              
+ 3469        [3, 289]      0                           w^(w^5*17) + w      1
+Skipping 3491 (exponent 850164)                                             
+Skipping 3499 (exponent 454740)                                             
+ 3511     [27, 5, 13]      0                      w^(w^4) + w^w + w^9      0
+Skipping 3517 (exponent 770004)                                             
+Skipping 3527 (exponent 740460)                                             
+ 3529         [9, 49]      0                          w^(w^2*7) + w^3      0
+Skipping 3533 (exponent 778806)                                             
+Skipping 3539 (exponent 742980)                                             
+Skipping 3541 (exponent 143724)                                             
+Skipping 3547 (exponent 115836)                                             
+ 3557        [4, 127]      0                             w^(w^29) + 4      3
+Skipping 3559 (exponent 789876)                                             
+ 3571      [5, 7, 17]      0                  w^(w^5) + w^(w^2) + w^w      4
+Skipping 3581 (exponent 3504820)                                            
+Skipping 3583 (exponent 394020)                                             
+Skipping 3593 (exponent 301728)                                             
+Skipping 3607 (exponent 60100)                                              
+ 3613         [4, 43]      0                             w^(w^12) + 4      0
+Skipping 3617 (exponent 37968)                                              
+Skipping 3623 (exponent 32580)                                              
+ 3631           [121]      1                           w^(w^3*11) + 1      0
+Skipping 3637 (exponent 90900)                                              
+Skipping 3643 (exponent 30300)                                              
+Skipping 3659 (exponent 143724)                                             
+Skipping 3671 (exponent 1343220)                                            
+ 3673        [27, 17]      0                            w^(w^5) + w^9      0
+Skipping 3677 (exponent 1124856)                                            
+ 3691         [9, 41]      0                           w^(w^11) + w^3      1
+ 3697      [8, 7, 11]      0                   w^(w^3) + w^(w^2) + 16      1
+Skipping 3701 (exponent 33300)                                              
+Skipping 3709 (exponent 42024)                                              
+Skipping 3719 (exponent 111540)                                             
+Skipping 3727 (exponent 409860)                                             
+Skipping 3733 (exponent 192820)                                             
+Skipping 3739 (exponent 58740)                                              
+Skipping 3761 (exponent 237820)                                             
+Skipping 3767 (exponent 44220)                                              
+Skipping 3769 (exponent 24492)                                              
+Skipping 3779 (exponent 143724)                                             
+Skipping 3793 (exponent 24648)                                              
+Skipping 3797 (exponent 34164)                                              
+Skipping 3803 (exponent 32507100)                                           
+Skipping 3821 (exponent 653220)                                             
+ 3823        [49, 13]      0                      w^(w^4) + w^(w^2*7)      1
+Skipping 3833 (exponent 682584)                                             
+Skipping 3847 (exponent 41024)                                              
+Skipping 3851 (exponent 23100)                                              
+Skipping 3853 (exponent 884676)                                             
+Skipping 3863 (exponent 92640)                                              
+Skipping 3877 (exponent 23256)                                              
+ 3881            [97]      1                             w^(w^23) + 1      1
+ 3889         [8, 81]      0                                w^27 + 16      0
+Skipping 3907 (exponent 39060)                                              
+Skipping 3911 (exponent 172040)                                             
+ 3917            [89]      1                             w^(w^22) + 1      8
+Skipping 3919 (exponent 52812)                                              
+Skipping 3923 (exponent 917748)                                             
+Skipping 3929 (exponent 1443540)                                            
+Skipping 3931 (exponent 102180)                                             
+ 3943            [73]      1                             w^(w^19) + 1      0
+Skipping 3947 (exponent 82824)                                              
+Skipping 3967 (exponent 436260)                                             
+Skipping 3989 (exponent 68060)                                              
+ 4001        [8, 125]      0                            w^(w*25) + 16      0
+Skipping 4003 (exponent 3081540)                                            
+Skipping 4007 (exponent 17185740)                                           
+Skipping 4013 (exponent 143724)                                             
+Skipping 4019 (exponent 120540)                                             
+Skipping 4021 (exponent 44220)                                              
+Skipping 4027 (exponent 40260)                                              
+ 4049            [23]      1                              w^(w^7) + 1      1
+ 4051            [25]      1                              w^(w*5) + 1      0
+ 4057           [169]      1                           w^(w^4*13) + 1      0
+Skipping 4073 (exponent 5430012)                                            
+Skipping 4079 (exponent 5430012)                                            
+Skipping 4091 (exponent 166872)                                             
+Skipping 4093 (exponent 20460)                                              
+Skipping 4099 (exponent 150260)                                             
+Skipping 4111 (exponent 93160)                                              
+Skipping 4127 (exponent 42024)                                              
+ 4129        [16, 43]      0                           w^(w^12) + 256      5
+Skipping 4133 (exponent 1865598)                                            
+Skipping 4139 (exponent 237820)                                             
+Skipping 4153 (exponent 624876)                                             
+Skipping 4157 (exponent 624876)                                             
+Skipping 4159 (exponent 41580)                                              
+ 4177            [29]      1                              w^(w^8) + 1      0
+ 4201         [25, 7]      0                        w^(w^2) + w^(w*5)      0
+Skipping 4211 (exponent 176820)                                             
+Skipping 4217 (exponent 21080)                                              
+Skipping 4219 (exponent 25308)                                              
