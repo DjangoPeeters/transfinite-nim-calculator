@@ -28,7 +28,7 @@ using uint256_t = boost::multiprecision::uint256_t;
 using boost::multiprecision::msb;
 using namespace nt_funcs;
 
-constexpr bool TEST_MODE = true;
+constexpr bool TEST_MODE = false;
 uint32_t MAX_TERM_COUNT = 10000000;
 
 //TODO check when calculations failed and report so appropriately
@@ -68,6 +68,10 @@ namespace important_funcs {
             const vector<uint16_t> q_set1 = q_set_r.second;
             uint256_t base_finite_summand = 0;
             if (!q_set1.empty() && (q_set1[0] & 1) == 0) {
+                if (q_set1[0] >= 512) {
+                    cout << "finite_summand failed because finite summand wouldn't fit in uint256_t\n";
+                    exit(1);
+                }
                 base_finite_summand = ((uint256_t)1) << (q_set1[0] >> 1);
             }
             return {0, base_finite_summand + (uint256_t)excess};
