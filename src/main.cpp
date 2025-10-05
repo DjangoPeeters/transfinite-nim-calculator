@@ -126,7 +126,7 @@ void alphas(const char* logs_dir_) {
         } else {
             cout << ar.result << '\n';
             cout << "===== Time is " << t << " seconds. =====\n\n";
-            write_alpha(file, p, q_set(p).second, excess(p), ar, t);
+            write_alpha(file, p, q_set(p).second, excess(p), ar, t); // fix used_cache = true, we need to check this before calculating alpha
         }
         n++;
     }
