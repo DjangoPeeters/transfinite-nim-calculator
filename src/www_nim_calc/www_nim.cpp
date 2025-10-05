@@ -371,7 +371,7 @@ namespace www_nim {
         const excess_return exr = important_funcs::excess(p);
         if (exr.failed) {
             cout << "alpha failed\n";
-            alpha_return ar(true, 0, exr.term_count);
+            alpha_return ar(true, 0, exr.term_count, exr.used_cache);
             if (p != 2) cache_alpha(p, ar, 0);
             return ar;
         }
@@ -379,7 +379,7 @@ namespace www_nim {
         const auto q_set_r = important_funcs::q_set(p);
         if (q_set_r.first != 0) {
             cout << "alpha failed\n";
-            alpha_return ar(true, 0, q_set_r.first);
+            alpha_return ar(true, 0, q_set_r.first, exr.used_cache);
             if (p != 2) cache_alpha(p, ar, 0);
             return ar;
         }
@@ -387,7 +387,7 @@ namespace www_nim {
             result = kappa(q) + result;
         }
         const time_t t = time(nullptr) - start;
-        const alpha_return ar(false, result, 0);
+        const alpha_return ar(false, result, 0, exr.used_cache);
         if (!exr.used_cache && p != 2) cache_alpha(p, ar, t);
         return ar;
     }

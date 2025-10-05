@@ -32990,3 +32990,93 @@
 [2025-10-05 19:38:54] 11813/11813 bits complete (1.000000); curpow/result has 2/5906 terms
 [2025-10-05 19:38:54] Logging completed.
 [2025-10-05 19:39:02] 0/70967 bits complete (0.000000); curpow/result has 3/1 terms
+[2025-10-05 20:23:34] 0/0 bits complete (-nan); curpow/result has 1/0 terms
+[2025-10-05 20:24:10] 143724/143724 bits complete (1.000000); curpow/result has 1/0 terms
+[2025-10-05 20:24:10] Logging completed.
+[2025-10-05 20:24:50] 0/0 bits complete (-nan); curpow/result has 1/0 terms
+[2025-10-05 20:25:25] 143724/143724 bits complete (1.000000); curpow/result has 1/0 terms
+[2025-10-05 20:25:25] Logging completed.
+[2025-10-05 20:26:41] 0/143715 bits complete (0.000000); curpow/result has 2/1 terms
+[2025-10-05 20:27:41] 13120/143715 bits complete (0.091292); curpow/result has 2/72175 terms
+[2025-10-05 20:28:41] 25344/143715 bits complete (0.176349); curpow/result has 2/71696 terms
+[2025-10-05 20:29:41] 37504/143715 bits complete (0.260961); curpow/result has 2/72249 terms
+[2025-10-05 20:30:41] 49728/143715 bits complete (0.346018); curpow/result has 2/71723 terms
+[2025-10-05 20:31:41] 61888/143715 bits complete (0.430630); curpow/result has 2/71987 terms
+[2025-10-05 20:32:41] 74112/143715 bits complete (0.515687); curpow/result has 2/71846 terms
+[2025-10-05 20:33:41] 86336/143715 bits complete (0.600745); curpow/result has 2/71641 terms
+[2025-10-05 20:34:41] 98560/143715 bits complete (0.685802); curpow/result has 2/71730 terms
+[2025-10-05 20:35:41] 111680/143715 bits complete (0.777094); curpow/result has 2/71736 terms
+[2025-10-05 20:36:41] 123904/143715 bits complete (0.862151); curpow/result has 2/71989 terms
+[2025-10-05 20:37:41] 136128/143715 bits complete (0.947208); curpow/result has 2/71740 terms
+[2025-10-05 20:38:18] 143715/143715 bits complete (1.000000); curpow/result has 2/70475 terms
+[2025-10-05 20:38:18] Logging completed.
+[2025-10-05 20:39:48] 0/0 bits complete (-nan); curpow/result has 1/0 terms
+[2025-10-05 20:40:48] 140416/0 bits complete (inf); curpow/result has 2564/0 terms
+[2025-10-05 20:41:29] 237820/237820 bits complete (1.000000); curpow/result has 1/0 terms
+[2025-10-05 20:41:29] Logging completed.
+[2025-10-05 20:42:58] 0/0 bits complete (-nan); curpow/result has 1/0 terms
+[2025-10-05 20:43:58] 142208/0 bits complete (inf); curpow/result has 2591/0 terms
+[2025-10-05 20:44:34] 237820/237820 bits complete (1.000000); curpow/result has 1/0 terms
+[2025-10-05 20:44:34] Logging completed.
+[2025-10-05 20:52:59] 0/237811 bits complete (0.000000); curpow/result has 2/1 terms
+[2025-10-05 20:53:59] 7296/237811 bits complete (0.030680); curpow/result has 2/118921 terms
+[2025-10-05 20:54:59] 14528/237811 bits complete (0.061091); curpow/result has 2/118806 terms
+[2025-10-05 20:55:59] 21952/237811 bits complete (0.092309); curpow/result has 2/119235 terms
+[2025-10-05 20:56:59] 29248/237811 bits complete (0.122988); curpow/result has 2/118744 terms
+[2025-10-05 20:57:59] 36608/237811 bits complete (0.153937); curpow/result has 2/118767 terms
+[2025-10-05 20:58:59] 44032/237811 bits complete (0.185155); curpow/result has 2/118794 terms
+[2025-10-05 20:59:59] 51456/237811 bits complete (0.216374); curpow/result has 2/118631 terms
+[2025-10-05 21:00:59] 58944/237811 bits complete (0.247861); curpow/result has 2/118562 terms
+[2025-10-05 21:01:59] 66368/237811 bits complete (0.279079); curpow/result has 2/118825 terms
+[2025-10-05 21:02:59] 73792/237811 bits complete (0.310297); curpow/result has 2/118691 terms
+[2025-10-05 21:03:59] 81216/237811 bits complete (0.341515); curpow/result has 2/118774 terms
+[2025-10-05 21:04:59] 88640/237811 bits complete (0.372733); curpow/result has 2/118801 terms
+[2025-10-05 21:05:59] 96576/237811 bits complete (0.406104); curpow/result has 2/119093 terms
+[2025-10-05 21:06:59] 103936/237811 bits complete (0.437053); curpow/result has 2/118746 terms
+[2025-10-05 21:07:59] 111360/237811 bits complete (0.468271); curpow/result has 2/119033 terms
+[2025-10-05 21:08:59] 118720/237811 bits complete (0.499220); curpow/result has 2/118641 terms
+[2025-10-05 21:09:59] 126144/237811 bits complete (0.530438); curpow/result has 2/118961 terms
+[2025-10-05 21:10:59] 133568/237811 bits complete (0.561656); curpow/result has 2/118971 terms
+[2025-10-05 21:11:59] 140992/237811 bits complete (0.592874); curpow/result has 2/118987 terms
+[2025-10-05 21:12:59] 148416/237811 bits complete (0.624092); curpow/result has 2/118899 terms
+[2025-10-05 21:13:59] 155840/237811 bits complete (0.655310); curpow/result has 2/119066 terms
+[2025-10-05 21:14:59] 163264/237811 bits complete (0.686528); curpow/result has 2/118538 terms
+[2025-10-05 21:15:59] 170752/237811 bits complete (0.718016); curpow/result has 2/118783 terms
+[2025-10-05 21:16:59] 178112/237811 bits complete (0.748964); curpow/result has 2/118793 terms
+[2025-10-05 21:17:59] 186048/237811 bits complete (0.782336); curpow/result has 2/119342 terms
+[2025-10-05 21:18:59] 193472/237811 bits complete (0.813554); curpow/result has 2/119133 terms
+[2025-10-05 21:19:59] 200896/237811 bits complete (0.844772); curpow/result has 2/119351 terms
+[2025-10-05 21:20:59] 208256/237811 bits complete (0.875721); curpow/result has 2/119094 terms
+[2025-10-05 21:21:59] 215680/237811 bits complete (0.906939); curpow/result has 2/118812 terms
+[2025-10-05 21:22:59] 223104/237811 bits complete (0.938157); curpow/result has 2/119061 terms
+[2025-10-05 21:23:59] 230464/237811 bits complete (0.969106); curpow/result has 2/118682 terms
+[2025-10-05 21:24:58] 237811/237811 bits complete (1.000000); curpow/result has 2/116695 terms
+[2025-10-05 21:24:58] Logging completed.
+[2025-10-05 21:26:02] 0/0 bits complete (-nan); curpow/result has 2/0 terms
+[2025-10-05 21:26:51] 198660/198660 bits complete (1.000000); curpow/result has 2/0 terms
+[2025-10-05 21:26:51] Logging completed.
+[2025-10-05 21:29:08] 0/198651 bits complete (0.000000); curpow/result has 2/1 terms
+[2025-10-05 21:30:08] 8896/198651 bits complete (0.044782); curpow/result has 2/99698 terms
+[2025-10-05 21:31:08] 17792/198651 bits complete (0.089564); curpow/result has 2/99450 terms
+[2025-10-05 21:32:08] 26688/198651 bits complete (0.134346); curpow/result has 2/99023 terms
+[2025-10-05 21:33:08] 35584/198651 bits complete (0.179128); curpow/result has 2/99379 terms
+[2025-10-05 21:34:08] 44480/198651 bits complete (0.223910); curpow/result has 2/98857 terms
+[2025-10-05 21:35:08] 53376/198651 bits complete (0.268692); curpow/result has 2/98957 terms
+[2025-10-05 21:36:08] 62272/198651 bits complete (0.313474); curpow/result has 2/99127 terms
+[2025-10-05 21:37:08] 71680/198651 bits complete (0.360834); curpow/result has 2/99430 terms
+[2025-10-05 21:38:08] 80512/198651 bits complete (0.405294); curpow/result has 2/99274 terms
+[2025-10-05 21:39:08] 89408/198651 bits complete (0.450076); curpow/result has 2/99279 terms
+[2025-10-05 21:40:08] 98240/198651 bits complete (0.494536); curpow/result has 2/99715 terms
+[2025-10-05 21:41:08] 107136/198651 bits complete (0.539318); curpow/result has 2/99228 terms
+[2025-10-05 21:42:08] 116032/198651 bits complete (0.584100); curpow/result has 2/99088 terms
+[2025-10-05 21:43:08] 124928/198651 bits complete (0.628882); curpow/result has 2/99557 terms
+[2025-10-05 21:44:08] 133824/198651 bits complete (0.673664); curpow/result has 2/99245 terms
+[2025-10-05 21:45:08] 143488/198651 bits complete (0.722312); curpow/result has 2/99798 terms
+[2025-10-05 21:46:08] 152320/198651 bits complete (0.766772); curpow/result has 2/99337 terms
+[2025-10-05 21:47:08] 161216/198651 bits complete (0.811554); curpow/result has 2/99268 terms
+[2025-10-05 21:48:08] 170048/198651 bits complete (0.856014); curpow/result has 2/99221 terms
+[2025-10-05 21:49:08] 179584/198651 bits complete (0.904018); curpow/result has 2/98835 terms
+[2025-10-05 21:50:08] 188416/198651 bits complete (0.948478); curpow/result has 2/99240 terms
+[2025-10-05 21:51:08] 197248/198651 bits complete (0.992937); curpow/result has 2/99086 terms
+[2025-10-05 21:51:17] 198651/198651 bits complete (1.000000); curpow/result has 2/89077 terms
+[2025-10-05 21:51:17] Logging completed.

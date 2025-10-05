@@ -15,8 +15,9 @@ typedef struct alpha_return {
         www result;
         uint32_t term_count;
     };
+    bool used_cache;
 
-    alpha_return(bool f, www r, uint32_t t): failed(f) {
+    alpha_return(bool f, www r, uint32_t t, bool used_cache): failed(f), used_cache(used_cache) {
         if (f) {
             term_count = t;
         } else {
@@ -30,6 +31,7 @@ typedef struct alpha_return {
         } else {
             new (&result) www(other.result);
         }
+        used_cache = other.used_cache;
     }
     
     ~alpha_return() {
@@ -46,6 +48,7 @@ typedef struct alpha_return {
         } else {
             new (&result) www(other.result);
         }
+        used_cache = other.used_cache;
         return *this;
     }
 } alpha_return;
