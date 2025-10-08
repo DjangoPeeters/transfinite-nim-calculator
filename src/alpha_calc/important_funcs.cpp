@@ -4,6 +4,7 @@
 #include "ring_buffer_queue.hpp"
 #include "calculation_logger.hpp"
 #include "../number_theory/nt_funcs.hpp"
+#include "../misc.hpp"
 
 #include <cstdint>
 #include <string>
@@ -28,7 +29,7 @@ using uint256_t = boost::multiprecision::uint256_t;
 using boost::multiprecision::msb;
 using namespace nt_funcs;
 
-constexpr bool TEST_MODE = false;
+constexpr bool TEST_MODE = true;
 uint32_t MAX_TERM_COUNT = 10000000;
 
 //TODO check when calculations failed and report so appropriately
@@ -41,6 +42,9 @@ namespace important_funcs {
         map<uint16_t, uint8_t> excess_cache{};
         std::mutex q_set_cache_mutex;
         std::mutex excess_cache_mutex;
+
+        map<uint16_t, uint32_t> degree_kappa_cache{};
+        std::mutex degree_kappa_cache_mutex;
 
         void cache_q_set(uint16_t p, vector<uint16_t> q_set_p) {
             std::lock_guard<std::mutex> lock(q_set_cache_mutex);
@@ -58,6 +62,18 @@ namespace important_funcs {
                 record_values::cache_excess(p, excess_p);
             }
         };
+
+        void cache_degree_kappa(uint16_t h, uint32_t degree_kappa_h) {
+            std::lock_guard<std::mutex> lock(degree_kappa_cache_mutex);
+            if (degree_kappa_cache.find(h) == degree_kappa_cache.end()) {
+                // new degree found!
+                degree_kappa_cache[h] = degree_kappa_h;
+                std::ofstream file;
+                file.open(logs_dir + "/degree_kappa_records.txt", std::ios::app);
+                file << ",\n{" << h << "," << degree_kappa_h << "}";
+                file.close();
+            }
+        }
 
         std::pair<uint32_t, uint256_t> finite_summand(uint16_t p, uint16_t excess) {
             const auto q_set_r = q_set(p);
@@ -163,55 +179,63 @@ namespace important_funcs {
 
             cout << "Computing the degree of kappa(" << g << ").\n";
 
-            cout << "Constructing algebra (components = {" << components[0];
-            for (size_t i = 1; i < components.size(); i++) {
-                cout << ", " << components[i];
-            }
-            cout << "}).\n";
-
-            // Check if term_count won't be too big
-            const uint32_t term_count_check = term_count_calc(components);
-            if (term_count_check > MAX_TERM_COUNT) { // roughly more than 100 days of computing time needed at the time of writing
-                cout << "constructing algebra failed due to imposed size limit\n";
-                cout << "term_count would have been " << term_count_check << "\n";
-                cout << "kappa_set failed\n";
-                return {term_count_check, {}};
-            }
-
-            // Shared resources
-            ring_buffer_calculation_queue log_queue;
-            std::atomic<bool> calculation_done{false};
-
-            // Create objects
-            impartial_term_algebra algebra(log_queue, calculation_done, components);
-            calculation_logger logger(log_queue, calculation_done, logs_dir + "/calculation.log");
-
-            cout << "Field has exponent " << algebra.get_term_count() << "." << '\n';
-            term_array kappag_in_algebra((uint32_t)kappag_set.size());
-            uint32_t i = 0;
-            for (const auto r : kappag_set) {
-                kappag_in_algebra.terms[i] = algebra.get_basis()[find(algebra.get_q_components().begin(),
-                    algebra.get_q_components().end(), r) - algebra.get_q_components().begin()];
-                i++;
-            }
-
             uint32_t degree = 0;
-            if (algebra.get_term_count() < ((uint32_t)1 << 14)) {
-                degree = algebra.degree(kappag_in_algebra);
-            } else {
-                cout << "Starting multithreaded calculation..." << '\n';
+            std::lock_guard<std::mutex> lock(degree_kappa_cache_mutex);
+            if (degree_kappa_cache.find(g) != degree_kappa_cache.end()) {
+                degree = degree_kappa_cache[g];
+            }
+            lock.~lock_guard();
+            if (degree == 0) { // not found in cache
+                cout << "Constructing algebra (components = {" << components[0];
+                for (size_t i = 1; i < components.size(); i++) {
+                    cout << ", " << components[i];
+                }
+                cout << "}).\n";
 
-                // Start threads
-                std::thread calc_thread(&impartial_term_algebra::q_set_degree, &algebra, kappag_in_algebra, std::ref(degree));
-                std::thread log_thread(&calculation_logger::progress_calculation_logger, &logger);
+                // Check if term_count won't be too big
+                const uint32_t term_count_check = term_count_calc(components);
+                if (term_count_check > MAX_TERM_COUNT) { // roughly more than 100 days of computing time needed at the time of writing
+                    cout << "constructing algebra failed due to imposed size limit\n";
+                    cout << "term_count would have been " << term_count_check << "\n";
+                    cout << "kappa_set failed\n";
+                    return {term_count_check, {}};
+                }
 
-                // Wait for completion
-                calc_thread.join();
-                log_thread.join();
+                // Shared resources
+                ring_buffer_calculation_queue log_queue;
+                std::atomic<bool> calculation_done{false};
 
-                cout << "All threads completed. Check calculation.log for full log." << '\n';
+                // Create objects
+                impartial_term_algebra algebra(log_queue, calculation_done, components);
+                calculation_logger logger(log_queue, calculation_done, logs_dir + "/calculation.log");
+
+                cout << "Field has exponent " << algebra.get_term_count() << "." << '\n';
+                term_array kappag_in_algebra((uint32_t)kappag_set.size());
+                uint32_t i = 0;
+                for (const auto r : kappag_set) {
+                    kappag_in_algebra.terms[i] = algebra.get_basis()[find(algebra.get_q_components().begin(),
+                        algebra.get_q_components().end(), r) - algebra.get_q_components().begin()];
+                    i++;
+                }
+
+                if (algebra.get_term_count() < ((uint32_t)1 << 14)) {
+                    degree = algebra.degree(kappag_in_algebra);
+                } else {
+                    cout << "Starting multithreaded calculation..." << '\n';
+
+                    // Start threads
+                    std::thread calc_thread(&impartial_term_algebra::q_set_degree, &algebra, kappag_in_algebra, std::ref(degree));
+                    std::thread log_thread(&calculation_logger::progress_calculation_logger, &logger);
+
+                    // Wait for completion
+                    calc_thread.join();
+                    log_thread.join();
+
+                    cout << "All threads completed. Check calculation.log for full log." << '\n';
+                }
             }
             cout << "Degree is " << degree << "." << '\n';
+            cache_degree_kappa(g, degree);
 
             if (degree % q == 0) {
                 return {0, kappag_set};
@@ -226,6 +250,18 @@ namespace important_funcs {
         record_values::init();
         q_set_cache = (TEST_MODE ? test_values::q_set_cache : record_values::q_set_cache);
         excess_cache = (TEST_MODE ? test_values::excess_cache : record_values::excess_cache);
+        std::lock_guard<std::mutex> lock(degree_kappa_cache_mutex);
+            std::ifstream file;
+            file.open(logs_dir + "/degree_kappa_records.txt");
+
+            std::string s, a, b;
+            std::size_t i;
+            while (file >> s) {
+                i = s.find(",");
+                a = s.substr(1, i - 1);
+                b = s.substr(i+1, s.find("}") - i - 1);
+                degree_kappa_cache[strtou16(a.c_str())] = strtou32(b.c_str());
+            }
     }
 
     const std::map<uint16_t, std::vector<uint16_t>>& get_q_set_cache() {

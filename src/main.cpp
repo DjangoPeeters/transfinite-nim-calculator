@@ -13,6 +13,7 @@
 
 #include "alpha_calc/calculation_logger.hpp"
 #include "alpha_calc/important_funcs.hpp"
+#include "misc.hpp"
 #include "number_theory/prime_generator.hpp"
 #include "www_nim_calc/ww.hpp"
 #include "www_nim_calc/www.hpp"
@@ -81,48 +82,20 @@ void alphas() {
     }
 }
 
-uint16_t strtou16(const char* str) {
-    size_t i = 0;
-    uint16_t r = 0;
-    while (str[i] != (char)0) {
-        r = 10*r + (str[i] - '0');
-        i++;
-    }
-    return r;
-}
-
-uint32_t strtou32(const char* str) {
-    size_t i = 0;
-    uint32_t r = 0;
-    while (str[i] != (char)0) {
-        r = 10*r + (str[i] - '0');
-        i++;
-    }
-    return r;
-}
-
-size_t strtosize(const char* str) {
-    size_t i = 0, r = 0;
-    while (str[i] != (char)0) {
-        r = 10*r + (str[i] - '0');
-        i++;
-    }
-    return r;
-}
-
 int main(int argc, char* argv[]) {
     cout << "argc == " << argc << '\n';
     for (int ndx{}; ndx != argc; ++ndx) {
         cout << "argv[" << ndx << "] == " << argv[ndx] << '\n';
     }
     cout << "argv[" << argc << "] == " << static_cast<void*>(argv[argc]) << '\n';
-    init();
     if (1 < argc) {
         if (argv[1] == string("alphas")) {
             if (2 < argc) {
                 logs_dir = argv[2];
-                init();
                 cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
+            }
+            init();
+            if (2 < argc) {
                 if (3 < argc) MAX_TERM_COUNT = strtou32(argv[3]);
                 cout << "setting MAX_TERM_COUNT to " << MAX_TERM_COUNT << "\n";
             }
@@ -130,8 +103,10 @@ int main(int argc, char* argv[]) {
         } else if(argv[1] == string("alpha")) {
             if (2 < argc) {
                 logs_dir = argv[2];
-                init();
                 cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
+            }
+            init();
+            if (2 < argc) {
                 if (3 < argc) {
                     uint16_t p;
                     if (argv[3] == string("nth_prime") && 4 < argc) {
