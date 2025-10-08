@@ -57,54 +57,12 @@ I don't know how long this will take, but my best guess says it'll take at least
 unless we find a way to go about doing this calculation in a smarter way.
 */
 
-void prep_alpha(fstream& file) {
-    file.open(logs_dir + "/alpha_log.txt", ios::app);
-    file << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n";
-    file << "    p           q_set excess                alpha t(sec)\n";
-    file << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n\n";
-    file.close();
-}
-
-void write_alpha(fstream& file, uint16_t p,
-    const vector<uint16_t>& q_set_p, uint8_t excess_p, const alpha_return& alpha_p, time_t t) {
-    
-    string s_p = to_string(p);
-    if (alpha_p.failed) {
-        file.open(logs_dir + "/alpha_log.txt", std::ios::in | std::ios::out | std::ios::ate);
-        file.seekp(-59, std::ios::end);
-        file << "Skipping " << s_p << " (exponent " << alpha_p.term_count << ")\n";
-        file << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n\n";
-        file.close();
-        return;
-    }
-    while (s_p.length() < 5) s_p = " " + s_p;
-    string s_q_set_p = "[";
-    if (!q_set_p.empty()) {
-        s_q_set_p += to_string(q_set_p[0]);
-        for (size_t i = 1; i < q_set_p.size(); i++) {
-            s_q_set_p += ", " + to_string(q_set_p[i]);
-        }
-    }
-    s_q_set_p += "]"; while (s_q_set_p.length() < 15) s_q_set_p = " " + s_q_set_p;
-    // now we must have excess_p.failed == false
-    string s_excess_p = to_string(excess_p); while (s_excess_p.length() < 6) s_excess_p = " " + s_excess_p;
-    string s_alpha_p = alpha_p.result.to_string(); while (s_alpha_p.length() < 20) s_alpha_p = " " + s_alpha_p;
-    string s_t = alpha_p.used_cache?"-":to_string(t); while (s_t.length() < 6) s_t = " " + s_t;
-    file.open(logs_dir + "/alpha_log.txt", std::ios::in | std::ios::out | std::ios::ate);
-    file.seekp(-59, std::ios::end);
-    file << s_p << " " << s_q_set_p << " " << s_excess_p << " " << s_alpha_p << " " << s_t << '\n';
-    file << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n\n";
-    file.close();
-}
-
 //TODO optimize
 //TODO split calculating into more threads
 void alphas(const char* logs_dir_) {
     if (logs_dir_ != NULL) logs_dir = logs_dir_;
     cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
  
-    fstream file;
-    prep_alpha(file);
     time_t checkpoint_time;
     uint16_t p;
     time_t t;
@@ -118,11 +76,9 @@ void alphas(const char* logs_dir_) {
         t = time(nullptr) - checkpoint_time;
         if (ar.failed) {
             cout << "calculating alpha(" << p << ") failed\n\n";
-            write_alpha(file, p, {}, 0, ar, t);
         } else {
             cout << ar.result << '\n';
             cout << "===== Time is " << t << " seconds. =====\n\n";
-            write_alpha(file, p, q_set(p).second, excess(p).result, ar, t); // fix used_cache = true, we need to check this before calculating alpha
         }
         n++;
     }
