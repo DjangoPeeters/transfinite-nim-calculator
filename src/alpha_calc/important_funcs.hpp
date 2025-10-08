@@ -18,6 +18,8 @@ typedef struct {
 } excess_return;
 
 namespace important_funcs {
+    void init();
+
     const std::map<uint16_t, std::vector<uint16_t>>& get_q_set_cache();
     std::pair<uint32_t, std::vector<uint16_t>> q_set(uint16_t p);
 

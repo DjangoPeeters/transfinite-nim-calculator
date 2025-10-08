@@ -90,8 +90,13 @@ namespace record_values {
         };
     }
 
-    map<uint16_t, vector<uint16_t>> q_set_cache(q_set_records());
-    map<uint16_t, uint8_t> excess_cache(excess_records());
+    map<uint16_t, vector<uint16_t>> q_set_cache{};
+    map<uint16_t, uint8_t> excess_cache{};
+
+    void init() {
+        q_set_cache = q_set_records();
+        excess_cache = excess_records();
+    }
 
     void cache_q_set(uint16_t p, vector<uint16_t> q_set_p) {
         std::lock_guard<std::mutex> lock(q_set_cache_mutex);

@@ -116,10 +116,12 @@ int main(int argc, char* argv[]) {
         cout << "argv[" << ndx << "] == " << argv[ndx] << '\n';
     }
     cout << "argv[" << argc << "] == " << static_cast<void*>(argv[argc]) << '\n';
+    init();
     if (1 < argc) {
         if (argv[1] == string("alphas")) {
             if (2 < argc) {
                 logs_dir = argv[2];
+                init();
                 cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
                 if (3 < argc) MAX_TERM_COUNT = strtou32(argv[3]);
                 cout << "setting MAX_TERM_COUNT to " << MAX_TERM_COUNT << "\n";
@@ -128,6 +130,7 @@ int main(int argc, char* argv[]) {
         } else if(argv[1] == string("alpha")) {
             if (2 < argc) {
                 logs_dir = argv[2];
+                init();
                 cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
                 if (3 < argc) {
                     uint16_t p;

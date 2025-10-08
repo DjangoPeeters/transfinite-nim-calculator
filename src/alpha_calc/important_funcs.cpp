@@ -36,9 +36,9 @@ uint32_t MAX_TERM_COUNT = 10000000;
 
 namespace important_funcs {
     namespace {
-        map<uint16_t, vector<uint16_t>> q_set_cache(TEST_MODE ? test_values::q_set_cache : record_values::q_set_cache);
-        // every excess for primes p <= 257 is at most 4
-        map<uint16_t, uint8_t> excess_cache(TEST_MODE ? test_values::excess_cache : record_values::excess_cache);
+        map<uint16_t, vector<uint16_t>> q_set_cache{};
+        // every excess for primes p <= 709 is at most 4
+        map<uint16_t, uint8_t> excess_cache{};
         std::mutex q_set_cache_mutex;
         std::mutex excess_cache_mutex;
 
@@ -220,6 +220,12 @@ namespace important_funcs {
                 return {0, kappag_set};
             }
         }
+    }
+
+    void init() {
+        record_values::init();
+        q_set_cache = (TEST_MODE ? test_values::q_set_cache : record_values::q_set_cache);
+        excess_cache = (TEST_MODE ? test_values::excess_cache : record_values::excess_cache);
     }
 
     const std::map<uint16_t, std::vector<uint16_t>>& get_q_set_cache() {
