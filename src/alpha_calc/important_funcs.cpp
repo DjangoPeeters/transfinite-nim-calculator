@@ -29,7 +29,7 @@ using uint256_t = boost::multiprecision::uint256_t;
 using boost::multiprecision::msb;
 using namespace nt_funcs;
 
-constexpr bool TEST_MODE = true;
+constexpr bool TEST_MODE = false;
 uint32_t MAX_TERM_COUNT = 10000000;
 
 //TODO check when calculations failed and report so appropriately
