@@ -59,10 +59,7 @@ unless we find a way to go about doing this calculation in a smarter way.
 
 //TODO optimize
 //TODO split calculating into more threads
-void alphas(const char* logs_dir_) {
-    if (logs_dir_ != NULL) logs_dir = logs_dir_;
-    cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
- 
+void alphas() {
     time_t checkpoint_time;
     uint16_t p;
     time_t t;
@@ -122,31 +119,36 @@ int main(int argc, char* argv[]) {
     if (1 < argc) {
         if (argv[1] == string("alphas")) {
             if (2 < argc) {
+                logs_dir = argv[2];
+                cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
                 if (3 < argc) MAX_TERM_COUNT = strtou32(argv[3]);
                 cout << "setting MAX_TERM_COUNT to " << MAX_TERM_COUNT << "\n";
-                alphas(argv[2]);
-            } else {
-                alphas(NULL);
             }
+            alphas();
         } else if(argv[1] == string("alpha")) {
             if (2 < argc) {
-                uint16_t p;
-                if (argv[2] == string("nth_prime") && 3 < argc) {
-                    p = nth_prime(strtosize(argv[3]));
-                } else {
-                    p = strtou16(argv[2]);
+                logs_dir = argv[2];
+                cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
+                if (3 < argc) {
+                    uint16_t p;
+                    if (argv[3] == string("nth_prime") && 4 < argc) {
+                        p = nth_prime(strtosize(argv[4]));
+                    } else {
+                        p = strtou16(argv[3]);
+                    }
+                    time_t checkpoint_time = time(nullptr);
+                    cout << "===== Calculating alpha(" << p << "). =====\n";
+                    alpha_return ar = alpha(p);
+                    time_t t = time(nullptr) - checkpoint_time;
+                    if (ar.failed) {
+                        cout << "calculating alpha(" << p << ") failed\n\n";
+                    } else {
+                        cout << ar.result << '\n';
+                        cout << "===== Time is " << t << " seconds. =====\n\n";
+                    }
                 }
-                time_t checkpoint_time = time(nullptr);
-                cout << "===== Calculating alpha(" << p << "). =====\n";
-                alpha_return ar = alpha(p);
-                time_t t = time(nullptr) - checkpoint_time;
-                if (ar.failed) {
-                    cout << "calculating alpha(" << p << ") failed\n\n";
-                } else {
-                    cout << ar.result << '\n';
-                    cout << "===== Time is " << t << " seconds. =====\n\n";
-                }
-            } else {
+            }
+            if (argc <= 3) {
                 unsigned n = 2;
                 uint16_t p = nth_prime(n);
                 while (get_excess_cache().find(p) != get_excess_cache().end()
