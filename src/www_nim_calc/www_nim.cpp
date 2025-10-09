@@ -48,7 +48,7 @@ namespace www_nim {
                 line = "Skipping " + s_p + " (exponent " + to_string(alpha_p.term_count) + ")";
             } else {
                 while (s_p.length() < 5) s_p = " " + s_p;
-                const vector<uint16_t>& q_set_p = important_funcs::get_q_set_cache().at(p);
+                const vector<uint16_t> q_set_p = important_funcs::q_set(p).second; // alpha succeeded hence so did q_set
                 string s_q_set_p = "[";
                 if (!q_set_p.empty()) {
                     s_q_set_p += to_string(q_set_p[0]);
@@ -57,7 +57,7 @@ namespace www_nim {
                     }
                 }
                 s_q_set_p += "]"; while (s_q_set_p.length() < 15) s_q_set_p = " " + s_q_set_p;
-                uint8_t excess_p = important_funcs::get_excess_cache().at(p);
+                uint8_t excess_p = important_funcs::excess(p).result; // alpha succeeded hence so did excess
                 string s_excess_p = to_string(excess_p); while (s_excess_p.length() < 6) s_excess_p = " " + s_excess_p;
                 s_alpha_p = alpha_p.result.to_string(); while (s_alpha_p.length() < 40) s_alpha_p = " " + s_alpha_p;
                 if (s_alpha_p.length() > 40) s_alpha_p = s_alpha_p.substr(0, 40);

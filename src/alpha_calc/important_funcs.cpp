@@ -293,7 +293,7 @@ namespace important_funcs {
         return result;
     }
 
-    const std::map<uint16_t, uint8_t> get_excess_cache() { // maybe decommission this method
+    const std::map<uint16_t, uint8_t> get_excess_cache() {
         std::lock_guard<std::mutex> lock(excess_cache_mutex);
         return std::map<uint16_t, uint8_t>(excess_cache);
     }
