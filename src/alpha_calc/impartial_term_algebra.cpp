@@ -28,7 +28,7 @@ using namespace nt_funcs;
 
 constexpr unsigned PUSH_INTERVAL = 6;
 
-uint32_t term_count_calc(vector<uint16_t>& q_components_) {
+uint32_t term_count_calc(const vector<uint16_t>& q_components_) {
     vector<uint16_t> q_components = q_components_;
     sort(q_components.begin(), q_components.end(), [](uint16_t a, uint16_t b)
                                         {

@@ -30,11 +30,9 @@ namespace nt_funcs {
         if (n == 1) return {2, 1};
 
         uint16_t p = 1;
-        auto both_it = prime_generator::primes(2, n + 1);
-        auto begin_it = both_it.first, end_it = both_it.second;
-        for (auto it = begin_it; it != end_it; it++) {
-            if (n % *it == 0) {
-                p = *it;
+        for (const auto p1 : prime_generator::primes(2, n + 1)) {
+            if (n % p1 == 0) {
+                p = p1;
                 break;
             }
         }
@@ -47,11 +45,9 @@ namespace nt_funcs {
     // q should be a non-trivial prime power
     std::pair<uint16_t, uint16_t> prime_pow(uint16_t q) {
         uint16_t p = 1;
-        auto both_it = prime_generator::primes(2, q + 1);
-        auto begin_it = both_it.first, end_it = both_it.second;
-        for (auto it = begin_it; it != end_it; it++) {
-            if (q % *it == 0) {
-                p = *it;
+        for (const auto p1 : prime_generator::primes(2, q + 1)) {
+            if (q % p1 == 0) {
+                p = p1;
                 break;
             }
         }

@@ -160,32 +160,34 @@ namespace important_funcs {
                 return {kappag_set_r.first, {}};
             }
             vector<uint16_t> kappag_set(kappag_set_r.second);
-            vector<uint16_t> components{};
-            for (const auto q1 : kappag_set) {
-                const auto prqr = primitive_components(q1);
-                if (prqr.first != 0) {
-                    cout << "kappa_set failed\n";
-                    return {prqr.first, {}};
-                }
-                for (const auto n : prqr.second) {
-                    components.push_back(n);
-                }
-            }
-            sort(components.begin(), components.end(), [](uint16_t a, uint16_t b)
-                                        {
-                                            return prime_pow(a) < prime_pow(b);
-                                        });
-            components.erase(unique(components.begin(), components.end()), components.end());
 
             cout << "Computing the degree of kappa(" << g << ").\n";
 
             uint32_t degree = 0;
-            std::lock_guard<std::mutex> lock(degree_kappa_cache_mutex);
-            if (degree_kappa_cache.find(g) != degree_kappa_cache.end()) {
-                degree = degree_kappa_cache[g];
+            {
+                std::lock_guard<std::mutex> lock(degree_kappa_cache_mutex);
+                if (degree_kappa_cache.find(g) != degree_kappa_cache.end()) {
+                    degree = degree_kappa_cache[g];
+                }
             }
-            lock.~lock_guard();
             if (degree == 0) { // not found in cache
+                vector<uint16_t> components{};
+                for (const auto q1 : kappag_set) {
+                    const auto prqr = primitive_components(q1);
+                    if (prqr.first != 0) {
+                        cout << "kappa_set failed\n";
+                        return {prqr.first, {}};
+                    }
+                    for (const auto n : prqr.second) {
+                        components.push_back(n);
+                    }
+                }
+                sort(components.begin(), components.end(), [](uint16_t a, uint16_t b)
+                                            {
+                                                return prime_pow(a) < prime_pow(b);
+                                            });
+                components.erase(unique(components.begin(), components.end()), components.end());
+
                 cout << "Constructing algebra (components = {" << components[0];
                 for (size_t i = 1; i < components.size(); i++) {
                     cout << ", " << components[i];
@@ -198,6 +200,7 @@ namespace important_funcs {
                     cout << "constructing algebra failed due to imposed size limit\n";
                     cout << "term_count would have been " << term_count_check << "\n";
                     cout << "kappa_set failed\n";
+                    cout << "term_count_check = " << term_count_check << "\n";
                     return {term_count_check, {}};
                 }
 
@@ -248,36 +251,41 @@ namespace important_funcs {
 
     void init() {
         record_values::init();
-        q_set_cache = (TEST_MODE ? test_values::q_set_cache : record_values::q_set_cache);
-        excess_cache = (TEST_MODE ? test_values::excess_cache : record_values::excess_cache);
+        {
+            std::lock_guard<std::mutex> lock_q_set(q_set_cache_mutex);
+            q_set_cache = (TEST_MODE ? test_values::q_set_cache : record_values::q_set_cache);
+            std::lock_guard<std::mutex> lock_excess(excess_cache_mutex);
+            excess_cache = (TEST_MODE ? test_values::excess_cache : record_values::excess_cache);
+        }
         std::lock_guard<std::mutex> lock(degree_kappa_cache_mutex);
-            std::ifstream file;
-            file.open(logs_dir + "/degree_kappa_records.txt");
+        std::ifstream file;
+        file.open(logs_dir + "/degree_kappa_records.txt");
 
-            std::string s, a, b;
-            std::size_t i;
-            while (file >> s) {
-                i = s.find(",");
-                a = s.substr(1, i - 1);
-                b = s.substr(i+1, s.find("}") - i - 1);
-                degree_kappa_cache[strtou16(a.c_str())] = strtou32(b.c_str());
-            }
+        std::string s, a, b;
+        std::size_t i;
+        while (file >> s) {
+            i = s.find(",");
+            a = s.substr(1, i - 1);
+            b = s.substr(i+1, s.find("}") - i - 1);
+            degree_kappa_cache[strtou16(a.c_str())] = strtou32(b.c_str());
+        }
     }
 
-    const std::map<uint16_t, std::vector<uint16_t>>& get_q_set_cache() {
+    const std::map<uint16_t, std::vector<uint16_t>> get_q_set_cache() {
         std::lock_guard<std::mutex> lock(q_set_cache_mutex);
-        return q_set_cache;
+        return std::map<uint16_t, std::vector<uint16_t>>(q_set_cache);
     }
 
     std::pair<uint32_t, vector<uint16_t>> q_set(uint16_t p) {
         if (p == 2) {
             return {0, {}};
         }
-        std::lock_guard<std::mutex> lock(q_set_cache_mutex);
-        if (q_set_cache.find(p) != q_set_cache.end()) {
-            return {0, q_set_cache[p]};
+        {
+            std::lock_guard<std::mutex> lock(q_set_cache_mutex);
+            if (q_set_cache.find(p) != q_set_cache.end()) {
+                return {0, q_set_cache[p]};
+            }
         }
-        lock.~lock_guard();
 
         const std::pair<uint32_t, vector<uint16_t>> result = kappa_set(f(p));
         if (result.first == 0) cache_q_set(p, result.second);
@@ -285,9 +293,9 @@ namespace important_funcs {
         return result;
     }
 
-    const std::map<uint16_t, uint8_t>& get_excess_cache() {
+    const std::map<uint16_t, uint8_t> get_excess_cache() { // maybe decommission this method
         std::lock_guard<std::mutex> lock(excess_cache_mutex);
-        return excess_cache;
+        return std::map<uint16_t, uint8_t>(excess_cache);
     }
     
     excess_return excess(uint16_t p) {
@@ -298,15 +306,16 @@ namespace important_funcs {
             r.used_cache = false;
             return r;
         }
-        std::lock_guard<std::mutex> lock(excess_cache_mutex);
-        if (excess_cache.find(p) != excess_cache.end()) {
-            excess_return r;
-            r.failed = false;
-            r.result = excess_cache[p];
-            r.used_cache = true;
-            return r;
+        {
+            std::lock_guard<std::mutex> lock(excess_cache_mutex);
+            if (excess_cache.find(p) != excess_cache.end()) {
+                excess_return r;
+                r.failed = false;
+                r.result = excess_cache[p];
+                r.used_cache = true;
+                return r;
+            }
         }
-        lock.~lock_guard();
 
         const auto q_set_r = q_set(p);
         if (q_set_r.first != 0) {

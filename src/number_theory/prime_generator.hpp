@@ -14,8 +14,7 @@ namespace prime_generator {
     uint16_t nth_prime(size_t n); // 1-indexed for historical reasons
     size_t prime_pi(uint16_t n);
         
-    std::pair<vector<uint16_t>::const_iterator, vector<uint16_t>::const_iterator>
-        primes(uint16_t start, uint16_t end);
+    vector<uint16_t> primes(uint16_t start, uint16_t end);
 }
 
 #endif
