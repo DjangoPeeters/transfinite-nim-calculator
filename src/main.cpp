@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
     for (int ndx{}; ndx != argc; ++ndx) {
         cout << "argv[" << ndx << "] == " << argv[ndx] << '\n';
     }
-    cout << "argv[" << argc << "] == " << static_cast<void*>(argv[argc]) << '\n';
+    cout << "argv[" << argc << "] == " << static_cast<void*>(argv[argc]) << '\n\n';
     if (1 < argc) {
         if (argv[1] == string("alphas")) {
             if (2 < argc) {

@@ -30,7 +30,7 @@ using boost::multiprecision::msb;
 using namespace nt_funcs;
 
 constexpr bool TEST_MODE = false;
-uint32_t MAX_TERM_COUNT = 10000000;
+uint32_t MAX_TERM_COUNT = 1000000;
 
 //TODO check when calculations failed and report so appropriately
 // only succesful calculations will return a pair with first component =0, otherwise term_count which caused problems
