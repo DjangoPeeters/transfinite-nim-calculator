@@ -13,9 +13,11 @@ SOURCES = src/alpha_calc/calculation_logger.cpp \
 		  src/www_nim_calc/www.cpp \
 		  src/misc.cpp \
 		  src/main.cpp
+TEST_SOURCES = test/test.cpp
 OBJECTS = $(SOURCES:src/%.cpp=obj/%.o)
 DEBUG_OBJECTS = $(SOURCES:src/%.cpp=obj/debug/%.o)
 PROF_OBJECTS = $(SOURCES:src/%.cpp=obj/prof/%.o)
+TEST_OBJECTS = $(TEST_SOURCES:test/%.cpp=obj/test/%.o)
 TARGET = bin/main
 
 CXX = g++
@@ -24,6 +26,7 @@ CXXFLAGS = -std=c++11 -Wall -Wextra -pthread
 RELEASE_FLAGS = -O3 -DNDEBUG
 DEBUG_FLAGS = -fsanitize=address -g -O0 -DDEBUG
 PROFILE_FLAGS = -pg -O2
+TEST_FLAGS = -O3 -DNDEBUG
 
 #TODO use include directory for proper dependency handling
 
@@ -39,6 +42,9 @@ obj/debug:
 
 obj/prof:
 	mkdir -p obj/prof
+
+obj/test:
+	mkdir -p obj/test
 
 # Release build
 $(TARGET): $(OBJECTS)
@@ -66,6 +72,15 @@ $(TARGET)_prof: $(PROF_OBJECTS)
 obj/prof/%.o: src/%.cpp | obj/prof
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $(PROFILE_FLAGS) -c $< -o $@
+
+# Test build
+$(TARGET)_test: $(TEST_OBJECTS) | $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) $(TEST_OBJECTS) $(subst obj/main.o,,$(OBJECTS)) -o $(TARGET)_test
+
+# Test object files
+obj/test/%.o: test/%.cpp | obj/test
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) -c $< -o $@
 
 # Debug build shortcut
 debug: $(TARGET)_debug
@@ -122,6 +137,11 @@ quick-profile: $(TARGET)_prof
 	@echo "=== TOP TIME-CONSUMING FUNCTIONS ==="
 	@gprof $(TARGET)_prof gmon.out | head -25
 
+# Test build shortcut
+test: $(TARGET)_test
+	@echo "Test build complete: $(TARGET)_test"
+	@echo "Run with: ./$(TARGET)_test"
+
 # Show file structure (helpful for debugging)
 show-files:
 	@echo "Source files found:"
@@ -135,6 +155,12 @@ show-files:
 	@echo ""
 	@echo "Object files (profile):"
 	@echo "$(PROF_OBJECTS)" | tr ' ' '\n'
+	@echo ""
+	@echo "Test source files found:"
+	@echo "$(SOURCES)" | tr ' ' '\n'
+	@echo ""
+	@echo "Object files (test):"
+	@echo "$(TEST_OBJECTS)" | tr ' ' '\n'
 
 # Clean up all generated files
 clean:
@@ -149,6 +175,10 @@ clean-debug:
 clean-profile:
 	rm -rf obj/prof $(TARGET)_prof gmon.out profile_report.txt profile_detailed.txt
 
+# Clean only test files
+clean-test:
+	rm -rf obj/test $(TARGET)test
+
 # Clean and rebuild everything
 rebuild: clean all
 
@@ -158,7 +188,10 @@ rebuild-debug: clean-debug debug
 # Clean and rebuild profile version
 rebuild-profile: clean-profile profile
 
-.PHONY: all debug run-debug gdb-debug valgrind-debug profile profile-detailed quick-profile show-files clean clean-debug clean-profile rebuild rebuild-debug rebuild-profile
+# Clean and rebuild debug version
+rebuild-test: clean-test test
+
+.PHONY: all debug run-debug gdb-debug valgrind-debug profile profile-detailed quick-profile test show-files clean clean-debug clean-profile clean-test rebuild rebuild-debug rebuild-profile rebuild-test
 
 # Dependencies
 obj/alpha_calc/calculation_logger.o: src/alpha_calc/calculation_logger.cpp src/alpha_calc/calculation_logger.hpp src/alpha_calc/ring_buffer_queue.hpp
@@ -205,3 +238,5 @@ obj/prof/www_nim_calc/www_nim.o: src/www_nim_calc/www_nim.cpp src/www_nim_calc/w
 obj/prof/www_nim_calc/www.o: src/www_nim_calc/www.cpp src/www_nim_calc/www.hpp src/www_nim_calc/ww.hpp
 obj/prof/misc.o: src/misc.cpp src/misc.hpp
 obj/prof/main.o: src/main.cpp src/alpha_calc/calculation_logger.hpp src/alpha_calc/important_funcs.hpp src/number_theory/prime_generator.hpp src/www_nim_calc/ww.hpp src/www_nim_calc/www.hpp src/www_nim_calc/www_nim.hpp src/misc.hpp
+
+obj/test/test.o: test/test.cpp test/acutest.h
