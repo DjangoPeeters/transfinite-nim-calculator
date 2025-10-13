@@ -26,7 +26,7 @@ namespace fin_nim {
         }
     }
 
-    inline uint256_t fin_nim_add(uint256_t a, uint256_t b) {
+    uint256_t fin_nim_add(uint256_t a, uint256_t b) {
         return a ^ b;
     }
 
