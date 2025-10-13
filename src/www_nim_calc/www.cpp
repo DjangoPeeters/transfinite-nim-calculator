@@ -160,6 +160,7 @@ www www::operator*(const www& other) const {
 
 www& www::operator+=(const www& other) {
     this->terms.insert(this->terms.end(), other.get_terms().begin(), other.get_terms().end());
+    this->terms = www::simp_terms(this->terms);
     return *this;
 }
 

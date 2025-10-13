@@ -136,6 +136,7 @@ ww ww::operator*(const ww& other) const {
 
 ww& ww::operator+=(const ww& other) {
     this->terms.insert(this->terms.end(), other.get_terms().begin(), other.get_terms().end());
+    this->terms = ww::simp_terms(this->terms);
     return *this;
 }
 
