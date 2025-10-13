@@ -74,7 +74,7 @@ obj/prof/%.o: src/%.cpp | obj/prof
 	$(CXX) $(CXXFLAGS) $(PROFILE_FLAGS) -c $< -o $@
 
 # Test build
-$(TARGET)_test: $(TEST_OBJECTS) | $(OBJECTS)
+$(TARGET)_test: $(OBJECTS) $(TEST_OBJECTS)
 	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) $(TEST_OBJECTS) $(subst obj/main.o,,$(OBJECTS)) -o $(TARGET)_test
 
 # Test object files
@@ -239,4 +239,18 @@ obj/prof/www_nim_calc/www.o: src/www_nim_calc/www.cpp src/www_nim_calc/www.hpp s
 obj/prof/misc.o: src/misc.cpp src/misc.hpp
 obj/prof/main.o: src/main.cpp src/alpha_calc/calculation_logger.hpp src/alpha_calc/important_funcs.hpp src/number_theory/prime_generator.hpp src/www_nim_calc/ww.hpp src/www_nim_calc/www.hpp src/www_nim_calc/www_nim.hpp src/misc.hpp
 
-obj/test/test.o: test/test.cpp test/acutest.h
+obj/test/test.o: test/test.cpp \
+				 test/acutest.h \
+				 src/alpha_calc/calculation_logger.hpp \
+				 src/alpha_calc/constants.hpp \
+				 src/alpha_calc/impartial_term_algebra.hpp \
+				 src/alpha_calc/important_funcs.hpp \
+				 src/alpha_calc/ring_buffer_queue.hpp \
+				 src/number_theory/nt_funcs.hpp \
+				 src/number_theory/prime_generator.hpp \
+				 src/www_nim_calc/fin_nim.hpp \
+				 src/www_nim_calc/kappa_component.hpp \
+				 src/www_nim_calc/ww.hpp \
+				 src/www_nim_calc/www_nim.hpp \
+				 src/www_nim_calc/www.hpp \
+				 src/misc.hpp
