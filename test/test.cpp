@@ -17,6 +17,7 @@
 
 using namespace prime_generator;
 using namespace fin_nim;
+using namespace www_nim;
 
 void test_miscelaneous(void) {
     TEST_CHECK(strtou16("123") == (uint16_t)123);
@@ -153,13 +154,20 @@ void test_www(void) {
     TEST_CHECK(result_copy == omega);
 }
 
+void test_www_nim(void) {
+    TEST_CHECK(alpha(2).result == 0);
+    TEST_CHECK(alpha(3).result == 2);
+    TEST_CHECK(alpha(5).result == 4);
+}
+
 TEST_LIST = {
     { "test miscelaneous", test_miscelaneous },
     { "test prime generator", test_prime_generator },
     { "test number theoretic functions", test_nt_funcs },
     { "test finite nimbers", test_fin_nim },
     { "test kappa components", test_kappa_component },
-    { "test nimbers below w^w", test_ww },
-    { "test nimbers below w^(w^w)", test_www },
+    { "test ordinals below w^w", test_ww },
+    { "test ordinals below w^(w^w)", test_www },
+    { "test nimbers below w^(w^w)", test_fin_nim },
     { NULL, NULL }     /* zeroed record marking the end of the list */
 };
