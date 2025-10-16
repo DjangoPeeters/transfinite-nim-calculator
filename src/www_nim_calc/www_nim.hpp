@@ -54,7 +54,7 @@ typedef struct alpha_return {
 } alpha_return;
 
 namespace www_nim {
-    inline www www_nim_add(const www& a, const www& b);
+    www www_nim_add(const www& a, const www& b);
     www www_nim_mul(const www& a, const www& b);
     www www_nim_square(const www& a);
     www www_nim_pow(const www& a, const cpp_int& n);

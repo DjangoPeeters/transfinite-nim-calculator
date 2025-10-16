@@ -312,7 +312,7 @@ namespace www_nim {
         }
     }
 
-    inline www www_nim_add(const www& a, const www& b) {
+    www www_nim_add(const www& a, const www& b) {
         return www_of_2_pow(xor_list_ww(www_to_2_pow(a), www_to_2_pow(b)));
     }
 

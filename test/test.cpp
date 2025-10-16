@@ -158,7 +158,43 @@ void test_www_nim(void) {
     TEST_CHECK(alpha(2).result == 0);
     TEST_CHECK(alpha(3).result == 2);
     TEST_CHECK(alpha(5).result == 4);
+    TEST_CHECK(alpha(7).result == ww() + 1);
+    TEST_CHECK(alpha(11).result == www() + 1);
+    TEST_CHECK(alpha(47).result == www({{ww({{7,1}}),1}}) + 1);
+    
+    TEST_CHECK(kappa(4) == 4);
+    TEST_CHECK(kappa(8) == 16);
+    TEST_CHECK(kappa(3) == ww());
+    TEST_CHECK(kappa(9) == ww({{3,1}}));
+    TEST_CHECK(kappa(5) == www());
+
+    TEST_CHECK(www_nim_add(1, 2) == 3);
+    TEST_CHECK(www_nim_add(ww(), ww()*2 + 1) == ww()*3 + 1);
+
+    TEST_CHECK(www_nim_mul(2, 3) == 1);
+    TEST_CHECK(www_nim_mul(ww(), ww()*ww()) == 2);
+    TEST_CHECK(www_nim_mul(www(), www()*www()*www()*www()) == 4);
+
+    TEST_CHECK(www_nim_square(2) == 3);
+    TEST_CHECK(www_nim_square(4) == 6);
+    TEST_CHECK(www_nim_square(ww()) == ww()*ww());
+    TEST_CHECK(www_nim_square(ww() + 2) == ww()*ww() + 3);
+
+    TEST_CHECK(www_nim_pow(ww(), 3) == 2);
+    TEST_CHECK(www_nim_pow(ww(), 4) == ww()*2);
+    TEST_CHECK(www_nim_pow(www(), 5) == 4);
+    TEST_CHECK(www_nim_pow(www()*ww(), 15) == 9);
 }
+
+void test_important_funcs(void) {
+
+}
+
+void test_impartial_term_algebra(void) {
+
+}
+
+// should we constants.hpp, calculation_logger.hpp, ring_buffer_queue.hpp?
 
 TEST_LIST = {
     { "test miscelaneous", test_miscelaneous },
@@ -169,5 +205,7 @@ TEST_LIST = {
     { "test ordinals below w^w", test_ww },
     { "test ordinals below w^(w^w)", test_www },
     { "test nimbers below w^(w^w)", test_fin_nim },
+    { "test important functions", test_important_funcs },
+    { "test impartial term algebra", test_impartial_term_algebra },
     { NULL, NULL }     /* zeroed record marking the end of the list */
 };
