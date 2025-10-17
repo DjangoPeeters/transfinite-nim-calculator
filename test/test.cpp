@@ -13,11 +13,18 @@
 #include "../src/www_nim_calc/www_nim.hpp"
 #include "../src/misc.hpp"
 
+#include <cstdint>
+#include <iostream>
 #include <utility>
+#include <vector>
 
 using namespace prime_generator;
 using namespace fin_nim;
 using namespace www_nim;
+using important_funcs::excess;
+using important_funcs::q_set;
+using std::cout;
+using std::vector;
 
 void test_miscelaneous(void) {
     TEST_CHECK(strtou16("123") == (uint16_t)123);
@@ -187,11 +194,47 @@ void test_www_nim(void) {
 }
 
 void test_important_funcs(void) {
+    important_funcs::init();
+    TEST_CHECK(excess(2).result == 0);
+    TEST_CHECK(excess(3).result == 0);
+    TEST_CHECK(excess(5).result == 0);
+    TEST_CHECK(excess(7).result == 1);
+    TEST_CHECK(excess(11).result == 1);
+    TEST_CHECK(excess(13).result == 0);
+    TEST_CHECK(excess(17).result == 0);
+    TEST_CHECK(excess(19).result == 4);
 
+    TEST_CHECK(q_set(2).second == vector<uint16_t>{});
+    TEST_CHECK(q_set(3).second == vector<uint16_t>{2});
+    TEST_CHECK(q_set(5).second == vector<uint16_t>{4});
+    TEST_CHECK(q_set(7).second == vector<uint16_t>{3});
+    TEST_CHECK(q_set(11).second == vector<uint16_t>{5});
+    TEST_CHECK(q_set(13).second == vector<uint16_t>({4, 3}));
+    TEST_CHECK(q_set(17).second == vector<uint16_t>{8});
+    TEST_CHECK(q_set(19).second == vector<uint16_t>{9});
 }
 
 void test_impartial_term_algebra(void) {
+    important_funcs::init();
+    vector<uint16_t> q_components{2, 4, 3, 5}; // closed under primitive_components
 
+    // Shared resources
+    ring_buffer_calculation_queue log_queue;
+    std::atomic<bool> calculation_done{false};
+
+    // Create objects
+    impartial_term_algebra algebra(log_queue, calculation_done, q_components); //TODO make constructor faster?
+    calculation_logger logger(log_queue, calculation_done, logs_dir + "/calculation.log");
+
+    cpp_int poww = cpp_int(1) << algebra.get_term_count();
+    term_array random(3);
+    for (int i = 0; i < 8; i++) {
+        random.terms[0] = 1+i;
+        random.terms[1] = 2+i;
+        random.terms[2] = 3+i;
+
+        TEST_CHECK(!(algebra.power(random, poww) != random));
+    }
 }
 
 // should we constants.hpp, calculation_logger.hpp, ring_buffer_queue.hpp?
