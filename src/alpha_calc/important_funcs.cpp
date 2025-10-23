@@ -353,6 +353,11 @@ namespace important_funcs {
                                         return prime_pow(a) < prime_pow(b);
                                     });
         components.erase(unique(components.begin(), components.end()), components.end());
+        cout << "[p = " << p << "] Subfield has components = {" << components[0];
+        for (size_t i = 1; i < components.size(); i++) {
+            cout << ", " << components[i];
+        }
+        cout << "} and term_count = " << term_count_calc(components) << ".\n";
 
         uint8_t excess1 = 0;
         const uint16_t fp = f(p);
