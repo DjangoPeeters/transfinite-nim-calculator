@@ -84,15 +84,14 @@ void alphas() {
     }
 }
 
-void excess_to_bfile() {
+void excess_to_afile() {
     size_t n = 2;
     uint16_t p = 0;
     size_t found = 0;
     const auto cache = get_excess_cache();
     const size_t total = cache.size() - 1; // ignore excess(2)
-    cout.flush();
     ofstream file;
-    file.open(logs_dir + "/excess_bfile.txt", ios::ate);
+    file.open(logs_dir + "/excess_afile.txt", ios::ate);
     while (found < total) {
         p = nth_prime(n);
         if (cache.find(p) != cache.end()) {
@@ -102,6 +101,20 @@ void excess_to_bfile() {
             file << (n-1) << " ?\n";
         }
         n++;
+    }
+    file.close();
+}
+
+void excess_to_bfile() {
+    size_t n = 2;
+    uint16_t p = 3;
+    const auto cache = get_excess_cache();
+    ofstream file;
+    file.open(logs_dir + "/excess_bfile.txt", ios::ate);
+    while (cache.find(p) != cache.end()) {
+        file << (n-1) << ' ' << (unsigned)cache.at(p) << '\n';
+        n++;
+        p = nth_prime(n);
     }
     file.close();
 }
@@ -171,6 +184,13 @@ int main(int argc, char* argv[]) {
                     cout << "===== Time is " << t << " seconds. =====\n\n";
                 }
             }
+        } else if(argv[1] == string("afile")) {
+            if (2 < argc) {
+                logs_dir = argv[2];
+                cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
+            }
+            init();
+            excess_to_afile();
         } else if(argv[1] == string("bfile")) {
             if (2 < argc) {
                 logs_dir = argv[2];
