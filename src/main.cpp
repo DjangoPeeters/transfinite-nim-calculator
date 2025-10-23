@@ -165,9 +165,9 @@ int main(int argc, char* argv[]) {
             }
             if (argc <= 3) {
                 unsigned n = 2;
-                uint16_t p = nth_prime(n);
-                auto excess_cache = get_excess_cache();
-                auto q_set_cache = get_q_set_cache();
+                uint16_t p = 3;
+                const auto excess_cache = get_excess_cache();
+                const auto q_set_cache = get_q_set_cache();
                 while (excess_cache.find(p) != excess_cache.end()
                     && q_set_cache.find(p) != q_set_cache.end()) {
                     n++;
