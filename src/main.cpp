@@ -28,7 +28,9 @@
 #include <map>
 #include <ctime>
 
-using namespace std;
+using std::cout;
+using std::ios;
+using std::ofstream;
 using namespace prime_generator;
 using namespace important_funcs;
 using namespace www_nim;
@@ -80,6 +82,28 @@ void alphas() {
         }
         n++;
     }
+}
+
+void excess_to_bfile() {
+    size_t n = 2;
+    uint16_t p = 0;
+    size_t found = 0;
+    const auto cache = get_excess_cache();
+    const size_t total = cache.size() - 1; // ignore excess(2)
+    cout.flush();
+    ofstream file;
+    file.open(logs_dir + "/excess_bfile.txt", ios::ate);
+    while (found < total) {
+        p = nth_prime(n);
+        if (cache.find(p) != cache.end()) {
+            file << (n-1) << ' ' << (unsigned)cache.at(p) << '\n';
+            found++;
+        } else {
+            file << (n-1) << " ?\n";
+        }
+        n++;
+    }
+    file.close();
 }
 
 int main(int argc, char* argv[]) {
@@ -147,6 +171,13 @@ int main(int argc, char* argv[]) {
                     cout << "===== Time is " << t << " seconds. =====\n\n";
                 }
             }
+        } else if(argv[1] == string("bfile")) {
+            if (2 < argc) {
+                logs_dir = argv[2];
+                cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
+            }
+            init();
+            excess_to_bfile();
         }
     }
 
