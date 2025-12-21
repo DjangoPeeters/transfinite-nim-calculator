@@ -12,7 +12,7 @@ Django Peeters
 
 ## Usage
 
-Currently, there is only support for calculating Lenstra excess and converting the results to an a-file and a b-file for the [https://oeis.org/A380496](OEIS). When calculating Lenstra excess, some other values are calculated as well (Q-sets, the nimbers alpha(p), degree of kappa(p)). Following are some examples of these features.
+Currently, there is only support for calculating Lenstra excess and converting the results to an a-file and a b-file for the [OEIS](https://oeis.org/A380496). When calculating Lenstra excess, some other values are calculated as well (Q-sets, the nimbers alpha(p), degree of kappa(p)). Following are some examples of these features.
 
 First and foremost, you can just let the program calculate the nimbers alpha(p) in order, starting from p=3:
 ```
