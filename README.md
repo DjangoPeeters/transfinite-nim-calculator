@@ -43,6 +43,7 @@ or
 ```
 ./bin/main alpha
 ```
+IMPORTANT NOTE: the current implementation only works for primes smaller than 12289, the 1470-th prime. (This is because the Q-set of 12289 would be {2048, 3}, and this leads to a finite summand not fitting in a `uint256_t`.)
 
 Last but not least, you can convert the stored Lenstra excess (inside `logs/excess_records.txt`) to an a-file for OEIS:
 ```

@@ -161,6 +161,7 @@ namespace important_funcs {
             }
             vector<uint16_t> kappag_set(kappag_set_r.second);
 
+            // degree being the smallest degree of a field extension of {0,1} containing kappa(g)
             cout << "Computing the degree of kappa(" << g << ").\n";
 
             uint32_t degree = 0;
