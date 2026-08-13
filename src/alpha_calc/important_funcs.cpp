@@ -29,7 +29,7 @@ using uint256_t = boost::multiprecision::uint256_t;
 using boost::multiprecision::msb;
 using namespace nt_funcs;
 
-constexpr bool TEST_MODE = false;
+constexpr bool TEST_MODE = true;
 uint32_t MAX_TERM_COUNT = 1000000;
 
 //TODO check when calculations failed and report so appropriately
@@ -214,12 +214,10 @@ namespace important_funcs {
                 calculation_logger logger(log_queue, calculation_done, logs_dir + "/calculation.log");
 
                 cout << "Field has exponent " << algebra.get_term_count() << "." << '\n';
-                term_array kappag_in_algebra((uint32_t)kappag_set.size());
-                uint32_t i = 0;
+                term_array kappag_in_algebra(algebra.get_term_count());
                 for (const auto r : kappag_set) {
-                    kappag_in_algebra.terms[i] = algebra.get_basis()[find(algebra.get_q_components().begin(),
-                        algebra.get_q_components().end(), r) - algebra.get_q_components().begin()];
-                    i++;
+                    kappag_in_algebra.set(algebra.get_basis()[find(algebra.get_q_components().begin(),
+                        algebra.get_q_components().end(), r) - algebra.get_q_components().begin()]);
                 }
 
                 if (algebra.get_term_count() < ((uint32_t)1 << 14)) {
@@ -369,8 +367,6 @@ namespace important_funcs {
         }
 
         bool done = false;
-        term_array one(1);
-        one.terms[0] = 0;
         vector<uint16_t> q_components{};
         while (!done) {
             const auto fin_sum_r = finite_summand(p, excess1);
@@ -454,12 +450,12 @@ namespace important_funcs {
                 const cpp_int testpow(((cpp_int(1) << algebra.get_term_count()) - 1) / p);
                 // we need to exploit more properties of `testpow`
 
-                term_array alpha_terms((uint32_t)alpha1.size());
+                term_array alpha_terms(algebra.get_term_count());
                 for (uint32_t i = 0; i < alpha1.size(); i++) {
-                    alpha_terms.terms[i] = alpha1[i];
+                    alpha_terms.set(alpha1[i]);
                 }
 
-                term_array respow = term_array();
+                term_array respow = term_array(algebra.get_term_count());
                 if (testpow < 1 << 7) {
                     respow = algebra.power(alpha_terms, testpow);
                 } else {
@@ -476,6 +472,8 @@ namespace important_funcs {
                     cout << "All threads completed. Check calculation.log for full log." << '\n';
                 }
 
+                term_array one(respow.capacity_bits);
+                one.set(0);
                 if (respow != one) done = true;
             } else {
                 cout << "[p = " << p << "] div_2_pow_min_1 failed." << '\n';

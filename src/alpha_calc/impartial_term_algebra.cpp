@@ -45,7 +45,7 @@ uint32_t term_count_calc(const vector<uint16_t>& q_components_) {
 impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& log_queue, std::atomic<bool>& calculation_done,
     vector<uint16_t>& q_components_): log_queue_(log_queue), calculation_done_(calculation_done),
     q_components(q_components_), q_degrees(new uint16_t[q_components.size()]),
-    basis(new uint32_t[q_components.size() + 1]), accumulate_size(0), kappa_table(new term_array[q_components.size()]) {
+    basis(new uint32_t[q_components.size() + 1]), accumulator(), kappa_table(new term_array[q_components.size()]) {
     
     sort(q_components.begin(), q_components.end(), [](uint16_t a, uint16_t b)
                                         {
@@ -59,26 +59,19 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
         basis[i + 1] = basis[i] * q_degrees[i];
     }
     term_count = basis[q_components.size()];
-    accumulator_size = ((term_count + 63) >> 6);
-    accumulator = new uint64_t[accumulator_size]; // maybe use an unordered set instead of a sparse array?
-    for (uint32_t i = 0; i < accumulator_size; i++) {
-        accumulator[i] = 0;
-    }
+    accumulator = term_array(term_count);
 
     for (size_t i = 0; i < q_components.size(); i++) {
         if (q_degrees[i] == 2) {
-            kappa_table[i] = term_array(2);
-            kappa_table[i].terms[0] = basis[i] - 1;
-            kappa_table[i].terms[1] = basis[i];
+            kappa_table[i] = term_array(term_count);
+            kappa_table[i].set(basis[i] - 1);
+            kappa_table[i].set(basis[i]);
         } else if (q_components[i] == q_degrees[i]) {
             const uint16_t p = q_degrees[i];
             const auto q_set_r = important_funcs::q_set(p);
             const excess_return exr = important_funcs::excess(p);
             if (q_set_r.first != 0 || exr.failed) {
                 cout << "constructing algebra failed\n";
-                accumulate_size = 0;
-                accumulator = 0;
-                accumulator_size = 0;
                 if (basis != nullptr) delete[] basis;
                 basis = nullptr;
                 if (basis_search != nullptr) delete[] basis_search;
@@ -104,13 +97,13 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
                 kappa_blocks.push_back(msb(excess));
                 sort(kappa_blocks.begin(), kappa_blocks.end()); // this sorting can be done smarter I think
             }
-            kappa_table[i] = term_array((uint32_t)kappa_blocks.size());
+            kappa_table[i] = term_array(term_count);
             for (uint32_t j = 0; j < kappa_blocks.size(); j++) {
-                kappa_table[i].terms[j] = kappa_blocks[j];
+                kappa_table[i].set(kappa_blocks[j]);
             }
         } else {
-            kappa_table[i] = term_array(1);
-            kappa_table[i].terms[0] = basis[i - 1];
+            kappa_table[i] = term_array(term_count);
+            kappa_table[i].set(basis[i - 1]);
         }
     }
 
@@ -160,8 +153,6 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
 impartial_term_algebra::~impartial_term_algebra() {
     if (kappa_table != nullptr) delete[] kappa_table;
     kappa_table = nullptr;
-    if (accumulator != nullptr) delete[] accumulator;
-    accumulator = nullptr;
     if (basis != nullptr) delete[] basis;
     basis = nullptr;
     if (q_degrees != nullptr) delete[] q_degrees;
@@ -173,7 +164,7 @@ impartial_term_algebra::~impartial_term_algebra() {
 }
 
 term_array impartial_term_algebra::q_power_times_term(size_t q_index, uint16_t q_exponent, uint32_t term) {
-    if (q_power_times_term_table.get(q_index, q_exponent, term).terms != nullptr) {
+    if (q_power_times_term_table.get(q_index, q_exponent, term).words != nullptr) {
         return q_power_times_term_table.get(q_index, q_exponent, term);
     } else {
         const term_array result = q_power_times_term_calc(q_index, q_exponent, term);
@@ -187,99 +178,61 @@ term_array impartial_term_algebra::q_power_times_term_calc(size_t q_index, uint1
     const uint16_t q_exponent_in_term = (uint16_t)((term % basis[q_index + 1]) / basis[q_index]); // see headerfile why I'm casting
     const uint16_t q_exponent_new = q_exponent + q_exponent_in_term;
     if (q_exponent_new < p) {
-        term_array result = term_array(1);
-        result.terms[0] = term + (uint32_t)q_exponent * basis[q_index];
+        term_array result = term_array(term_count);
+        result.set(term + (uint32_t)q_exponent * basis[q_index]);
         return result;
     } else {
         const uint32_t high_order_part = (term / basis[q_index + 1]) * basis[q_index + 1] + (q_exponent_new % p) * basis[q_index];
         const uint32_t low_order_part = term % basis[q_index];
         const term_array kappa_expansion(kappa_table[q_index]);
 
-        set<uint32_t> terms{};
-        term_array product;
-        for (uint32_t i = 0; i < kappa_expansion.terms_size; i++) {
-            product = term_times_term(low_order_part, kappa_expansion.terms[i]);
-            for (uint32_t j = 0; j < product.terms_size; j++) {
-                if (terms.find(product.terms[j]) != terms.end()) {
-                    terms.erase(product.terms[j]);
-                } else {
-                    terms.insert(product.terms[j]);
-                }
-            }
-        }
+        term_array terms(term_count);
+        term_array product(term_count);
+        
+        kappa_expansion.for_each_set_bit([&](uint32_t i) {
+            term_array product = term_times_term(low_order_part, i);
+            terms ^= product;
+        });
 
-        term_array result((uint32_t)terms.size());
-        uint32_t i = 0;
-        for (uint32_t k : terms) { // set is internally sorted so this for-loop uses the right order
-            result.terms[i] = high_order_part + k;
-            i++;
-        }
+        term_array result(term_count);
+        terms.for_each_set_bit([&](uint32_t i) {
+            result.set(high_order_part + i);
+        });
         return result;
     }
 }
 
 term_array impartial_term_algebra::term_times_term(uint32_t x, uint32_t y) {
-    set<uint32_t> terms{y};
-    term_array product;
+    term_array result(term_count);
+    result.set(y);
+    term_array product(term_count);
     uint16_t x_exp;
     for (size_t xip1 = q_components.size(); xip1 > 0; xip1--) { // `xip1` is `xi + 1` because `0 - 1` will cause overflow
         x_exp = (uint16_t)((x % basis[xip1]) / basis[xip1 - 1]); // see headerfile why I'm casting
         if (x_exp > 0) {
-            set<uint32_t> new_terms{};
-            for (uint32_t term : terms) {
-                product = q_power_times_term(xip1 - 1, x_exp, term);
-                for (uint32_t i = 0; i < product.terms_size; i++) {
-                    if (new_terms.find(product.terms[i]) != new_terms.end()) {
-                        new_terms.erase(product.terms[i]);
-                    } else {
-                        new_terms.insert(product.terms[i]);
-                    }
-                }
-            }
-            terms = new_terms;
+            term_array new_terms(term_count);
+            result.for_each_set_bit([&](uint32_t i) {
+                product = q_power_times_term(xip1 - 1, x_exp, i);
+                new_terms ^= product;
+            });
+            result = new_terms;
         }
     }
     
-    term_array result((uint32_t)terms.size());
-    uint32_t i = 0;
-    for (uint32_t k : terms) {
-        result.terms[i] = k;
-        i++;
-    }
     return result;
-}
-
-inline void impartial_term_algebra::flip_accumulator_term(uint32_t x) {
-    accumulator[x / 64] ^= ((uint64_t)1) << (x & 63);
-    if ((accumulator[x / 64] & ((uint64_t)1) << (x & 63)) != 0) { // can this be faster?
-        accumulate_size++;
-    } else {
-        accumulate_size--;
-    }
-}
-
-inline bool impartial_term_algebra::accumulator_contains(uint32_t x) {
-    return (accumulator[x / 64] & (((uint64_t)1) << (x & 63))) != 0;
-}
-
-inline void impartial_term_algebra::clear_accumulator() {
-    for (uint32_t i = 0; i < accumulator_size; i++) {
-        accumulator[i] = 0;
-    }
-    accumulate_size = 0;
 }
 
 void impartial_term_algebra::accumulate_term_product(uint32_t x, uint32_t y) {
     if (y == 0) {
-        flip_accumulator_term(x);
+        accumulator.flip(x);
         return;
     } else {
         const uint32_t bi = basis[basis_search[y]];
         // 0 <= `y / bi` < some prime from `q_degrees`
         const tmp_term_array product = tmp_term_array(q_power_times_term_table.get(basis_search[y], (uint16_t)(y / bi), x));
-        for (uint32_t i = 0; i < product.terms_size; i++) {
-            accumulate_term_product(product.terms[i], y % bi);
-        }
+        product.for_each_set_bit([&](uint32_t i) {
+            accumulate_term_product(i, y % bi);
+        });
         return;
     }
 }
@@ -298,93 +251,54 @@ uint32_t* impartial_term_algebra::get_basis() const {
 
 // a and b must already be sorted
 term_array impartial_term_algebra::multiply(const term_array& a, const term_array& b) {
-    clear_accumulator();
-    for (uint32_t i = 0; i < a.terms_size; i++) {
-        for (uint32_t j = 0; j < b.terms_size; j++) {
-            accumulate_term_product(a.terms[i], b.terms[j]);
-        }
-    }
-
-    term_array result(accumulate_size);
-    uint32_t j = 0;
-    for (uint32_t i = 0; i < term_count; i++) {
-        if (accumulator_contains(i)) {
-            result.terms[j] = i;
-            j++;
-        }
-    }
-    return result;
+    accumulator.clear_all();
+    a.for_each_set_bit([&](uint32_t i) {
+        b.for_each_set_bit([&](uint32_t j) {
+            accumulate_term_product(i, j);
+        });
+    });
+    return accumulator;
 }
 
 term_array impartial_term_algebra::square_term_calc(uint32_t x) {
-    clear_accumulator();
+    accumulator.clear_all();
     accumulate_term_product(x, x);
-
-    term_array result(accumulate_size);
-    uint32_t j = 0;
-    for (uint32_t i = 0; i < term_count; i++) {
-        if (accumulator_contains(i)) {
-            result.terms[j] = i;
-            j++;
-        }
-    }
-    return result;
+    return accumulator;
 }
 
 // a must have enough allocated memory for the result
 void impartial_term_algebra::square_with_table(term_array& a) {
-    clear_accumulator();
+    accumulator.clear_all();
     tmp_term_array square_term;
-    for (uint32_t i = 0; i < a.terms_size; i++) {
-        square_term = tmp_term_array(square_term_table[a.terms[i]]);
-        for (uint32_t j = 0; j < square_term.terms_size; j++) {
-            flip_accumulator_term(square_term.terms[j]);
-        }
-    }
+    a.for_each_set_bit([&](uint32_t i) {
+        square_term = tmp_term_array(square_term_table[i]);
+        accumulator ^= square_term;
+    });
 
-    a.terms_size = accumulate_size;
-    uint32_t j = 0;
-    for (uint32_t i = 0; i < term_count; i++) {
-        if (accumulator_contains(i)) {
-            a.terms[j] = i;
-            j++;
-        }
-    }
+    a = accumulator;
     return;
 }
 
 // a must already be sorted
 term_array impartial_term_algebra::square(const term_array& a) {
-    clear_accumulator();
+    accumulator.clear_all();
     tmp_term_array square_term;
-    for (uint32_t i = 0; i < a.terms_size; i++) {
-        square_term = tmp_term_array(square_term_table[a.terms[i]]);
-        for (uint32_t j = 0; j < square_term.terms_size; j++) {
-            flip_accumulator_term(square_term.terms[j]);
-        }
-    }
+    a.for_each_set_bit([&](uint32_t i) {
+        square_term = tmp_term_array(square_term_table[i]);
+        accumulator ^= square_term;
+    });
 
-    term_array result(accumulate_size);
-    uint32_t j = 0;
-    for (uint32_t i = 0; i < term_count; i++) {
-        if (accumulator_contains(i)) {
-            result.terms[j] = i;
-            j++;
-        }
-    }
+    term_array result = term_array(a);
     return result;
 }
 
 // a must already be sorted
 term_array impartial_term_algebra::power(const term_array& a, const cpp_int& n) {
-    term_array result(1);
-    result.terms[0] = 0;
+    term_array result(term_count);
+    result.set(0);
     if(n.is_zero()) return result;
     
-    term_array curpow(a.terms_size);
-    for (uint32_t i = 0; i < a.terms_size; i++) {
-        curpow.terms[i] = a.terms[i];
-    }
+    term_array curpow(a);
     unsigned index = 0;
     const unsigned msbnp1 = msb(n) + 1;
     
@@ -402,17 +316,13 @@ term_array impartial_term_algebra::power(const term_array& a, const cpp_int& n) 
 // a must already be sorted
 void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, term_array& res) {
     term_array result(term_count);
-    result.terms_size = 1; // feels hacky but very useful
-    result.terms[0] = 0;
+    result.set(0);
     if(n.is_zero()) {
         res = result;
         return;
     }
     
-    term_array curpow(a.terms_size);
-    for (uint32_t i = 0; i < a.terms_size; i++) {
-        curpow.terms[i] = a.terms[i];
-    }
+    term_array curpow(a);
     unsigned index = 0;
     const unsigned msbnp1 = msb(n) + 1;
     constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
@@ -503,14 +413,15 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     */
 
     term_array* term_times_a = new term_array[term_count];
-    term_array term_as_array(1);
+    term_array term_as_array(term_count);
     for (uint32_t term = 0; term < term_count; term++) {
-        term_as_array.terms[0] = term;
+        term_as_array.set(term);
         term_times_a[term] = multiply(term_as_array, a);
+        term_as_array.clear_bit(term);
     }
     cout << "Precomputed values done." << '\n';
 
-    while (!log_queue_.push({0, msbnp1, curpow.terms_size, result.terms_size})) {
+    while (!log_queue_.push({0, msbnp1, curpow.bit_count, result.bit_count})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     size_t ip1 = (size_t)msbnp1;
@@ -518,31 +429,22 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     while (ip1 > 0) {
         square_with_table(result);
         if (vn[ip1-1]) {
-            clear_accumulator();
-            for (uint32_t i = 0; i < result.terms_size; i++) {
-                tmp = tmp_term_array(term_times_a[result.terms[i]]);
-                for (uint32_t j = 0; j < tmp.terms_size; j++) {
-                    flip_accumulator_term(tmp.terms[j]);
-                }
-            }
-            result.terms_size = accumulate_size;
-            uint32_t j = 0;
-            for (uint32_t i = 0; i < term_count; i++) {
-                if (accumulator_contains(i)) {
-                    result.terms[j] = i;
-                    j++;
-                }
-            }
+            accumulator.clear_all();
+            result.for_each_set_bit([&](uint32_t i) {
+                tmp = tmp_term_array(term_times_a[i]);
+                accumulator ^= tmp;
+            });
+            result = accumulator;
         }
         index++;
         if (!(index & MASK)) { // Send progress update
-            while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
+            while (!log_queue_.push({index, msbnp1, curpow.bit_count, result.bit_count})) {
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
         }
         ip1--;
     }
-    while (!log_queue_.push({msbnp1, msbnp1, curpow.terms_size, result.terms_size})) {
+    while (!log_queue_.push({msbnp1, msbnp1, curpow.bit_count, result.bit_count})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     calculation_done_ = true;
@@ -573,19 +475,19 @@ void impartial_term_algebra::q_set_degree(const term_array& a, uint32_t& res) {
     uint32_t result = 1;
     constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
 
-    while (!log_queue_.push({0, 0, respow.terms_size, 0})) {
+    while (!log_queue_.push({0, 0, respow.bit_count, 0})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     while (respow != a) {
         respow = square(respow);
         result++;
         if (!(result & MASK)) { // Send progress update
-            while (!log_queue_.push({result, 0, respow.terms_size, 0})) {
+            while (!log_queue_.push({result, 0, respow.bit_count, 0})) {
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
         }
     }
-    while (!log_queue_.push({result, result, respow.terms_size, 0})) {
+    while (!log_queue_.push({result, result, respow.bit_count, 0})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     calculation_done_ = true;

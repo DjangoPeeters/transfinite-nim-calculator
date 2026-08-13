@@ -6,6 +6,8 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
+#include <cassert>
 #include <ostream>
 #include <vector>
 #include <boost/multiprecision/cpp_int.hpp>
@@ -14,44 +16,65 @@ using std::size_t;
 using std::vector;
 using boost::multiprecision::cpp_int;
 
+struct tmp_term_array;
+
 struct term_array {
-    uint32_t terms_size;
-    uint32_t* terms;
+    uint32_t capacity_bits;   // domain size (== term_count for this algebra)
+    uint32_t word_count;      // ceil(capacity_bits / 64)
+    uint32_t bit_count;       // number of set bits (replaces old terms_size)
+    uint64_t* words;
 
-    term_array(): terms_size(0), terms(nullptr) {}
+    static uint32_t words_for(uint32_t bits) {
+        return (bits + 63u) / 64u;
+    }
 
-    term_array(uint32_t size): terms_size(size), terms(new uint32_t[size]) {}
+    term_array() : capacity_bits(0), word_count(0), bit_count(0), words(nullptr) {}
 
-    term_array(const term_array& other): terms_size(other.terms_size), terms(nullptr) {
-        if (other.terms != nullptr && other.terms_size > 0) {
-            terms = new uint32_t[terms_size];
-            std::memcpy(terms, other.terms, terms_size * sizeof(uint32_t));  // Faster than loop
+    // Allocates a zero-initialized bitset over `capacity_bits` terms.
+    explicit term_array(uint32_t capacity_bits_)
+        : capacity_bits(capacity_bits_),
+          word_count(words_for(capacity_bits_)),
+          bit_count(0),
+          words(word_count ? new uint64_t[word_count]() : nullptr) {} // value-init zeroes
+
+    term_array(const term_array& other)
+        : capacity_bits(other.capacity_bits),
+          word_count(other.word_count),
+          bit_count(other.bit_count),
+          words(nullptr) {
+        if (word_count > 0) {
+            words = new uint64_t[word_count];
+            std::memcpy(words, other.words, word_count * sizeof(uint64_t));
         }
     }
 
-    term_array(term_array&& other) noexcept : terms_size(other.terms_size), terms(other.terms) {
-        other.terms = nullptr;
-        other.terms_size = 0;
+    term_array(term_array&& other) noexcept
+        : capacity_bits(other.capacity_bits),
+          word_count(other.word_count),
+          bit_count(other.bit_count),
+          words(other.words) {
+        other.words = nullptr;
+        other.capacity_bits = 0;
+        other.word_count = 0;
+        other.bit_count = 0;
     }
 
     ~term_array() {
-        if (terms != nullptr) delete[] terms;
-        terms = nullptr;
-        terms_size = 0;
+        delete[] words;
+        words = nullptr;
     }
 
     term_array& operator=(const term_array& other) {
         if (this != &other) {
-            if (terms != nullptr) delete[] terms;
-            terms_size = other.terms_size;
-
-            if (other.terms != nullptr && other.terms_size > 0) {
-                terms = new uint32_t[terms_size];
-                for (uint32_t i = 0; i < terms_size; i++) {
-                    terms[i] = other.terms[i];
-                }
-            } else {
-                terms = nullptr;
+            if (word_count != other.word_count) {
+                delete[] words;
+                word_count = other.word_count;
+                words = word_count ? new uint64_t[word_count] : nullptr;
+            }
+            capacity_bits = other.capacity_bits;
+            bit_count = other.bit_count;
+            if (word_count > 0) {
+                std::memcpy(words, other.words, word_count * sizeof(uint64_t));
             }
         }
         return *this;
@@ -59,45 +82,158 @@ struct term_array {
 
     term_array& operator=(term_array&& other) noexcept {
         if (this != &other) {
-            if (terms != nullptr) delete[] terms;
-            terms_size = other.terms_size;
-            terms = other.terms;
-            other.terms = nullptr;
-            other.terms_size = 0;
+            delete[] words;
+            capacity_bits = other.capacity_bits;
+            word_count = other.word_count;
+            bit_count = other.bit_count;
+            words = other.words;
+            other.words = nullptr;
+            other.capacity_bits = 0;
+            other.word_count = 0;
+            other.bit_count = 0;
         }
         return *this;
     }
 
-    friend bool operator!=(const term_array& me, const term_array& other) {
-        if (me.terms_size != other.terms_size) return true;
-        for (uint32_t i = 0; i < me.terms_size; i++) {
-            if (me.terms[i] != other.terms[i]) return true;
+    // --- bit ops ---
+
+    inline bool test(uint32_t idx) const {
+        return (words[idx >> 6] & (uint64_t(1) << (idx & 63))) != 0;
+    }
+
+    inline void set(uint32_t idx) {
+        uint64_t mask = uint64_t(1) << (idx & 63);
+        uint64_t& w = words[idx >> 6];
+        if (!(w & mask)) { w |= mask; bit_count++; }
+    }
+
+    inline void clear_bit(uint32_t idx) {
+        uint64_t mask = uint64_t(1) << (idx & 63);
+        uint64_t& w = words[idx >> 6];
+        if (w & mask) { w &= ~mask; bit_count--; }
+    }
+
+    // Same job as the old flip_accumulator_term, single load instead of load+reload.
+    inline void flip(uint32_t idx) {
+        uint64_t mask = uint64_t(1) << (idx & 63);
+        uint64_t& w = words[idx >> 6];
+        uint64_t before = w;
+        w = before ^ mask;
+        bit_count += (before & mask) ? -1 : 1;
+    }
+
+    inline void clear_all() {
+        if (word_count) std::memset(words, 0, word_count * sizeof(uint64_t));
+        bit_count = 0;
+    }
+
+    // Merge another bitset into this one via XOR (word-wise; auto-vectorizes).
+    // Both must share the same capacity/word_count.
+    term_array& operator^=(const term_array& other) {
+        assert(word_count == other.word_count);
+        int64_t delta = 0;
+        for (uint32_t w = 0; w < word_count; w++) {
+            uint64_t before = words[w];
+            uint64_t after = before ^ other.words[w];
+            words[w] = after;
+            delta += __builtin_popcountll(after) - __builtin_popcountll(before);
         }
-        return false;
+        bit_count = (uint32_t)((int64_t)bit_count + delta);
+        return *this;
+    }
+
+    term_array& operator^=(const tmp_term_array& other);
+
+    // Optional cross-check / recovery if you ever suspect incremental drift.
+    uint32_t recompute_bit_count() const {
+        uint32_t c = 0;
+        for (uint32_t w = 0; w < word_count; w++) c += __builtin_popcountll(words[w]);
+        return c;
+    }
+
+    friend bool operator!=(const term_array& me, const term_array& other) {
+        if (me.word_count != other.word_count) return true;
+        return std::memcmp(me.words, other.words, me.word_count * sizeof(uint64_t)) != 0;
+    }
+
+    // Visit set bit indices in increasing order — for code that still needs
+    // the sorted-index view (e.g. final output, or interfacing with
+    // q_power_times_term_table which is keyed by term index).
+    template <typename F>
+    void for_each_set_bit(F&& fn) const {
+        for (uint32_t w = 0; w < word_count; w++) {
+            uint64_t word = words[w];
+            uint32_t base = w * 64u;
+            while (word) {
+                unsigned b = __builtin_ctzll(word);
+                fn(base + b);
+                word &= word - 1; // clear lowest set bit
+            }
+        }
     }
 };
 
 struct tmp_term_array { // only for transferring `term_array`'s
-    uint32_t terms_size;
-    uint32_t* terms;
+    uint32_t capacity_bits;
+    uint32_t word_count;
+    uint32_t bit_count;
+    uint64_t* words;
 
-    tmp_term_array(): terms_size(0), terms(nullptr) {}
+    tmp_term_array() : capacity_bits(0), word_count(0), bit_count(0), words(nullptr) {}
 
-    tmp_term_array(const term_array& other): terms_size(other.terms_size), terms(other.terms) {}
+    tmp_term_array(const term_array& other)
+        : capacity_bits(other.capacity_bits),
+          word_count(other.word_count),
+          bit_count(other.bit_count),
+          words(other.words) {
+    }
 
     ~tmp_term_array() {
-        terms_size = 0;
-        terms = nullptr;
+        capacity_bits = 0;
+        word_count = 0;
+        bit_count = 0;
+        words = nullptr;
     }
 
     tmp_term_array& operator=(const tmp_term_array& other) {
         if (this != &other) {
-            terms_size = other.terms_size;
-            terms = other.terms;
+            capacity_bits = other.capacity_bits;
+            word_count = other.word_count;
+            bit_count = other.bit_count;
+            words = other.words;
         }
         return *this;
     }
+
+    // Visit set bit indices in increasing order — for code that still needs
+    // the sorted-index view (e.g. final output, or interfacing with
+    // q_power_times_term_table which is keyed by term index).
+    template <typename F>
+    void for_each_set_bit(F&& fn) const {
+        for (uint32_t w = 0; w < word_count; w++) {
+            uint64_t word = words[w];
+            uint32_t base = w * 64u;
+            while (word) {
+                unsigned b = __builtin_ctzll(word);
+                fn(base + b);
+                word &= word - 1; // clear lowest set bit
+            }
+        }
+    }
 };
+
+inline term_array& term_array::operator^=(const tmp_term_array& other) {
+    assert(word_count == other.word_count);
+    int64_t delta = 0;
+    for (uint32_t w = 0; w < word_count; w++) {
+        uint64_t before = words[w];
+        uint64_t after = before ^ other.words[w];
+        words[w] = after;
+        delta += __builtin_popcountll(after) - __builtin_popcountll(before);
+    }
+    bit_count = (uint32_t)((int64_t)bit_count + delta);
+    return *this;
+}
 
 struct flattened_table {
     term_array* data;
@@ -140,9 +276,7 @@ class impartial_term_algebra {
         uint16_t* q_degrees; // ditto
         uint32_t* basis; // multiplying everything together from `q_degrees` might need more than 16 bits
         uint32_t term_count;
-        uint32_t accumulator_size;
-        uint64_t* accumulator; // using uint64_t to represent 64 contiguous bits
-        uint32_t accumulate_size;
+        term_array accumulator;
         term_array* kappa_table; // some entries come from `basis`
         flattened_table q_power_times_term_table; // ditto
         uint32_t* basis_search;
