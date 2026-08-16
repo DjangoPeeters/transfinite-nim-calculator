@@ -144,6 +144,8 @@ struct term_array {
 
     term_array& operator^=(const tmp_term_array& other);
 
+    inline void merge_xor_no_count(const tmp_term_array& other);
+
     // Optional cross-check / recovery if you ever suspect incremental drift.
     uint32_t recompute_bit_count() const {
         uint32_t c = 0;
@@ -188,12 +190,13 @@ struct tmp_term_array { // only for transferring `term_array`'s
           words(other.words) {
     }
 
-    ~tmp_term_array() {
-        capacity_bits = 0;
-        word_count = 0;
-        bit_count = 0;
-        words = nullptr;
-    }
+    tmp_term_array(const tmp_term_array& other)
+        : capacity_bits(other.capacity_bits),
+          word_count(other.word_count),
+          bit_count(other.bit_count),
+          words(other.words) {}
+    
+    ~tmp_term_array() = default;
 
     tmp_term_array& operator=(const tmp_term_array& other) {
         if (this != &other) {
@@ -235,6 +238,15 @@ inline term_array& term_array::operator^=(const tmp_term_array& other) {
     return *this;
 }
 
+// Fast path: merge with no per-call bit_count bookkeeping.
+inline void term_array::merge_xor_no_count(const tmp_term_array& other) {
+    uint64_t* __restrict w_ptr = words;
+    const uint64_t* __restrict o_ptr = other.words;
+    for (uint32_t w = 0; w < word_count; w++) {
+        w_ptr[w] ^= o_ptr[w];
+    }
+}
+
 struct flattened_table {
     term_array* data;
     size_t* component_offsets;
@@ -255,6 +267,76 @@ struct flattened_table {
                        term_count*(degree-1) + // we ignore degree=0 because this corresponds to the trivial case with result 1 = term_array({0})
                        term_idx;
         return data[offset];
+    }
+};
+
+struct flat_term_table {
+    // Row `term`'s set-bit indices live in index_data[row_offsets[term] .. row_offsets[term+1]),
+    // in increasing order (guaranteed by how add_row() walks a bitset's set bits).
+    std::vector<uint32_t> index_data;
+    std::vector<uint64_t> row_offsets;   // size term_count+1; uint64_t since total indices can exceed 4B at large term_count
+    uint32_t term_count;
+    uint32_t capacity_bits;              // domain the indices are valid within (== term_count for this algebra)
+
+    flat_term_table() : term_count(0), capacity_bits(0) {
+        row_offsets.push_back(0);
+    }
+
+    // `index_estimate` is a rough guess at total set bits across all rows —
+    // used only to size the initial reserve() and avoid reallocation churn
+    // during the build loop. Getting it wrong just costs some reallocations,
+    // not correctness. Pass 0 if you have no idea.
+    flat_term_table(uint32_t term_count_, uint32_t capacity_bits_, size_t index_estimate = 0)
+        : term_count(term_count_), capacity_bits(capacity_bits_) {
+        row_offsets.reserve((size_t)term_count_ + 1);
+        row_offsets.push_back(0);
+        if (index_estimate > 0) index_data.reserve(index_estimate);
+    }
+
+    // No implicit deep copies of a structure this size.
+    flat_term_table(const flat_term_table&) = delete;
+    flat_term_table& operator=(const flat_term_table&) = delete;
+    flat_term_table(flat_term_table&&) noexcept = default;
+    flat_term_table& operator=(flat_term_table&&) noexcept = default;
+
+    // Append one row's worth of set-bit indices, taken from any bitset type
+    // that exposes for_each_set_bit (term_array, or another bitset view).
+    // Must be called exactly once per term, in order 0..term_count-1 —
+    // row identity comes purely from call order, not an explicit index,
+    // so calling out of order or skipping a term will silently misalign
+    // every row after it.
+    template <typename Bitset>
+    void add_row(const Bitset& bits) {
+        bits.for_each_set_bit([&](uint32_t idx) {
+            assert(idx < capacity_bits);
+            index_data.push_back(idx);
+        });
+        row_offsets.push_back(index_data.size());
+    }
+
+    // Visit set-bit indices of row `term`, in increasing order.
+    template <typename Fn>
+    inline void for_each_set_bit_in_row(uint32_t term, Fn&& fn) const {
+        const uint64_t begin = row_offsets[term];
+        const uint64_t end = row_offsets[term + 1];
+        const uint32_t* data = index_data.data();
+        for (uint64_t k = begin; k < end; k++) {
+            fn(data[k]);
+        }
+    }
+
+    inline uint32_t row_bit_count(uint32_t term) const {
+        return (uint32_t)(row_offsets[term + 1] - row_offsets[term]);
+    }
+
+    // Diagnostics — e.g. the density check that confirmed this rewrite was worth doing.
+    size_t total_index_count() const { return index_data.size(); }
+    double average_row_density() const {
+        if (term_count == 0 || capacity_bits == 0) return 0.0;
+        return (double)index_data.size() / term_count / capacity_bits;
+    }
+    size_t bytes_used() const {
+        return index_data.size() * sizeof(uint32_t) + row_offsets.size() * sizeof(uint64_t);
     }
 };
 
@@ -280,7 +362,7 @@ class impartial_term_algebra {
         term_array* kappa_table; // some entries come from `basis`
         flattened_table q_power_times_term_table; // ditto
         uint32_t* basis_search;
-        term_array* square_term_table;
+        flat_term_table square_term_table;
 
         term_array q_power_times_term(size_t q_index, uint16_t q_exponent, uint32_t term); // same `uint16_t` as for `q_degrees`
         term_array q_power_times_term_calc(size_t q_index, uint16_t q_exponent, uint32_t term); // ditto

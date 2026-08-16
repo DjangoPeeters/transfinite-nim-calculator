@@ -80,8 +80,6 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
                 kappa_table = nullptr;
                 if (q_degrees != nullptr) delete[] q_degrees;
                 q_degrees = nullptr;
-                if (square_term_table != nullptr) delete[] square_term_table;
-                square_term_table = nullptr;
                 cout << "term_count was " << term_count << "\n";
                 term_count = 0;
                 return;
@@ -144,9 +142,11 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
         basis_search[term] = index;
     }
 
-    square_term_table = new term_array[term_count];
+    square_term_table = flat_term_table(term_count, term_count);
     for (uint32_t term = 0; term < term_count; term++) {
-        square_term_table[term] = square_term_calc(term);
+        accumulator.clear_all();
+        accumulate_term_product(term, term);
+        square_term_table.add_row(accumulator);
     }
 }
 
@@ -159,8 +159,6 @@ impartial_term_algebra::~impartial_term_algebra() {
     q_degrees = nullptr;
     if (basis_search != nullptr) delete[] basis_search;
     basis_search = nullptr;
-    if (square_term_table != nullptr) delete[] square_term_table;
-    square_term_table = nullptr;
 }
 
 term_array impartial_term_algebra::q_power_times_term(size_t q_index, uint16_t q_exponent, uint32_t term) {
@@ -187,11 +185,9 @@ term_array impartial_term_algebra::q_power_times_term_calc(size_t q_index, uint1
         const term_array kappa_expansion(kappa_table[q_index]);
 
         term_array terms(term_count);
-        term_array product(term_count);
         
         kappa_expansion.for_each_set_bit([&](uint32_t i) {
-            term_array product = term_times_term(low_order_part, i);
-            terms ^= product;
+            terms ^= term_times_term(low_order_part, i);
         });
 
         term_array result(term_count);
@@ -257,24 +253,27 @@ term_array impartial_term_algebra::multiply(const term_array& a, const term_arra
             accumulate_term_product(i, j);
         });
     });
-    return accumulator;
+
+    term_array result = accumulator;
+    return result;
 }
 
 term_array impartial_term_algebra::square_term_calc(uint32_t x) {
     accumulator.clear_all();
     accumulate_term_product(x, x);
-    return accumulator;
+
+    term_array result = accumulator;
+    return result;
 }
 
 // a must have enough allocated memory for the result
 void impartial_term_algebra::square_with_table(term_array& a) {
     accumulator.clear_all();
-    tmp_term_array square_term;
     a.for_each_set_bit([&](uint32_t i) {
-        square_term = tmp_term_array(square_term_table[i]);
-        accumulator ^= square_term;
+        square_term_table.for_each_set_bit_in_row(i, [&](uint32_t idx) {
+            accumulator.flip(idx);
+        });
     });
-
     a = accumulator;
     return;
 }
@@ -282,13 +281,12 @@ void impartial_term_algebra::square_with_table(term_array& a) {
 // a must already be sorted
 term_array impartial_term_algebra::square(const term_array& a) {
     accumulator.clear_all();
-    tmp_term_array square_term;
     a.for_each_set_bit([&](uint32_t i) {
-        square_term = tmp_term_array(square_term_table[i]);
-        accumulator ^= square_term;
+        square_term_table.for_each_set_bit_in_row(i, [&](uint32_t idx) {
+            accumulator.flip(idx);
+        });
     });
-
-    term_array result = term_array(a);
+    term_array result = accumulator;
     return result;
 }
 
@@ -432,8 +430,9 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
             accumulator.clear_all();
             result.for_each_set_bit([&](uint32_t i) {
                 tmp = tmp_term_array(term_times_a[i]);
-                accumulator ^= tmp;
+                accumulator.merge_xor_no_count(tmp);
             });
+            accumulator.bit_count = accumulator.recompute_bit_count();
             result = accumulator;
         }
         index++;
