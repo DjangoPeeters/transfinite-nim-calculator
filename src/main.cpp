@@ -62,14 +62,13 @@ unless we find a way to go about doing this calculation in a smarter way.
 
 //TODO optimize
 //TODO split calculating into more threads
-void alphas() {
+void alphas_upto(uint16_t p_max) {
     time_t checkpoint_time;
-    uint16_t p;
+    uint16_t p = 3;
     time_t t;
-    alpha_return ar = alpha(2);
-    unsigned n = 2; // `alpha(nth_prime(1))` (a.k.a. `alpha(2)`) is a dummy value
-    while (1) {
-        p = nth_prime(n);
+    alpha_return ar = alpha(2); // `alpha(nth_prime(1))` (a.k.a. `alpha(2)`) is a dummy value
+    unsigned n = 2;
+    while (p <= p_max) {
         checkpoint_time = time(nullptr);
         cout << "===== Calculating alpha(" << p << "). =====\n";
         ar = alpha(p);
@@ -81,7 +80,12 @@ void alphas() {
             cout << "===== Time is " << t << " seconds. =====\n\n";
         }
         n++;
+        p = nth_prime(n);
     }
+}
+
+void alphas() {
+    alphas_upto(UINT16_MAX);
 }
 
 void excess_to_afile() {
@@ -199,6 +203,9 @@ int main(int argc, char* argv[]) {
             init();
             excess_to_bfile();
         }
+    } else {
+        init();
+        alphas_upto(150);
     }
 
     return 0;
