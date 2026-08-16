@@ -23,10 +23,10 @@ TARGET = bin/main
 CXX = g++
 CXXFLAGS = -std=c++11 -Wall -Wextra -pthread
 # Separate targets for release and profiling
-RELEASE_FLAGS = -O3 -DNDEBUG
+RELEASE_FLAGS = -O3 -DNDEBUG -mpopcnt
 DEBUG_FLAGS = -fsanitize=address -g -O0 -DDEBUG
-PROFILE_FLAGS = -pg -O2
-TEST_FLAGS = -O3 -DNDEBUG
+PROFILE_FLAGS = -pg -O2 -mpopcnt
+TEST_FLAGS = -O3 -DNDEBUG -mpopcnt
 
 #TODO use include directory for proper dependency handling
 
