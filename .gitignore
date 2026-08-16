@@ -6,4 +6,4 @@
 *.a
 *.so
 *.dll
-build/
+bin/
