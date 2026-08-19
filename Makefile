@@ -43,6 +43,9 @@ PERF_FLAGS = -O3 -DNDEBUG -mpopcnt -g -fno-omit-frame-pointer
 all: $(TARGET)
 
 # Create necessary directories
+bin:
+	mkdir -p bin
+
 obj:
 	mkdir -p obj
 
@@ -59,7 +62,7 @@ obj/test:
 	mkdir -p obj/test
 
 # Release build
-$(TARGET): $(OBJECTS)
+$(TARGET): $(OBJECTS) | bin
 	$(CXX) $(CXXFLAGS) $(RELEASE_FLAGS) $(OBJECTS) -o $(TARGET)
 
 # Release object files
@@ -68,7 +71,7 @@ obj/%.o: src/%.cpp | obj
 	$(CXX) $(CXXFLAGS) $(RELEASE_FLAGS) -c $< -o $@
 
 # Debug build
-$(TARGET)_debug: $(DEBUG_OBJECTS)
+$(TARGET)_debug: $(DEBUG_OBJECTS) | bin
 	$(CXX) $(CXXFLAGS) $(DEBUG_FLAGS) $(DEBUG_OBJECTS) -o $(TARGET)_debug
 
 # Debug object files
@@ -77,7 +80,7 @@ obj/debug/%.o: src/%.cpp | obj/debug
 	$(CXX) $(CXXFLAGS) $(DEBUG_FLAGS) -c $< -o $@
 
 # Profile build
-$(TARGET)_prof: $(PROF_OBJECTS)
+$(TARGET)_prof: $(PROF_OBJECTS) | bin
 	$(CXX) $(CXXFLAGS) $(PROFILE_FLAGS) $(PROF_OBJECTS) -o $(TARGET)_prof
 
 # Profile object files
@@ -86,7 +89,7 @@ obj/prof/%.o: src/%.cpp | obj/prof
 	$(CXX) $(CXXFLAGS) $(PROFILE_FLAGS) -c $< -o $@
 
 # perf build
-$(TARGET)_perf: $(PERF_OBJECTS)
+$(TARGET)_perf: $(PERF_OBJECTS) | bin
 	$(CXX) $(CXXFLAGS) $(PERF_FLAGS) $(PERF_OBJECTS) -o $(TARGET)_perf
 
 # perf object files
@@ -95,7 +98,7 @@ obj/perf/%.o: src/%.cpp | obj/perf
 	$(CXX) $(CXXFLAGS) $(PERF_FLAGS) -c $< -o $@
 
 # Test build
-$(TARGET)_test: $(OBJECTS) $(TEST_OBJECTS)
+$(TARGET)_test: $(OBJECTS) $(TEST_OBJECTS) | bin
 	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) $(TEST_OBJECTS) $(subst obj/main.o,,$(OBJECTS)) -o $(TARGET)_test
 
 # Test object files
