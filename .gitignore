@@ -10,3 +10,8 @@ bin/
 
 # Live progress trace, not reference data — regenerated every run
 logs/calculation.log
+
+# Editor-specific, not project configuration — the Makefile is the source of truth for
+# building/running/testing, and these don't need to be shared across contributors/environments
+.vscode/
+*.code-workspace
