@@ -16,8 +16,6 @@ using std::size_t;
 using std::vector;
 using boost::multiprecision::cpp_int;
 
-struct tmp_term_array;
-
 struct term_array {
     uint32_t capacity_bits;   // domain size (== term_count for this algebra)
     uint32_t word_count;      // ceil(capacity_bits / 64)
@@ -122,32 +120,23 @@ struct term_array {
         bit_count += (before & mask) ? -1 : 1;
     }
 
+    // Same as flip(), but skips the bit_count update. Whether a flip sets or clears a bit is
+    // data-dependent and effectively unpredictable in a hot scatter-XOR loop (e.g.
+    // square_with_table), so flip()'s branch there is a real per-call misprediction cost at
+    // scale. Use this in such loops and call recompute_bit_count() once afterward instead.
+    inline void flip_no_count(uint32_t idx) {
+        uint64_t mask = uint64_t(1) << (idx & 63);
+        words[idx >> 6] ^= mask;
+    }
+
     inline void clear_all() {
         if (word_count) std::memset(words, 0, word_count * sizeof(uint64_t));
         bit_count = 0;
     }
 
-    // Merge another bitset into this one via XOR (word-wise; auto-vectorizes).
-    // Both must share the same capacity/word_count.
-    term_array& operator^=(const term_array& other) {
-        assert(word_count == other.word_count);
-        int64_t delta = 0;
-        for (uint32_t w = 0; w < word_count; w++) {
-            uint64_t before = words[w];
-            uint64_t after = before ^ other.words[w];
-            words[w] = after;
-            delta += __builtin_popcountll(after) - __builtin_popcountll(before);
-        }
-        bit_count = (uint32_t)((int64_t)bit_count + delta);
-        return *this;
-    }
-
-    term_array& operator^=(const tmp_term_array& other);
-
-    inline void merge_xor_no_count(const tmp_term_array& other);
-
-    // Optional cross-check / recovery if you ever suspect incremental drift.
-    uint32_t recompute_bit_count() const {
+    // Recomputes bit_count from scratch (branchless popcount scan) — for use after a run of
+    // flip_no_count() calls.
+    inline uint32_t recompute_bit_count() const {
         uint32_t c = 0;
         for (uint32_t w = 0; w < word_count; w++) c += __builtin_popcountll(words[w]);
         return c;
@@ -172,101 +161,6 @@ struct term_array {
                 word &= word - 1; // clear lowest set bit
             }
         }
-    }
-};
-
-struct tmp_term_array { // only for transferring `term_array`'s
-    uint32_t capacity_bits;
-    uint32_t word_count;
-    uint32_t bit_count;
-    uint64_t* words;
-
-    tmp_term_array() : capacity_bits(0), word_count(0), bit_count(0), words(nullptr) {}
-
-    tmp_term_array(const term_array& other)
-        : capacity_bits(other.capacity_bits),
-          word_count(other.word_count),
-          bit_count(other.bit_count),
-          words(other.words) {
-    }
-
-    tmp_term_array(const tmp_term_array& other)
-        : capacity_bits(other.capacity_bits),
-          word_count(other.word_count),
-          bit_count(other.bit_count),
-          words(other.words) {}
-    
-    ~tmp_term_array() = default;
-
-    tmp_term_array& operator=(const tmp_term_array& other) {
-        if (this != &other) {
-            capacity_bits = other.capacity_bits;
-            word_count = other.word_count;
-            bit_count = other.bit_count;
-            words = other.words;
-        }
-        return *this;
-    }
-
-    // Visit set bit indices in increasing order — for code that still needs
-    // the sorted-index view (e.g. final output, or interfacing with
-    // q_power_times_term_table which is keyed by term index).
-    template <typename F>
-    void for_each_set_bit(F&& fn) const {
-        for (uint32_t w = 0; w < word_count; w++) {
-            uint64_t word = words[w];
-            uint32_t base = w * 64u;
-            while (word) {
-                unsigned b = __builtin_ctzll(word);
-                fn(base + b);
-                word &= word - 1; // clear lowest set bit
-            }
-        }
-    }
-};
-
-inline term_array& term_array::operator^=(const tmp_term_array& other) {
-    assert(word_count == other.word_count);
-    int64_t delta = 0;
-    for (uint32_t w = 0; w < word_count; w++) {
-        uint64_t before = words[w];
-        uint64_t after = before ^ other.words[w];
-        words[w] = after;
-        delta += __builtin_popcountll(after) - __builtin_popcountll(before);
-    }
-    bit_count = (uint32_t)((int64_t)bit_count + delta);
-    return *this;
-}
-
-// Fast path: merge with no per-call bit_count bookkeeping.
-inline void term_array::merge_xor_no_count(const tmp_term_array& other) {
-    uint64_t* __restrict w_ptr = words;
-    const uint64_t* __restrict o_ptr = other.words;
-    for (uint32_t w = 0; w < word_count; w++) {
-        w_ptr[w] ^= o_ptr[w];
-    }
-}
-
-struct flattened_table {
-    term_array* data;
-    size_t* component_offsets;
-    uint32_t term_count;
-
-    flattened_table(): data(nullptr), component_offsets(nullptr), term_count(0) {}
-
-    ~flattened_table() {
-        if (data != nullptr) delete[] data;
-        data = nullptr;
-        if (component_offsets != nullptr) delete[] component_offsets;
-        component_offsets = nullptr;
-        term_count = 0;
-    }
-    
-    term_array& get(size_t component, size_t degree, size_t term_idx) {
-        size_t offset = component_offsets[component] + 
-                       term_count*(degree-1) + // we ignore degree=0 because this corresponds to the trivial case with result 1 = term_array({0})
-                       term_idx;
-        return data[offset];
     }
 };
 
@@ -311,6 +205,16 @@ struct flat_term_table {
             assert(idx < capacity_bits);
             index_data.push_back(idx);
         });
+        row_offsets.push_back(index_data.size());
+    }
+
+    // Same as above, but for a row already held as a sorted, duplicate-free index list —
+    // skips going through a term_array entirely when the caller already has one.
+    void add_row(const std::vector<uint32_t>& sorted_indices) {
+        for (uint32_t idx : sorted_indices) {
+            assert(idx < capacity_bits);
+            index_data.push_back(idx);
+        }
         row_offsets.push_back(index_data.size());
     }
 
@@ -360,19 +264,25 @@ class impartial_term_algebra {
         uint32_t term_count;
         term_array accumulator;
         term_array* kappa_table; // some entries come from `basis`
-        flattened_table q_power_times_term_table; // ditto
+        size_t* component_offsets; // flattens (q_index, q_exponent, term) into a single row index below
+        flat_term_table q_power_times_term_table; // ditto; entries are as sparse as square_term_table's rows
         uint32_t* basis_search;
         flat_term_table square_term_table;
 
-        term_array q_power_times_term(size_t q_index, uint16_t q_exponent, uint32_t term); // same `uint16_t` as for `q_degrees`
-        term_array q_power_times_term_calc(size_t q_index, uint16_t q_exponent, uint32_t term); // ditto
-        term_array term_times_term(uint32_t x, uint32_t y);
+        inline size_t q_power_times_term_row(size_t q_index, uint16_t q_exponent, uint32_t term) const;
+        // Both of these return a reference to a persistent scratch member (qptc_result_ /
+        // ttt_result_ respectively), valid until the next call to the same function. Safe
+        // because neither is reentrant: q_power_times_term_calc is only ever called from the
+        // constructor's fill loop, and term_times_term only from q_power_times_term_calc — never
+        // from itself or back into q_power_times_term_calc.
+        const vector<uint32_t>& q_power_times_term_calc(size_t q_index, uint16_t q_exponent, uint32_t term);
+        const vector<uint32_t>& term_times_term(uint32_t x, uint32_t y);
+        // Scratch buffers for the two functions above — persistent to avoid a heap alloc per
+        // call across the tens of millions of calls a large algebra's construction makes.
+        vector<uint32_t> qptc_result_, qptc_merged_, qptc_scratch_;
+        vector<uint32_t> ttt_result_, ttt_next_, ttt_scratch_;
 
-        inline void flip_accumulator_term(uint32_t x);
-        inline bool accumulator_contains(uint32_t x);
-        inline void clear_accumulator();
         void accumulate_term_product(uint32_t x, uint32_t y);
-        term_array square_term_calc(uint32_t x);
         void square_with_table(term_array& a);
     public:
         impartial_term_algebra(ring_buffer_calculation_queue& log_queue, std::atomic<bool>& calculation_done,

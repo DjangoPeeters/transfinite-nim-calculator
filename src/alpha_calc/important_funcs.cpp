@@ -70,7 +70,7 @@ namespace important_funcs {
                 degree_kappa_cache[h] = degree_kappa_h;
                 std::ofstream file;
                 file.open(logs_dir + "/degree_kappa_records.txt", std::ios::app);
-                file << ",\n{" << h << "," << degree_kappa_h << "}";
+                file << (file.tellp() == std::streampos(0) ? "{" : ",\n{") << h << "," << degree_kappa_h << "}";
                 file.close();
             }
         }
@@ -249,6 +249,7 @@ namespace important_funcs {
     }
 
     void init() {
+        ensure_dir_exists(logs_dir);
         record_values::init();
         {
             std::lock_guard<std::mutex> lock_q_set(q_set_cache_mutex);

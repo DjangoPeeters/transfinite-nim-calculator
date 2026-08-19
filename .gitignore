@@ -7,3 +7,6 @@
 *.so
 *.dll
 bin/
+
+# Live progress trace, not reference data — regenerated every run
+logs/calculation.log

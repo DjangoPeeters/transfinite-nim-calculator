@@ -104,7 +104,7 @@ namespace record_values {
             // new q_set found!
             std::ofstream file;
             file.open(logs_dir + "/q_set_records.txt", std::ios::app);
-            file << ",\n{" << p << ",{";
+            file << (file.tellp() == std::streampos(0) ? "{" : ",\n{") << p << ",{";
             if (!q_set_p.empty()) {
                 file << q_set_p[0];
                 for (std::size_t i = 1; i < q_set_p.size(); i++) {
@@ -122,7 +122,7 @@ namespace record_values {
             // new excess found!
             std::ofstream file;
             file.open(logs_dir + "/excess_records.txt", std::ios::app);
-            file << ",\n{" << p << "," << (unsigned)excess_p << "}";
+            file << (file.tellp() == std::streampos(0) ? "{" : ",\n{") << p << "," << (unsigned)excess_p << "}";
             file.close();
         }
     };

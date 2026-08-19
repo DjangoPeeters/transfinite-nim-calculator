@@ -75,9 +75,19 @@ namespace www_nim {
             std::fstream file;
             file.open(logs_dir + "/alpha_records.txt", std::ios::in | std::ios::out);
             if (!file.is_open()) {
-                cout << "failed to open alpha_records.txt\n";
-                file.close();
-                exit(1);
+                // Doesn't exist yet — ios::in|ios::out won't create it, so create it empty
+                // first and reopen. The fill-gaps logic below already handles a file with
+                // fewer lines than `index` correctly, so an empty file just falls out of that
+                // naturally (currentLineIndex == 0).
+                std::ofstream create(logs_dir + "/alpha_records.txt");
+                create.close();
+                file.clear();
+                file.open(logs_dir + "/alpha_records.txt", std::ios::in | std::ios::out);
+                if (!file.is_open()) {
+                    cout << "failed to open alpha_records.txt\n";
+                    file.close();
+                    exit(1);
+                }
             }
 
             // Determine current number of lines
