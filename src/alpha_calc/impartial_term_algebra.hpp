@@ -164,15 +164,22 @@ struct term_array {
     }
 };
 
-struct flat_term_table {
+// Offset is templated so tables whose total index count is provably bounded (e.g.
+// square_term_table, capped at roughly 2*term_count — see small_flat_term_table below) can use
+// a 4-byte offset instead of 8. That directly shrinks row_offsets, which is read once per set
+// bit of the array being processed — profiling on real hardware (doduo) showed the stall in
+// square_with_table's hot loop sitting right on this table's row_offsets/index_data reads, so
+// this isn't a shot in the dark: it's the concrete lever that data pointed at.
+template <typename Offset>
+struct flat_term_table_base {
     // Row `term`'s set-bit indices live in index_data[row_offsets[term] .. row_offsets[term+1]),
     // in increasing order (guaranteed by how add_row() walks a bitset's set bits).
     std::vector<uint32_t> index_data;
-    std::vector<uint64_t> row_offsets;   // size term_count+1; uint64_t since total indices can exceed 4B at large term_count
+    std::vector<Offset> row_offsets;     // size term_count+1
     uint32_t term_count;
     uint32_t capacity_bits;              // domain the indices are valid within (== term_count for this algebra)
 
-    flat_term_table() : term_count(0), capacity_bits(0) {
+    flat_term_table_base() : term_count(0), capacity_bits(0) {
         row_offsets.push_back(0);
     }
 
@@ -180,7 +187,7 @@ struct flat_term_table {
     // used only to size the initial reserve() and avoid reallocation churn
     // during the build loop. Getting it wrong just costs some reallocations,
     // not correctness. Pass 0 if you have no idea.
-    flat_term_table(uint32_t term_count_, uint32_t capacity_bits_, size_t index_estimate = 0)
+    flat_term_table_base(uint32_t term_count_, uint32_t capacity_bits_, size_t index_estimate = 0)
         : term_count(term_count_), capacity_bits(capacity_bits_) {
         row_offsets.reserve((size_t)term_count_ + 1);
         row_offsets.push_back(0);
@@ -188,10 +195,10 @@ struct flat_term_table {
     }
 
     // No implicit deep copies of a structure this size.
-    flat_term_table(const flat_term_table&) = delete;
-    flat_term_table& operator=(const flat_term_table&) = delete;
-    flat_term_table(flat_term_table&&) noexcept = default;
-    flat_term_table& operator=(flat_term_table&&) noexcept = default;
+    flat_term_table_base(const flat_term_table_base&) = delete;
+    flat_term_table_base& operator=(const flat_term_table_base&) = delete;
+    flat_term_table_base(flat_term_table_base&&) noexcept = default;
+    flat_term_table_base& operator=(flat_term_table_base&&) noexcept = default;
 
     // Append one row's worth of set-bit indices, taken from any bitset type
     // that exposes for_each_set_bit (term_array, or another bitset view).
@@ -205,7 +212,7 @@ struct flat_term_table {
             assert(idx < capacity_bits);
             index_data.push_back(idx);
         });
-        row_offsets.push_back(index_data.size());
+        row_offsets.push_back((Offset)index_data.size());
     }
 
     // Same as above, but for a row already held as a sorted, duplicate-free index list —
@@ -215,16 +222,16 @@ struct flat_term_table {
             assert(idx < capacity_bits);
             index_data.push_back(idx);
         }
-        row_offsets.push_back(index_data.size());
+        row_offsets.push_back((Offset)index_data.size());
     }
 
     // Visit set-bit indices of row `term`, in increasing order.
     template <typename Fn>
     inline void for_each_set_bit_in_row(uint32_t term, Fn&& fn) const {
-        const uint64_t begin = row_offsets[term];
-        const uint64_t end = row_offsets[term + 1];
+        const Offset begin = row_offsets[term];
+        const Offset end = row_offsets[term + 1];
         const uint32_t* data = index_data.data();
-        for (uint64_t k = begin; k < end; k++) {
+        for (Offset k = begin; k < end; k++) {
             fn(data[k]);
         }
     }
@@ -240,9 +247,17 @@ struct flat_term_table {
         return (double)index_data.size() / term_count / capacity_bits;
     }
     size_t bytes_used() const {
-        return index_data.size() * sizeof(uint32_t) + row_offsets.size() * sizeof(uint64_t);
+        return index_data.size() * sizeof(uint32_t) + row_offsets.size() * sizeof(Offset);
     }
 };
+
+// q_power_times_term_table's total index count is term_count * sum(degree-1), which for
+// extreme algebras (many large-degree components) can exceed 4B — keep the safe, wide offset.
+using flat_term_table = flat_term_table_base<uint64_t>;
+// square_term_table's total index count is bounded by roughly 2*term_count (observed average
+// row density), which stays well within 4B for any realistic term_count — safe to use the
+// smaller offset, and it's the table actually sitting in excess_power's hot loop.
+using small_flat_term_table = flat_term_table_base<uint32_t>;
 
 uint32_t term_count_calc(const vector<uint16_t>& q_components);
 
@@ -267,7 +282,7 @@ class impartial_term_algebra {
         size_t* component_offsets; // flattens (q_index, q_exponent, term) into a single row index below
         flat_term_table q_power_times_term_table; // ditto; entries are as sparse as square_term_table's rows
         uint32_t* basis_search;
-        flat_term_table square_term_table;
+        small_flat_term_table square_term_table;
 
         inline size_t q_power_times_term_row(size_t q_index, uint16_t q_exponent, uint32_t term) const;
         // Both of these return a reference to a persistent scratch member (qptc_result_ /

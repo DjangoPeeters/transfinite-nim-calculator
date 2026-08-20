@@ -15,3 +15,13 @@ logs/calculation.log
 # building/running/testing, and these don't need to be shared across contributors/environments
 .vscode/
 *.code-workspace
+
+# Profiling output (gprof/perf) — local analysis artifacts, not something to version. perf's
+# own recordings in particular can run into the gigabytes.
+profile_report.txt
+profile_detailed.txt
+perf.data
+perf.data.old
+perf_stat_*.txt
+*.data
+*:Zone.Identifier

@@ -136,7 +136,7 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
     }
 
     // Same reserve()-hint reasoning as above (observed average ~2 set bits/row; 4x for headroom).
-    square_term_table = flat_term_table(term_count, term_count, (size_t)term_count * 4);
+    square_term_table = small_flat_term_table(term_count, term_count, (size_t)term_count * 4);
     for (uint32_t term = 0; term < term_count; term++) {
         accumulator.clear_all();
         accumulate_term_product(term, term);
