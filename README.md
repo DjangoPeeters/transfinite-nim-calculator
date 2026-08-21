@@ -26,6 +26,13 @@ If you let this run for long enough, you will encounter an Out Of Memory error b
 ```
 ./bin/main alphas logs 3000000
 ```
+If you're running this on a server with a wall-time cap (e.g. a 72-hour job limit), you can chunk a sweep across multiple jobs by giving a starting prime as a fourth argument, either directly or by index (same `nth_prime` convention as below):
+```
+./bin/main alphas logs 3000000 173
+```
+```
+./bin/main alphas logs 3000000 nth_prime 40
+```
 
 You can also let the program calculate a specific alpha(p), for example:
 ```
