@@ -22,7 +22,8 @@ using boost::multiprecision::msb;
 using boost::multiprecision::bit_test;
 using namespace nt_funcs;
 
-constexpr unsigned PUSH_INTERVAL = 6;
+constexpr unsigned PUSH_INTERVAL = 6; // how often (in iterations, as a power of 2) to check whether it's time to push a progress update
+constexpr time_t PROGRESS_LOG_SECONDS = 60; // matches calculation_logger's own 60s print threshold
 
 uint32_t term_count_calc(const vector<uint16_t>& q_components_) {
     vector<uint16_t> q_components = q_components_;
@@ -367,11 +368,24 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     while (!log_queue_.push({0, msbnp1, a.bit_count, result.bit_count})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
+    time_t last_push_time = time(nullptr);
     size_t ip1 = (size_t)msbnp1;
     while (ip1 > 0) {
-        // bit_count is only read when we're about to log it — either right after this
-        // iteration (the periodic push below) or once the loop ends (the push right after it).
-        const bool need_bit_count = (ip1 == 1) || !((index + 1) & MASK);
+        const bool is_last = (ip1 == 1);
+        // Checking the wall clock is cheap (a vDSO read, no real syscall), but there's still no
+        // reason to do it more often than every MASK+1 iterations. Once we do check, only
+        // actually push — and only then need the freshly-recomputed bit_count for it — if
+        // PROGRESS_LOG_SECONDS of real time have passed since the last push. The previous
+        // fixed "every 64 iterations" schedule fired far more often than the logger's own 60s
+        // threshold could ever use, for large term_count — that's wasted pushes and wasted
+        // popcount scans with nothing shown for it.
+        time_t now = 0;
+        bool due = false;
+        if (!((index + 1) & MASK)) {
+            now = time(nullptr);
+            due = now - last_push_time >= PROGRESS_LOG_SECONDS;
+        }
+        const bool need_bit_count = is_last || due;
         square_with_table(result, need_bit_count);
         if (vn[ip1-1]) {
             accumulator.clear_all();
@@ -384,7 +398,8 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
             result = accumulator;
         }
         index++;
-        if (!(index & MASK)) { // Send progress update
+        if (due) { // Send progress update
+            last_push_time = now;
             while (!log_queue_.push({index, msbnp1, a.bit_count, result.bit_count})) {
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
