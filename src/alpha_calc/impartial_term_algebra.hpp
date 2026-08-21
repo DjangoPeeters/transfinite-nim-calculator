@@ -298,7 +298,7 @@ class impartial_term_algebra {
         vector<uint32_t> ttt_result_, ttt_next_, ttt_scratch_;
 
         void accumulate_term_product(uint32_t x, uint32_t y);
-        void square_with_table(term_array& a);
+        void square_with_table(term_array& a, bool need_bit_count);
     public:
         impartial_term_algebra(ring_buffer_calculation_queue& log_queue, std::atomic<bool>& calculation_done,
             vector<uint16_t>& q_components);

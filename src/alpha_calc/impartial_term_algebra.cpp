@@ -283,15 +283,19 @@ term_array impartial_term_algebra::multiply(const term_array& a, const term_arra
     return result;
 }
 
-// a must have enough allocated memory for the result
-void impartial_term_algebra::square_with_table(term_array& a) {
+// a must have enough allocated memory for the result. bit_count is only ever read back for
+// progress logging, which fires once every PUSH_INTERVAL iterations — pass need_bit_count=false
+// on the other calls to skip the O(word_count) popcount scan entirely; a's bit_count is then
+// left stale (whatever accumulator's was before this call) until the next call that does pass
+// true, which is harmless as long as nothing reads it in between.
+void impartial_term_algebra::square_with_table(term_array& a, bool need_bit_count) {
     accumulator.clear_all();
     a.for_each_set_bit([&](uint32_t i) {
         square_term_table.for_each_set_bit_in_row(i, [&](uint32_t idx) {
             accumulator.flip_no_count(idx);
         });
     });
-    accumulator.bit_count = accumulator.recompute_bit_count();
+    if (need_bit_count) accumulator.bit_count = accumulator.recompute_bit_count();
     a = accumulator;
     return;
 }
@@ -365,7 +369,10 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     }
     size_t ip1 = (size_t)msbnp1;
     while (ip1 > 0) {
-        square_with_table(result);
+        // bit_count is only read when we're about to log it — either right after this
+        // iteration (the periodic push below) or once the loop ends (the push right after it).
+        const bool need_bit_count = (ip1 == 1) || !((index + 1) & MASK);
+        square_with_table(result, need_bit_count);
         if (vn[ip1-1]) {
             accumulator.clear_all();
             result.for_each_set_bit([&](uint32_t i) {
@@ -373,7 +380,7 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
                     accumulator.flip_no_count(idx);
                 });
             });
-            accumulator.bit_count = accumulator.recompute_bit_count();
+            if (need_bit_count) accumulator.bit_count = accumulator.recompute_bit_count();
             result = accumulator;
         }
         index++;
