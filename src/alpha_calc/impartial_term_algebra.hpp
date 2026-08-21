@@ -309,7 +309,7 @@ class impartial_term_algebra {
         uint32_t* get_basis() const;
 
         term_array multiply(const term_array& a, const term_array& b);
-        term_array square(const term_array& a);
+        term_array square(const term_array& a, bool need_bit_count);
         term_array power(const term_array& a, const cpp_int& n);
         void excess_power(const term_array&a, const cpp_int& n, term_array& res);
         uint32_t degree(const term_array& a); // not sure how much space is adequate for the result

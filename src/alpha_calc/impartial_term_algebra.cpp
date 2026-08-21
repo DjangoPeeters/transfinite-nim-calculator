@@ -301,15 +301,16 @@ void impartial_term_algebra::square_with_table(term_array& a, bool need_bit_coun
     return;
 }
 
-// a must already be sorted
-term_array impartial_term_algebra::square(const term_array& a) {
+// a must already be sorted. need_bit_count skips the O(word_count) popcount scan when the
+// caller knows it won't read the result's bit_count (see square_with_table for the same idea).
+term_array impartial_term_algebra::square(const term_array& a, bool need_bit_count) {
     accumulator.clear_all();
     a.for_each_set_bit([&](uint32_t i) {
         square_term_table.for_each_set_bit_in_row(i, [&](uint32_t idx) {
             accumulator.flip_no_count(idx);
         });
     });
-    accumulator.bit_count = accumulator.recompute_bit_count();
+    if (need_bit_count) accumulator.bit_count = accumulator.recompute_bit_count();
     term_array result = accumulator;
     return result;
 }
@@ -319,16 +320,16 @@ term_array impartial_term_algebra::power(const term_array& a, const cpp_int& n) 
     term_array result(term_count);
     result.set(0);
     if(n.is_zero()) return result;
-    
+
     term_array curpow(a);
     unsigned index = 0;
     const unsigned msbnp1 = msb(n) + 1;
-    
+
     while (index < msbnp1) {
         if (bit_test(n, index)) {
             result = multiply(result, curpow);
         }
-        curpow = square(curpow);
+        curpow = square(curpow, false); // bit_count is never read here
         index++;
     }
     return result;
@@ -420,10 +421,10 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
 
 // a must already be sorted
 uint32_t impartial_term_algebra::degree(const term_array& a) {
-    term_array respow = square(a);
+    term_array respow = square(a, false); // bit_count is never read here
     uint32_t result = 1;
     while (respow != a) {
-        respow = square(respow);
+        respow = square(respow, false);
         result++;
     }
     return result;
@@ -431,22 +432,37 @@ uint32_t impartial_term_algebra::degree(const term_array& a) {
 
 // a must already be sorted
 void impartial_term_algebra::q_set_degree(const term_array& a, uint32_t& res) {
-    term_array respow = square(a);
+    term_array respow = square(a, true); // logged unconditionally right after
     uint32_t result = 1;
-    constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
+    constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only check the wall clock when first PUSH_INTERVAL bits are off
 
     while (!log_queue_.push({0, 0, respow.bit_count, 0})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
+    time_t last_push_time = time(nullptr);
     while (respow != a) {
-        respow = square(respow);
+        // Same idea as excess_power's loop: only actually push (and only then need a fresh
+        // bit_count) once PROGRESS_LOG_SECONDS have genuinely passed, not every fixed number of
+        // iterations — degree() calls can run for a long time on large term_count too.
+        time_t now = 0;
+        bool due = false;
+        if (!((result + 1) & MASK)) {
+            now = time(nullptr);
+            due = now - last_push_time >= PROGRESS_LOG_SECONDS;
+        }
+        respow = square(respow, due);
         result++;
-        if (!(result & MASK)) { // Send progress update
+        if (due) { // Send progress update
+            last_push_time = now;
             while (!log_queue_.push({result, 0, respow.bit_count, 0})) {
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
         }
     }
+    // The loop's last squaring may not have refreshed bit_count (it's not known to be the last
+    // iteration in advance, since the loop ends on a data-dependent condition) — this final log
+    // line needs it accurate regardless.
+    respow.bit_count = respow.recompute_bit_count();
     while (!log_queue_.push({result, result, respow.bit_count, 0})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
