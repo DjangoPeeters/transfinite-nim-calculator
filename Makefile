@@ -23,11 +23,21 @@ TARGET = bin/main
 
 CXX = g++
 CXXFLAGS = -std=c++11 -Wall -Wextra -pthread
+# TEST_MODE controls important_funcs.cpp's TEST_MODE constant (see there for what it does —
+# short version: 1 starts every cache empty for benchmarking, 0 uses the real accumulated
+# knowledge in logs/*_records.txt for real work). Override with `make TEST_MODE=0`, which only
+# affects the release build ($(TARGET)) — debug/profile/perf/test all force TEST_MODE=1
+# unconditionally, since caches serving cached values instead of computing them defeats the
+# purpose of testing, debugging, and profiling the computation itself.
+# CAUTION: object files are keyed by path, not by which flags built them, so switching this
+# value does NOT force a recompile on its own — `make clean` first, or you'll silently link
+# object files built with the OLD value.
+TEST_MODE ?= 1
 # Separate targets for release and profiling
-RELEASE_FLAGS = -O3 -DNDEBUG -mpopcnt
-DEBUG_FLAGS = -fsanitize=address -g -O0 -DDEBUG
-PROFILE_FLAGS = -pg -O3 -DNDEBUG -mpopcnt
-TEST_FLAGS = -O3 -DNDEBUG -mpopcnt
+RELEASE_FLAGS = -O3 -DNDEBUG -mpopcnt -DTEST_MODE_ENABLED=$(TEST_MODE)
+DEBUG_FLAGS = -fsanitize=address -g -O0 -DDEBUG -DTEST_MODE_ENABLED=1
+PROFILE_FLAGS = -pg -O3 -DNDEBUG -mpopcnt -DTEST_MODE_ENABLED=1
+TEST_FLAGS = -O3 -DNDEBUG -mpopcnt -DTEST_MODE_ENABLED=1
 # Same optimization as the release build (this is what we want to characterize), plus debug
 # symbols so `perf report`/`perf annotate` can resolve function and line info, plus explicit
 # frame pointers so `perf record --call-graph fp` can unwind call stacks without the extra
@@ -35,7 +45,7 @@ TEST_FLAGS = -O3 -DNDEBUG -mpopcnt
 # instrumentation adds a per-call cost that disproportionately distorts very-high-call-count
 # functions (we saw this firsthand with q_power_times_term_calc) — perf's sampling approach
 # doesn't have that problem, which is part of why it's worth using on top of gprof.
-PERF_FLAGS = -O3 -DNDEBUG -mpopcnt -g -fno-omit-frame-pointer
+PERF_FLAGS = -O3 -DNDEBUG -mpopcnt -g -fno-omit-frame-pointer -DTEST_MODE_ENABLED=1
 
 #TODO use include directory for proper dependency handling
 
