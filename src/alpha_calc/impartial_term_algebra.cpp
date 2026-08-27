@@ -297,7 +297,7 @@ void impartial_term_algebra::square_with_table(term_array& a, bool need_bit_coun
         });
     });
     if (need_bit_count) accumulator.bit_count = accumulator.recompute_bit_count();
-    a = accumulator;
+    a.swap(accumulator);
     return;
 }
 
@@ -396,7 +396,7 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
                 });
             });
             if (need_bit_count) accumulator.bit_count = accumulator.recompute_bit_count();
-            result = accumulator;
+            result.swap(accumulator);
         }
         index++;
         if (due) { // Send progress update

@@ -9,6 +9,7 @@
 #include <cstring>
 #include <cassert>
 #include <ostream>
+#include <utility>
 #include <vector>
 #include <boost/multiprecision/cpp_int.hpp>
 
@@ -132,6 +133,18 @@ struct term_array {
     inline void clear_all() {
         if (word_count) std::memset(words, 0, word_count * sizeof(uint64_t));
         bit_count = 0;
+    }
+
+    // Swaps buffers instead of copying word_count words. Requires same capacity_bits (both sides
+    // of the swaps this is used for are always sized to the same algebra's term_count) — for use
+    // where the source is about to be cleared/overwritten anyway (e.g. accumulator right after
+    // its contents are moved out in square_with_table), so there's no need for the old `a =
+    // accumulator` full-array memcpy.
+    inline void swap(term_array& other) {
+        assert(capacity_bits == other.capacity_bits);
+        std::swap(word_count, other.word_count);
+        std::swap(bit_count, other.bit_count);
+        std::swap(words, other.words);
     }
 
     // Recomputes bit_count from scratch (branchless popcount scan) — for use after a run of
