@@ -7,6 +7,7 @@ SOURCES = src/alpha_calc/calculation_logger.cpp \
 		  src/number_theory/nt_funcs.cpp \
 		  src/number_theory/prime_generator.cpp \
 		  src/www_nim_calc/fin_nim.cpp \
+		  src/www_nim_calc/expr_parser.cpp \
 		  src/www_nim_calc/kappa_component.cpp \
 		  src/www_nim_calc/ww.cpp \
 		  src/www_nim_calc/www_nim.cpp \

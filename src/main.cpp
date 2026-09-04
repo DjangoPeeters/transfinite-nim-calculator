@@ -15,6 +15,7 @@
 #include "alpha_calc/important_funcs.hpp"
 #include "misc.hpp"
 #include "number_theory/prime_generator.hpp"
+#include "www_nim_calc/expr_parser.hpp"
 #include "www_nim_calc/ww.hpp"
 #include "www_nim_calc/www.hpp"
 #include "www_nim_calc/www_nim.hpp"
@@ -197,6 +198,23 @@ void cmd_bfile(int argc, char* argv[]) {
     excess_to_bfile();
 }
 
+void cmd_calc(int argc, char* argv[]) {
+    set_logs_dir_if_given(argc, argv, 2);
+    init();
+    if (argc <= 3) {
+        cout << "usage: calc [logs_dir] EXPRESSION\n";
+        cout << "  ordinal arithmetic: + * and w^E (Cantor normal form), e.g. \"w^3 + w*2 + 1\"\n";
+        cout << "  nim (field) arithmetic: +. *. ^. , e.g. \"w +. w\", \"w *. w\", \"w ^. 5\"\n";
+        return;
+    }
+    try {
+        www result = expr_parser::parse_and_evaluate(argv[3]);
+        cout << result.to_string() << '\n';
+    } catch (const expr_parser::parse_error& e) {
+        cout << "parse error: " << e.what() << '\n';
+    }
+}
+
 } // namespace
 
 int main(int argc, char* argv[]) {
@@ -221,6 +239,8 @@ int main(int argc, char* argv[]) {
         cmd_afile(argc, argv);
     } else if (command == "bfile") {
         cmd_bfile(argc, argv);
+    } else if (command == "calc") {
+        cmd_calc(argc, argv);
     }
 
     return 0;

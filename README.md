@@ -69,4 +69,22 @@ or
 ./bin/main bfile logs
 ```
 
+## Calculating with nimbers
+
+Beyond computing individual alpha(p) values, you can evaluate ordinal/nimber arithmetic expressions directly:
+```
+./bin/main calc logs "w^3 + w*2 + 1"
+```
+`+`, `*` and `w^E` are ordinal (Cantor normal form) arithmetic — the same non-commutative sum/product used to write ordinals below w^(w^w) in normal form (so e.g. `2 * w` gives `w`, not `w*2`, and `(w+1) * 2` gives `w*2 + 1`).
+
+`+.`, `*.` and `^.` are nim (field) arithmetic instead — nim-addition, nim-multiplication, and nim-exponentiation (with a plain non-negative integer exponent), the operations alpha(p) exists to support. For example:
+```
+./bin/main calc logs "w +. w"     # nim-add: always 0 for any value +. itself
+./bin/main calc logs "w *. w"     # nim-multiply: w^2
+./bin/main calc logs "w ^. 5"     # nim-power
+```
+Large enough nim-multiplications/-powers will compute alpha(p) values on demand behind the scenes, same as the `alpha`/`alphas` commands, and are subject to the same prime-size limitation noted above.
+
+A bare (unparenthesized) exponent after `w^` can only be `w` itself or a plain integer, since exponentiation binds tighter than `+`/`*` — anything more needs explicit parentheses, e.g. `w^(w*2)` or `w^(w^2 + 3)`.
+
 That's it!
