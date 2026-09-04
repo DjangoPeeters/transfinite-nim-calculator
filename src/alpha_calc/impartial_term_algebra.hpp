@@ -298,17 +298,22 @@ class impartial_term_algebra {
         small_flat_term_table square_term_table;
 
         inline size_t q_power_times_term_row(size_t q_index, uint16_t q_exponent, uint32_t term) const;
-        // Both of these return a reference to a persistent scratch member (qptc_result_ /
-        // ttt_result_ respectively), valid until the next call to the same function. Safe
-        // because neither is reentrant: q_power_times_term_calc is only ever called from the
-        // constructor's fill loop, and term_times_term only from q_power_times_term_calc — never
-        // from itself or back into q_power_times_term_calc.
-        const vector<uint32_t>& q_power_times_term_calc(size_t q_index, uint16_t q_exponent, uint32_t term);
-        const vector<uint32_t>& term_times_term(uint32_t x, uint32_t y);
-        // Scratch buffers for the two functions above — persistent to avoid a heap alloc per
-        // call across the tens of millions of calls a large algebra's construction makes.
-        vector<uint32_t> qptc_result_, qptc_merged_, qptc_scratch_;
-        vector<uint32_t> ttt_result_, ttt_next_, ttt_scratch_;
+        // Scratch buffers for the two functions below — persistent (per-caller) to avoid a heap
+        // alloc per call across the tens of millions of calls a large algebra's construction
+        // makes. Grouped into a struct, one instance per worker thread, so
+        // build_q_power_times_term_table() (see the .cpp) can parallelize row computation within
+        // a q_index level: each level's rows only ever read *already-finalized* lower-q_index
+        // rows of q_power_times_term_table (see that function's comment for why), so concurrent
+        // calls are safe as long as each thread has its own scratch instance.
+        struct calc_scratch {
+            vector<uint32_t> qptc_result_, qptc_merged_, qptc_scratch_;
+            vector<uint32_t> ttt_result_, ttt_next_, ttt_scratch_;
+        };
+        // Both of these return a reference to a field of `scratch` (qptc_result_ / ttt_result_
+        // respectively), valid until the next call made with that same scratch instance.
+        const vector<uint32_t>& q_power_times_term_calc(size_t q_index, uint16_t q_exponent, uint32_t term, calc_scratch& scratch) const;
+        const vector<uint32_t>& term_times_term(uint32_t x, uint32_t y, calc_scratch& scratch) const;
+        void build_q_power_times_term_table();
 
         void accumulate_term_product(uint32_t x, uint32_t y);
         void square_with_table(term_array& a, bool need_bit_count);

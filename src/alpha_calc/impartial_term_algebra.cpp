@@ -119,13 +119,7 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
     // headroom) — a wrong guess costs reallocations, not correctness.
     q_power_times_term_table = flat_term_table((uint32_t)q_power_times_term_table_size, term_count,
         q_power_times_term_table_size * 2);
-    for (size_t q_index = 0; q_index < q_components.size(); q_index++) {
-        for (uint16_t q_exp = 1; q_exp < q_degrees[q_index]; q_exp++) {
-            for (uint32_t term = 0; term < term_count; term++) {
-                q_power_times_term_table.add_row(q_power_times_term_calc(q_index, q_exp, term));
-            }
-        }
-    }
+    build_q_power_times_term_table();
 
     basis_search = new uint32_t[term_count];
     basis_search[0] = 0; // dummy value
@@ -199,15 +193,18 @@ inline size_t impartial_term_algebra::q_power_times_term_row(size_t q_index, uin
            term;
 }
 
-// Returns a reference to qptc_result_, valid until the next call. Only ever called from the
-// constructor's fill loop (never reentrant), so a persistent scratch buffer is safe — and
-// entries here average ~1-2 set bits, so building the result as a sparse vector end-to-end
-// (rather than through a dense term_count-sized term_array) avoids O(term_count) work for
-// O(1)-ish content, same reasoning as square_term_table's rows.
-const vector<uint32_t>& impartial_term_algebra::q_power_times_term_calc(size_t q_index, uint16_t q_exponent, uint32_t term) {
+// Returns a reference to scratch.qptc_result_, valid until the next call made with that same
+// scratch instance — safe for concurrent calls from different threads as long as each has its
+// own `scratch` (see build_q_power_times_term_table()). Entries here average ~1-2 set bits, so
+// building the result as a sparse vector end-to-end (rather than through a dense
+// term_count-sized term_array) avoids O(term_count) work for O(1)-ish content, same reasoning
+// as square_term_table's rows.
+const vector<uint32_t>& impartial_term_algebra::q_power_times_term_calc(size_t q_index, uint16_t q_exponent, uint32_t term, calc_scratch& scratch) const {
     const uint16_t p = q_degrees[q_index];
     const uint16_t q_exponent_in_term = (uint16_t)((term % basis[q_index + 1]) / basis[q_index]); // see headerfile why I'm casting
     const uint16_t q_exponent_new = q_exponent + q_exponent_in_term;
+    vector<uint32_t>& qptc_result_ = scratch.qptc_result_;
+    vector<uint32_t>& qptc_merged_ = scratch.qptc_merged_;
     qptc_result_.clear();
     if (q_exponent_new < p) {
         qptc_result_.push_back(term + (uint32_t)q_exponent * basis[q_index]);
@@ -218,7 +215,7 @@ const vector<uint32_t>& impartial_term_algebra::q_power_times_term_calc(size_t q
 
         qptc_merged_.clear();
         kappa_expansion.for_each_set_bit([&](uint32_t i) {
-            xor_merge_vec_into(qptc_merged_, term_times_term(low_order_part, i), qptc_scratch_);
+            xor_merge_vec_into(qptc_merged_, term_times_term(low_order_part, i, scratch), scratch.qptc_scratch_);
         });
 
         for (uint32_t i : qptc_merged_) qptc_result_.push_back(high_order_part + i);
@@ -226,7 +223,9 @@ const vector<uint32_t>& impartial_term_algebra::q_power_times_term_calc(size_t q
     return qptc_result_;
 }
 
-const vector<uint32_t>& impartial_term_algebra::term_times_term(uint32_t x, uint32_t y) {
+const vector<uint32_t>& impartial_term_algebra::term_times_term(uint32_t x, uint32_t y, calc_scratch& scratch) const {
+    vector<uint32_t>& ttt_result_ = scratch.ttt_result_;
+    vector<uint32_t>& ttt_next_ = scratch.ttt_next_;
     ttt_result_.clear();
     ttt_result_.push_back(y);
     for (size_t xip1 = q_components.size(); xip1 > 0; xip1--) { // `xip1` is `xi + 1` because `0 - 1` will cause overflow
@@ -235,12 +234,90 @@ const vector<uint32_t>& impartial_term_algebra::term_times_term(uint32_t x, uint
             ttt_next_.clear();
             for (uint32_t i : ttt_result_) {
                 const uint32_t row = (uint32_t)q_power_times_term_row(xip1 - 1, x_exp, i);
-                xor_merge_row_into(ttt_next_, q_power_times_term_table, row, ttt_scratch_);
+                xor_merge_row_into(ttt_next_, q_power_times_term_table, row, scratch.ttt_scratch_);
             }
             ttt_result_.swap(ttt_next_);
         }
     }
     return ttt_result_;
+}
+
+// Parallelizes q_power_times_term_table's construction level-by-level (by q_index). Within one
+// level, q_power_times_term_calc(q_index, q_exp, term) for every (q_exp, term) only ever reads
+// q_power_times_term_table rows belonging to STRICTLY LOWER q_index values: term_times_term only
+// follows rows for x's nonzero digits, and it's only ever called here with
+// low_order_part = term % basis[q_index], which by construction has no nonzero digits at or
+// above q_index. So every row within a level is independent of every other row in that level,
+// and depends only on lower levels — which are already fully finalized by the time this level
+// runs. That makes each level parallel-safe: every worker thread only ever *reads*
+// q_power_times_term_table (all writes for a level happen after every thread for it has joined,
+// so there's no race), as long as each thread uses its own calc_scratch — the two functions are
+// otherwise stateless.
+//
+// Each thread accumulates its chunk of the level into its own local flat_term_table (built up
+// sequentially within the thread — safe, since it's a fully independent object) rather than a
+// vector<vector<uint32_t>> per row, to avoid millions of tiny heap allocations for a large,
+// sparse level. After joining, the chunks are appended into q_power_times_term_table in order;
+// that final step is single-threaded but just a bulk copy, cheap given how sparse the data is.
+void impartial_term_algebra::build_q_power_times_term_table() {
+    const unsigned hw_threads = std::max(1u, std::thread::hardware_concurrency());
+    // Below this many rows, thread spawn/join overhead isn't worth it — just do it inline.
+    constexpr size_t MIN_ROWS_PER_LEVEL_TO_PARALLELIZE = 20000;
+    // Rough per-thread reserve() hint, same reasoning as the global table's own hint.
+    constexpr size_t INDEX_ESTIMATE_PER_ROW = 2;
+
+    for (size_t q_index = 0; q_index < q_components.size(); q_index++) {
+        const size_t level_row_count = (size_t)(q_degrees[q_index] - 1) * term_count;
+        if (level_row_count == 0) continue;
+
+        const unsigned num_threads = (unsigned)std::min<size_t>(
+            level_row_count < MIN_ROWS_PER_LEVEL_TO_PARALLELIZE ? 1 : hw_threads, level_row_count);
+
+        if (num_threads <= 1) {
+            calc_scratch scratch;
+            for (uint16_t q_exp = 1; q_exp < q_degrees[q_index]; q_exp++) {
+                for (uint32_t term = 0; term < term_count; term++) {
+                    q_power_times_term_table.add_row(q_power_times_term_calc(q_index, q_exp, term, scratch));
+                }
+            }
+            continue;
+        }
+
+        vector<size_t> chunk_starts(num_threads + 1);
+        for (unsigned t = 0; t <= num_threads; t++) {
+            chunk_starts[t] = level_row_count * t / num_threads;
+        }
+        vector<flat_term_table> chunks;
+        chunks.reserve(num_threads);
+        for (unsigned t = 0; t < num_threads; t++) {
+            const size_t chunk_size = chunk_starts[t + 1] - chunk_starts[t];
+            chunks.emplace_back((uint32_t)chunk_size, term_count, chunk_size * INDEX_ESTIMATE_PER_ROW);
+        }
+
+        vector<std::thread> workers;
+        workers.reserve(num_threads);
+        for (unsigned t = 0; t < num_threads; t++) {
+            workers.emplace_back([this, q_index, &chunk_starts, &chunks, t]() {
+                calc_scratch scratch;
+                for (size_t local_row = chunk_starts[t]; local_row < chunk_starts[t + 1]; local_row++) {
+                    const uint16_t q_exp = (uint16_t)(1 + local_row / term_count);
+                    const uint32_t term = (uint32_t)(local_row % term_count);
+                    chunks[t].add_row(q_power_times_term_calc(q_index, q_exp, term, scratch));
+                }
+            });
+        }
+        for (auto& w : workers) w.join();
+
+        for (unsigned t = 0; t < num_threads; t++) {
+            const flat_term_table& chunk = chunks[t];
+            const uint64_t base = (uint64_t)q_power_times_term_table.index_data.size();
+            q_power_times_term_table.index_data.insert(q_power_times_term_table.index_data.end(),
+                chunk.index_data.begin(), chunk.index_data.end());
+            for (size_t k = 1; k < chunk.row_offsets.size(); k++) {
+                q_power_times_term_table.row_offsets.push_back(base + chunk.row_offsets[k]);
+            }
+        }
+    }
 }
 
 void impartial_term_algebra::accumulate_term_product(uint32_t x, uint32_t y) {
