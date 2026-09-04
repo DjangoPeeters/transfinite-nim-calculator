@@ -225,7 +225,7 @@ show-files:
 
 # Clean up all generated files
 clean:
-	rm -rf obj $(TARGET) $(TARGET)_debug $(TARGET)_prof $(TARGET)_perf gmon.out profile_report.txt profile_detailed.txt perf.data perf.data.old; \
+	rm -rf obj $(TARGET) $(TARGET)_debug $(TARGET)_prof $(TARGET)_perf $(TARGET)_test gmon.out profile_report.txt profile_detailed.txt perf.data perf.data.old; \
 	> logs/calculation.log
 
 # Clean only debug files
