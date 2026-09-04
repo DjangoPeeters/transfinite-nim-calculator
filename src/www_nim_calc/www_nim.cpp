@@ -255,12 +255,13 @@ namespace www_nim {
                     new_components.insert(new_components.end(), it, components.end());
                     return reduce_components(new_components, processed_components, coefficient);
                 } else {
-                    vector<kappa_component> new_components{};
+                    vector<kappa_component> base_components{};
                     if (a.get_exponent() + b.get_exponent() != a.get_p()) {
-                        new_components.push_back(kappa_component(a.get_k(), a.get_n(), a.get_exponent() + b.get_exponent() - a.get_p()));
+                        base_components.push_back(kappa_component(a.get_k(), a.get_n(), a.get_exponent() + b.get_exponent() - a.get_p()));
                     }
 
                     if (a.get_n() > 0) {
+                        vector<kappa_component> new_components = base_components;
                         new_components.push_back(kappa_component(a.get_k(), a.get_n() - 1, 1));
                         auto it = components.begin();
                         it++; it++;
@@ -276,9 +277,13 @@ namespace www_nim {
                         www alpha1 = ar.result;
 
                         www result(0);
+                        // Each term of alpha1 needs its own fresh copy of base_components — reusing/growing
+                        // one shared vector across iterations (the previous bug here) leaks kappa_components
+                        // from an earlier term into a later term's reduce_components call, corrupting it.
                         for (const auto& expcoef : alpha1.get_terms()) {
                             auto exp = expcoef.first;
                             auto coef = expcoef.second;
+                            vector<kappa_component> new_components = base_components;
                             if (exp == 0) {
                                 auto it = components.begin();
                                 it++; it++;
