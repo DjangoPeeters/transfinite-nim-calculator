@@ -313,9 +313,18 @@ namespace www_nim {
             auto it = components.begin();
             it++;
             new_components.insert(new_components.end(), it, components.end());
-            vector<kappa_component> new_processed_components{components[0]};
-            new_processed_components.insert(new_processed_components.end(),
-                processed_components.begin(), processed_components.end());
+            // components stays sorted descending by k throughout (the initial sort in
+            // www_nim_mul_term, and every other place `components`/`new_components` is rebuilt
+            // above, keeps that invariant), so components[0] here is always the biggest
+            // k not yet moved into processed_components — append it to preserve that same
+            // descending order in processed_components. Prepending instead (as this used to do)
+            // reverses processed_components into ascending order, and www_of_kappa_components
+            // feeds it straight into ww(terms), whose simp_terms assumes descending (CNF) order:
+            // fed ascending, it wrongly treats a distinct smaller-k component as a stray
+            // out-of-order ordinal term and absorbs it into the next, bigger one — silently
+            // dropping real algebraic information for two different primes' kappa_components.
+            vector<kappa_component> new_processed_components = processed_components;
+            new_processed_components.push_back(components[0]);
             return reduce_components(new_components, new_processed_components, coefficient);
         }
 
