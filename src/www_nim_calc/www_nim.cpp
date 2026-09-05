@@ -75,9 +75,19 @@ namespace www_nim {
             std::fstream file;
             file.open(logs_dir + "/alpha_records.txt", std::ios::in | std::ios::out);
             if (!file.is_open()) {
-                cout << "failed to open alpha_records.txt\n";
-                file.close();
-                exit(1);
+                // Doesn't exist yet — ios::in|ios::out won't create it, so create it empty
+                // first and reopen. The fill-gaps logic below already handles a file with
+                // fewer lines than `index` correctly, so an empty file just falls out of that
+                // naturally (currentLineIndex == 0).
+                std::ofstream create(logs_dir + "/alpha_records.txt");
+                create.close();
+                file.clear();
+                file.open(logs_dir + "/alpha_records.txt", std::ios::in | std::ios::out);
+                if (!file.is_open()) {
+                    cout << "failed to open alpha_records.txt\n";
+                    file.close();
+                    exit(1);
+                }
             }
 
             // Determine current number of lines
@@ -245,12 +255,13 @@ namespace www_nim {
                     new_components.insert(new_components.end(), it, components.end());
                     return reduce_components(new_components, processed_components, coefficient);
                 } else {
-                    vector<kappa_component> new_components{};
+                    vector<kappa_component> base_components{};
                     if (a.get_exponent() + b.get_exponent() != a.get_p()) {
-                        new_components.push_back(kappa_component(a.get_k(), a.get_n(), a.get_exponent() + b.get_exponent() - a.get_p()));
+                        base_components.push_back(kappa_component(a.get_k(), a.get_n(), a.get_exponent() + b.get_exponent() - a.get_p()));
                     }
 
                     if (a.get_n() > 0) {
+                        vector<kappa_component> new_components = base_components;
                         new_components.push_back(kappa_component(a.get_k(), a.get_n() - 1, 1));
                         auto it = components.begin();
                         it++; it++;
@@ -266,9 +277,13 @@ namespace www_nim {
                         www alpha1 = ar.result;
 
                         www result(0);
+                        // Each term of alpha1 needs its own fresh copy of base_components — reusing/growing
+                        // one shared vector across iterations (the previous bug here) leaks kappa_components
+                        // from an earlier term into a later term's reduce_components call, corrupting it.
                         for (const auto& expcoef : alpha1.get_terms()) {
                             auto exp = expcoef.first;
                             auto coef = expcoef.second;
+                            vector<kappa_component> new_components = base_components;
                             if (exp == 0) {
                                 auto it = components.begin();
                                 it++; it++;
@@ -298,9 +313,18 @@ namespace www_nim {
             auto it = components.begin();
             it++;
             new_components.insert(new_components.end(), it, components.end());
-            vector<kappa_component> new_processed_components{components[0]};
-            new_processed_components.insert(new_processed_components.end(),
-                processed_components.begin(), processed_components.end());
+            // components stays sorted descending by k throughout (the initial sort in
+            // www_nim_mul_term, and every other place `components`/`new_components` is rebuilt
+            // above, keeps that invariant), so components[0] here is always the biggest
+            // k not yet moved into processed_components — append it to preserve that same
+            // descending order in processed_components. Prepending instead (as this used to do)
+            // reverses processed_components into ascending order, and www_of_kappa_components
+            // feeds it straight into ww(terms), whose simp_terms assumes descending (CNF) order:
+            // fed ascending, it wrongly treats a distinct smaller-k component as a stray
+            // out-of-order ordinal term and absorbs it into the next, bigger one — silently
+            // dropping real algebraic information for two different primes' kappa_components.
+            vector<kappa_component> new_processed_components = processed_components;
+            new_processed_components.push_back(components[0]);
             return reduce_components(new_components, new_processed_components, coefficient);
         }
 

@@ -1,5 +1,6 @@
 #include "constants.hpp"
 #include "calculation_logger.hpp"
+#include "../misc.hpp"
 
 #include <cstdint>
 #include <mutex>
@@ -14,6 +15,7 @@ using std::map;
 namespace test_values {
     const map<uint16_t, vector<uint16_t>> q_set_cache({{2, {}}});
     const map<uint16_t, uint8_t> excess_cache({{2, 0}});
+    const map<uint16_t, uint32_t> degree_kappa_cache{};
 };
 
 namespace previously_known_values { // known at 1 january 2025
@@ -41,6 +43,7 @@ namespace previously_known_values { // known at 1 january 2025
 namespace record_values {
     std::mutex q_set_cache_mutex;
     std::mutex excess_cache_mutex;
+    std::mutex degree_kappa_cache_mutex;
 
     namespace {
         map<uint16_t, vector<uint16_t>> q_set_records() {
@@ -88,14 +91,34 @@ namespace record_values {
 
             return result;
         };
+
+        map<uint16_t, uint32_t> degree_kappa_records() {
+            std::lock_guard<std::mutex> lock(degree_kappa_cache_mutex);
+            std::ifstream file;
+            file.open(logs_dir + "/degree_kappa_records.txt");
+            map<uint16_t, uint32_t> result{};
+
+            std::string s, a, b;
+            std::size_t i;
+            while (file >> s) {
+                i = s.find(",");
+                a = s.substr(1, i - 1);
+                b = s.substr(i+1, s.find("}") - i - 1);
+                result[strtou16(a.c_str())] = strtou32(b.c_str());
+            }
+
+            return result;
+        };
     }
 
     map<uint16_t, vector<uint16_t>> q_set_cache{};
     map<uint16_t, uint8_t> excess_cache{};
+    map<uint16_t, uint32_t> degree_kappa_cache{};
 
     void init() {
         q_set_cache = q_set_records();
         excess_cache = excess_records();
+        degree_kappa_cache = degree_kappa_records();
     }
 
     void cache_q_set(uint16_t p, vector<uint16_t> q_set_p) {
@@ -104,7 +127,7 @@ namespace record_values {
             // new q_set found!
             std::ofstream file;
             file.open(logs_dir + "/q_set_records.txt", std::ios::app);
-            file << ",\n{" << p << ",{";
+            file << (file.tellp() == std::streampos(0) ? "{" : ",\n{") << p << ",{";
             if (!q_set_p.empty()) {
                 file << q_set_p[0];
                 for (std::size_t i = 1; i < q_set_p.size(); i++) {
@@ -122,7 +145,19 @@ namespace record_values {
             // new excess found!
             std::ofstream file;
             file.open(logs_dir + "/excess_records.txt", std::ios::app);
-            file << ",\n{" << p << "," << (unsigned)excess_p << "}";
+            file << (file.tellp() == std::streampos(0) ? "{" : ",\n{") << p << "," << (unsigned)excess_p << "}";
+            file.close();
+        }
+    };
+
+    void cache_degree_kappa(uint16_t h, uint32_t degree_kappa_h) {
+        std::lock_guard<std::mutex> lock(degree_kappa_cache_mutex);
+        if (degree_kappa_cache.find(h) == degree_kappa_cache.end()) {
+            // new degree found!
+            degree_kappa_cache[h] = degree_kappa_h;
+            std::ofstream file;
+            file.open(logs_dir + "/degree_kappa_records.txt", std::ios::app);
+            file << (file.tellp() == std::streampos(0) ? "{" : ",\n{") << h << "," << degree_kappa_h << "}";
             file.close();
         }
     };

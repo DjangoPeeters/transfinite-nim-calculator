@@ -15,6 +15,7 @@
 #include "alpha_calc/important_funcs.hpp"
 #include "misc.hpp"
 #include "number_theory/prime_generator.hpp"
+#include "www_nim_calc/expr_parser.hpp"
 #include "www_nim_calc/ww.hpp"
 #include "www_nim_calc/www.hpp"
 #include "www_nim_calc/www_nim.hpp"
@@ -60,28 +61,39 @@ I don't know how long this will take, but my best guess says it'll take at least
 unless we find a way to go about doing this calculation in a smarter way.
 */
 
+void compute_and_report_alpha(uint16_t p) {
+    time_t checkpoint_time = time(nullptr);
+    cout << "===== Calculating alpha(" << p << "). =====\n";
+    alpha_return ar = alpha(p);
+    time_t t = time(nullptr) - checkpoint_time;
+    if (ar.failed) {
+        cout << "calculating alpha(" << p << ") failed\n\n";
+    } else {
+        cout << ar.result << '\n';
+        cout << "===== Time is " << t << " seconds. =====\n\n";
+    }
+}
+
 //TODO optimize
 //TODO split calculating into more threads
-void alphas() {
-    time_t checkpoint_time;
-    uint16_t p;
-    time_t t;
-    alpha_return ar = alpha(2);
-    unsigned n = 2; // `alpha(nth_prime(1))` (a.k.a. `alpha(2)`) is a dummy value
-    while (1) {
-        p = nth_prime(n);
-        checkpoint_time = time(nullptr);
-        cout << "===== Calculating alpha(" << p << "). =====\n";
-        ar = alpha(p);
-        t = time(nullptr) - checkpoint_time;
-        if (ar.failed) {
-            cout << "calculating alpha(" << p << ") failed\n\n";
-        } else {
-            cout << ar.result << '\n';
-            cout << "===== Time is " << t << " seconds. =====\n\n";
-        }
+// p_min lets a run be resumed/chunked (e.g. across separate jobs on a server with a wall-time cap)
+void alphas_upto(uint16_t p_max, uint16_t p_min = 3) {
+    alpha(2); // `alpha(nth_prime(1))` (a.k.a. `alpha(2)`) is a dummy value
+    unsigned n = 2;
+    uint16_t p = nth_prime(n);
+    while (p < p_min) {
         n++;
+        p = nth_prime(n);
     }
+    while (p <= p_max) {
+        compute_and_report_alpha(p);
+        n++;
+        p = nth_prime(n);
+    }
+}
+
+void alphas(uint16_t p_min = 3) {
+    alphas_upto(UINT16_MAX, p_min);
 }
 
 void excess_to_afile() {
@@ -119,86 +131,116 @@ void excess_to_bfile() {
     file.close();
 }
 
+namespace {
+
+void set_logs_dir_if_given(int argc, char* argv[], int index) {
+    if (index < argc) {
+        logs_dir = argv[index];
+        cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
+    }
+}
+
+// a prime given either directly (e.g. "127") or as "nth_prime N"
+uint16_t parse_prime_arg(int argc, char* argv[], int index) {
+    if (argv[index] == string("nth_prime") && index + 1 < argc) {
+        return nth_prime(strtosize(argv[index + 1]));
+    }
+    return strtou16(argv[index]);
+}
+
+// the smallest prime for which either excess or q_set hasn't been computed yet
+uint16_t next_unknown_prime() {
+    unsigned n = 2;
+    uint16_t p = 3;
+    const auto excess_cache = get_excess_cache();
+    const auto q_set_cache = get_q_set_cache();
+    while (excess_cache.find(p) != excess_cache.end()
+        && q_set_cache.find(p) != q_set_cache.end()) {
+        n++;
+        p = nth_prime(n);
+    }
+    return p;
+}
+
+void cmd_alphas(int argc, char* argv[]) {
+    set_logs_dir_if_given(argc, argv, 2);
+    init();
+    if (2 < argc) {
+        if (3 < argc) MAX_TERM_COUNT = strtou32(argv[3]);
+        cout << "setting MAX_TERM_COUNT to " << MAX_TERM_COUNT << "\n";
+    }
+    if (4 < argc) {
+        alphas(parse_prime_arg(argc, argv, 4));
+    } else {
+        alphas();
+    }
+}
+
+void cmd_alpha(int argc, char* argv[]) {
+    set_logs_dir_if_given(argc, argv, 2);
+    init();
+    if (3 < argc) {
+        compute_and_report_alpha(parse_prime_arg(argc, argv, 3));
+    } else {
+        compute_and_report_alpha(next_unknown_prime());
+    }
+}
+
+void cmd_afile(int argc, char* argv[]) {
+    set_logs_dir_if_given(argc, argv, 2);
+    init();
+    excess_to_afile();
+}
+
+void cmd_bfile(int argc, char* argv[]) {
+    set_logs_dir_if_given(argc, argv, 2);
+    init();
+    excess_to_bfile();
+}
+
+void cmd_calc(int argc, char* argv[]) {
+    set_logs_dir_if_given(argc, argv, 2);
+    init();
+    if (argc <= 3) {
+        cout << "usage: calc [logs_dir] EXPRESSION\n";
+        cout << "  ordinal arithmetic: + * and w^E (Cantor normal form), e.g. \"w^3 + w*2 + 1\"\n";
+        cout << "  nim (field) arithmetic: +. *. ^. , e.g. \"w +. w\", \"w *. w\", \"w ^. 5\"\n";
+        return;
+    }
+    try {
+        www result = expr_parser::parse_and_evaluate(argv[3]);
+        cout << result.to_string() << '\n';
+    } catch (const expr_parser::parse_error& e) {
+        cout << "parse error: " << e.what() << '\n';
+    }
+}
+
+} // namespace
+
 int main(int argc, char* argv[]) {
     cout << "argc == " << argc << '\n';
     for (int ndx{}; ndx != argc; ++ndx) {
         cout << "argv[" << ndx << "] == " << argv[ndx] << '\n';
     }
     cout << "argv[" << argc << "] == " << static_cast<void*>(argv[argc]) << "\n\n";
-    if (1 < argc) {
-        if (argv[1] == string("alphas")) {
-            if (2 < argc) {
-                logs_dir = argv[2];
-                cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
-            }
-            init();
-            if (2 < argc) {
-                if (3 < argc) MAX_TERM_COUNT = strtou32(argv[3]);
-                cout << "setting MAX_TERM_COUNT to " << MAX_TERM_COUNT << "\n";
-            }
-            alphas();
-        } else if(argv[1] == string("alpha")) {
-            if (2 < argc) {
-                logs_dir = argv[2];
-                cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
-            }
-            init();
-            if (2 < argc) {
-                if (3 < argc) {
-                    uint16_t p;
-                    if (argv[3] == string("nth_prime") && 4 < argc) {
-                        p = nth_prime(strtosize(argv[4]));
-                    } else {
-                        p = strtou16(argv[3]);
-                    }
-                    time_t checkpoint_time = time(nullptr);
-                    cout << "===== Calculating alpha(" << p << "). =====\n";
-                    alpha_return ar = alpha(p);
-                    time_t t = time(nullptr) - checkpoint_time;
-                    if (ar.failed) {
-                        cout << "calculating alpha(" << p << ") failed\n\n";
-                    } else {
-                        cout << ar.result << '\n';
-                        cout << "===== Time is " << t << " seconds. =====\n\n";
-                    }
-                }
-            }
-            if (argc <= 3) {
-                unsigned n = 2;
-                uint16_t p = 3;
-                const auto excess_cache = get_excess_cache();
-                const auto q_set_cache = get_q_set_cache();
-                while (excess_cache.find(p) != excess_cache.end()
-                    && q_set_cache.find(p) != q_set_cache.end()) {
-                    n++;
-                    p = nth_prime(n);
-                }
-                time_t checkpoint_time = time(nullptr);
-                cout << "===== Calculating alpha(" << p << "). =====\n";
-                alpha_return ar = alpha(p);
-                time_t t = time(nullptr) - checkpoint_time;
-                if (ar.failed) {
-                    cout << "calculating alpha(" << p << ") failed\n\n";
-                } else {
-                    cout << ar.result << '\n';
-                    cout << "===== Time is " << t << " seconds. =====\n\n";
-                }
-            }
-        } else if(argv[1] == string("afile")) {
-            if (2 < argc) {
-                logs_dir = argv[2];
-                cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
-            }
-            init();
-            excess_to_afile();
-        } else if(argv[1] == string("bfile")) {
-            if (2 < argc) {
-                logs_dir = argv[2];
-                cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
-            }
-            init();
-            excess_to_bfile();
-        }
+
+    if (argc <= 1) {
+        init();
+        alphas_upto(150);
+        return 0;
+    }
+
+    const string command = argv[1];
+    if (command == "alphas") {
+        cmd_alphas(argc, argv);
+    } else if (command == "alpha") {
+        cmd_alpha(argc, argv);
+    } else if (command == "afile") {
+        cmd_afile(argc, argv);
+    } else if (command == "bfile") {
+        cmd_bfile(argc, argv);
+    } else if (command == "calc") {
+        cmd_calc(argc, argv);
     }
 
     return 0;

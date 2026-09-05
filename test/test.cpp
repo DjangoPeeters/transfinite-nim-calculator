@@ -227,11 +227,11 @@ void test_impartial_term_algebra(void) {
     calculation_logger logger(log_queue, calculation_done, logs_dir + "/calculation.log");
 
     cpp_int poww = cpp_int(1) << algebra.get_term_count();
-    term_array random(3);
+    term_array random(algebra.get_term_count());
     for (int i = 0; i < 8; i++) {
-        random.terms[0] = 1+i;
-        random.terms[1] = 2+i;
-        random.terms[2] = 3+i;
+        random.set(1+i);
+        random.set(2+i);
+        random.set(3+i);
 
         TEST_CHECK(!(algebra.power(random, poww) != random));
     }

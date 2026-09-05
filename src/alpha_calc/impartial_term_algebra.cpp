@@ -10,10 +10,8 @@
 #include <ctime>
 #include <thread>
 #include <chrono>
-#include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/integer.hpp>
-#include <boost/math/special_functions/log1p.hpp>
 
 using std::size_t;
 using std::vector;
@@ -22,11 +20,10 @@ using std::cout;
 using boost::multiprecision::cpp_int;
 using boost::multiprecision::msb;
 using boost::multiprecision::bit_test;
-using boost::multiprecision::cpp_dec_float_100;
-using boost::multiprecision::log;
 using namespace nt_funcs;
 
-constexpr unsigned PUSH_INTERVAL = 6;
+constexpr unsigned PUSH_INTERVAL = 6; // how often (in iterations, as a power of 2) to check whether it's time to push a progress update
+constexpr time_t PROGRESS_LOG_SECONDS = 60; // matches calculation_logger's own 60s print threshold
 
 uint32_t term_count_calc(const vector<uint16_t>& q_components_) {
     vector<uint16_t> q_components = q_components_;
@@ -45,7 +42,8 @@ uint32_t term_count_calc(const vector<uint16_t>& q_components_) {
 impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& log_queue, std::atomic<bool>& calculation_done,
     vector<uint16_t>& q_components_): log_queue_(log_queue), calculation_done_(calculation_done),
     q_components(q_components_), q_degrees(new uint16_t[q_components.size()]),
-    basis(new uint32_t[q_components.size() + 1]), accumulate_size(0), kappa_table(new term_array[q_components.size()]) {
+    basis(new uint32_t[q_components.size() + 1]), accumulator(), kappa_table(new term_array[q_components.size()]),
+    component_offsets(nullptr) {
     
     sort(q_components.begin(), q_components.end(), [](uint16_t a, uint16_t b)
                                         {
@@ -59,26 +57,19 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
         basis[i + 1] = basis[i] * q_degrees[i];
     }
     term_count = basis[q_components.size()];
-    accumulator_size = ((term_count + 63) >> 6);
-    accumulator = new uint64_t[accumulator_size]; // maybe use an unordered set instead of a sparse array?
-    for (uint32_t i = 0; i < accumulator_size; i++) {
-        accumulator[i] = 0;
-    }
+    accumulator = term_array(term_count);
 
     for (size_t i = 0; i < q_components.size(); i++) {
         if (q_degrees[i] == 2) {
-            kappa_table[i] = term_array(2);
-            kappa_table[i].terms[0] = basis[i] - 1;
-            kappa_table[i].terms[1] = basis[i];
+            kappa_table[i] = term_array(term_count);
+            kappa_table[i].set(basis[i] - 1);
+            kappa_table[i].set(basis[i]);
         } else if (q_components[i] == q_degrees[i]) {
             const uint16_t p = q_degrees[i];
             const auto q_set_r = important_funcs::q_set(p);
             const excess_return exr = important_funcs::excess(p);
             if (q_set_r.first != 0 || exr.failed) {
                 cout << "constructing algebra failed\n";
-                accumulate_size = 0;
-                accumulator = 0;
-                accumulator_size = 0;
                 if (basis != nullptr) delete[] basis;
                 basis = nullptr;
                 if (basis_search != nullptr) delete[] basis_search;
@@ -87,8 +78,6 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
                 kappa_table = nullptr;
                 if (q_degrees != nullptr) delete[] q_degrees;
                 q_degrees = nullptr;
-                if (square_term_table != nullptr) delete[] square_term_table;
-                square_term_table = nullptr;
                 cout << "term_count was " << term_count << "\n";
                 term_count = 0;
                 return;
@@ -104,43 +93,33 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
                 kappa_blocks.push_back(msb(excess));
                 sort(kappa_blocks.begin(), kappa_blocks.end()); // this sorting can be done smarter I think
             }
-            kappa_table[i] = term_array((uint32_t)kappa_blocks.size());
+            kappa_table[i] = term_array(term_count);
             for (uint32_t j = 0; j < kappa_blocks.size(); j++) {
-                kappa_table[i].terms[j] = kappa_blocks[j];
+                kappa_table[i].set(kappa_blocks[j]);
             }
         } else {
-            kappa_table[i] = term_array(1);
-            kappa_table[i].terms[0] = basis[i - 1];
+            kappa_table[i] = term_array(term_count);
+            kappa_table[i].set(basis[i - 1]);
         }
     }
 
-    q_power_times_term_table.component_offsets = new size_t[q_components.size()];
-    q_power_times_term_table.term_count = term_count;
-    q_power_times_term_table.component_offsets[0] = 0;
+    component_offsets = new size_t[q_components.size()];
+    component_offsets[0] = 0;
     size_t q_power_times_term_table_size = 0;
     for (size_t q_index = 0; q_index < q_components.size()-1; q_index++) {
-        q_power_times_term_table.component_offsets[q_index+1] = q_power_times_term_table.component_offsets[q_index];
-        for (size_t q_exp = 1; q_exp < q_degrees[q_index]; q_exp++) {
-            for (size_t term = 0; term < term_count; term++) {
-                q_power_times_term_table.component_offsets[q_index+1]++;
-                q_power_times_term_table_size++;
-            }
-        }
+        const size_t component_size = (size_t)(q_degrees[q_index] - 1) * term_count;
+        component_offsets[q_index+1] = component_offsets[q_index] + component_size;
+        q_power_times_term_table_size += component_size;
     }
-    for (size_t q_exp = 1; q_exp < q_degrees[q_components.size()-1]; q_exp++) {
-        for (size_t term = 0; term < term_count; term++) {
-            q_power_times_term_table_size++;
-        }
-    }
-    q_power_times_term_table.data = new term_array[q_power_times_term_table_size];
+    q_power_times_term_table_size += (size_t)(q_degrees[q_components.size()-1] - 1) * term_count;
 
-    for (size_t q_index = 0; q_index < q_components.size(); q_index++) {
-        for (size_t q_exp = 1; q_exp < q_degrees[q_index]; q_exp++) {
-            for (size_t term = 0; term < term_count; term++) {
-                q_power_times_term(q_index, q_exp, term);
-            }
-        }
-    }
+    // Entries here are as sparse as square_term_table's rows (see its density diagnostic) —
+    // a dense term_count-sized bitset per entry would need tens of GB for realistic algebras.
+    // index_estimate is just a reserve() hint (observed average ~1.3 set bits/entry; 2x for
+    // headroom) — a wrong guess costs reallocations, not correctness.
+    q_power_times_term_table = flat_term_table((uint32_t)q_power_times_term_table_size, term_count,
+        q_power_times_term_table_size * 2);
+    build_q_power_times_term_table();
 
     basis_search = new uint32_t[term_count];
     basis_search[0] = 0; // dummy value
@@ -151,135 +130,207 @@ impartial_term_algebra::impartial_term_algebra(ring_buffer_calculation_queue& lo
         basis_search[term] = index;
     }
 
-    square_term_table = new term_array[term_count];
+    // Same reserve()-hint reasoning as above (observed average ~2 set bits/row; 4x for headroom).
+    square_term_table = small_flat_term_table(term_count, term_count, (size_t)term_count * 4);
     for (uint32_t term = 0; term < term_count; term++) {
-        square_term_table[term] = square_term_calc(term);
+        accumulator.clear_all();
+        accumulate_term_product(term, term);
+        square_term_table.add_row(accumulator);
     }
 }
 
 impartial_term_algebra::~impartial_term_algebra() {
     if (kappa_table != nullptr) delete[] kappa_table;
     kappa_table = nullptr;
-    if (accumulator != nullptr) delete[] accumulator;
-    accumulator = nullptr;
     if (basis != nullptr) delete[] basis;
     basis = nullptr;
     if (q_degrees != nullptr) delete[] q_degrees;
     q_degrees = nullptr;
     if (basis_search != nullptr) delete[] basis_search;
     basis_search = nullptr;
-    if (square_term_table != nullptr) delete[] square_term_table;
-    square_term_table = nullptr;
+    if (component_offsets != nullptr) delete[] component_offsets;
+    component_offsets = nullptr;
 }
 
-term_array impartial_term_algebra::q_power_times_term(size_t q_index, uint16_t q_exponent, uint32_t term) {
-    if (q_power_times_term_table.get(q_index, q_exponent, term).terms != nullptr) {
-        return q_power_times_term_table.get(q_index, q_exponent, term);
-    } else {
-        const term_array result = q_power_times_term_calc(q_index, q_exponent, term);
-        q_power_times_term_table.get(q_index, q_exponent, term) = result;
-        return result;
+// XOR (symmetric-difference) merges the source's set-bit indices into sorted, duplicate-free
+// `dst`. `scratch` is caller-owned so repeated calls in a loop don't reallocate.
+// These per-term intermediate results (unlike `accumulator`/`result` in excess_power's hot
+// loop) stay sparse regardless of term_count, so tracking them as index lists rather than
+// dense term_count-sized bitsets avoids doing O(term_count) work for O(1)-ish content.
+
+// Source is one row of a flat_term_table (the row-index-keyed q_power_times_term_table).
+static void xor_merge_row_into(vector<uint32_t>& dst, const flat_term_table& table, uint32_t row, vector<uint32_t>& scratch) {
+    scratch.clear();
+    scratch.reserve(dst.size() + table.row_bit_count(row));
+    size_t a = 0;
+    table.for_each_set_bit_in_row(row, [&](uint32_t idx) {
+        while (a < dst.size() && dst[a] < idx) scratch.push_back(dst[a++]);
+        if (a < dst.size() && dst[a] == idx) a++; // cancels
+        else scratch.push_back(idx);
+    });
+    while (a < dst.size()) scratch.push_back(dst[a++]);
+    dst.swap(scratch);
+}
+
+// Source is another already-sorted, duplicate-free index vector.
+static void xor_merge_vec_into(vector<uint32_t>& dst, const vector<uint32_t>& src, vector<uint32_t>& scratch) {
+    scratch.clear();
+    scratch.reserve(dst.size() + src.size());
+    size_t a = 0, b = 0;
+    while (a < dst.size() && b < src.size()) {
+        if (dst[a] < src[b]) scratch.push_back(dst[a++]);
+        else if (dst[a] > src[b]) scratch.push_back(src[b++]);
+        else { a++; b++; } // cancels
     }
+    while (a < dst.size()) scratch.push_back(dst[a++]);
+    while (b < src.size()) scratch.push_back(src[b++]);
+    dst.swap(scratch);
 }
 
-term_array impartial_term_algebra::q_power_times_term_calc(size_t q_index, uint16_t q_exponent, uint32_t term) {
+inline size_t impartial_term_algebra::q_power_times_term_row(size_t q_index, uint16_t q_exponent, uint32_t term) const {
+    return component_offsets[q_index] +
+           (size_t)term_count * (q_exponent - 1) + // we ignore q_exponent=0, which is the trivial case result = 1 = term_array({0})
+           term;
+}
+
+// Returns a reference to scratch.qptc_result_, valid until the next call made with that same
+// scratch instance — safe for concurrent calls from different threads as long as each has its
+// own `scratch` (see build_q_power_times_term_table()). Entries here average ~1-2 set bits, so
+// building the result as a sparse vector end-to-end (rather than through a dense
+// term_count-sized term_array) avoids O(term_count) work for O(1)-ish content, same reasoning
+// as square_term_table's rows.
+const vector<uint32_t>& impartial_term_algebra::q_power_times_term_calc(size_t q_index, uint16_t q_exponent, uint32_t term, calc_scratch& scratch) const {
     const uint16_t p = q_degrees[q_index];
     const uint16_t q_exponent_in_term = (uint16_t)((term % basis[q_index + 1]) / basis[q_index]); // see headerfile why I'm casting
     const uint16_t q_exponent_new = q_exponent + q_exponent_in_term;
+    vector<uint32_t>& qptc_result_ = scratch.qptc_result_;
+    vector<uint32_t>& qptc_merged_ = scratch.qptc_merged_;
+    qptc_result_.clear();
     if (q_exponent_new < p) {
-        term_array result = term_array(1);
-        result.terms[0] = term + (uint32_t)q_exponent * basis[q_index];
-        return result;
+        qptc_result_.push_back(term + (uint32_t)q_exponent * basis[q_index]);
     } else {
         const uint32_t high_order_part = (term / basis[q_index + 1]) * basis[q_index + 1] + (q_exponent_new % p) * basis[q_index];
         const uint32_t low_order_part = term % basis[q_index];
-        const term_array kappa_expansion(kappa_table[q_index]);
+        const term_array& kappa_expansion = kappa_table[q_index];
 
-        set<uint32_t> terms{};
-        term_array product;
-        for (uint32_t i = 0; i < kappa_expansion.terms_size; i++) {
-            product = term_times_term(low_order_part, kappa_expansion.terms[i]);
-            for (uint32_t j = 0; j < product.terms_size; j++) {
-                if (terms.find(product.terms[j]) != terms.end()) {
-                    terms.erase(product.terms[j]);
-                } else {
-                    terms.insert(product.terms[j]);
-                }
-            }
-        }
+        qptc_merged_.clear();
+        kappa_expansion.for_each_set_bit([&](uint32_t i) {
+            xor_merge_vec_into(qptc_merged_, term_times_term(low_order_part, i, scratch), scratch.qptc_scratch_);
+        });
 
-        term_array result((uint32_t)terms.size());
-        uint32_t i = 0;
-        for (uint32_t k : terms) { // set is internally sorted so this for-loop uses the right order
-            result.terms[i] = high_order_part + k;
-            i++;
-        }
-        return result;
+        for (uint32_t i : qptc_merged_) qptc_result_.push_back(high_order_part + i);
     }
+    return qptc_result_;
 }
 
-term_array impartial_term_algebra::term_times_term(uint32_t x, uint32_t y) {
-    set<uint32_t> terms{y};
-    term_array product;
-    uint16_t x_exp;
+const vector<uint32_t>& impartial_term_algebra::term_times_term(uint32_t x, uint32_t y, calc_scratch& scratch) const {
+    vector<uint32_t>& ttt_result_ = scratch.ttt_result_;
+    vector<uint32_t>& ttt_next_ = scratch.ttt_next_;
+    ttt_result_.clear();
+    ttt_result_.push_back(y);
     for (size_t xip1 = q_components.size(); xip1 > 0; xip1--) { // `xip1` is `xi + 1` because `0 - 1` will cause overflow
-        x_exp = (uint16_t)((x % basis[xip1]) / basis[xip1 - 1]); // see headerfile why I'm casting
+        const uint16_t x_exp = (uint16_t)((x % basis[xip1]) / basis[xip1 - 1]); // see headerfile why I'm casting
         if (x_exp > 0) {
-            set<uint32_t> new_terms{};
-            for (uint32_t term : terms) {
-                product = q_power_times_term(xip1 - 1, x_exp, term);
-                for (uint32_t i = 0; i < product.terms_size; i++) {
-                    if (new_terms.find(product.terms[i]) != new_terms.end()) {
-                        new_terms.erase(product.terms[i]);
-                    } else {
-                        new_terms.insert(product.terms[i]);
-                    }
-                }
+            ttt_next_.clear();
+            for (uint32_t i : ttt_result_) {
+                const uint32_t row = (uint32_t)q_power_times_term_row(xip1 - 1, x_exp, i);
+                xor_merge_row_into(ttt_next_, q_power_times_term_table, row, scratch.ttt_scratch_);
             }
-            terms = new_terms;
+            ttt_result_.swap(ttt_next_);
         }
     }
-    
-    term_array result((uint32_t)terms.size());
-    uint32_t i = 0;
-    for (uint32_t k : terms) {
-        result.terms[i] = k;
-        i++;
-    }
-    return result;
+    return ttt_result_;
 }
 
-inline void impartial_term_algebra::flip_accumulator_term(uint32_t x) {
-    accumulator[x / 64] ^= ((uint64_t)1) << (x & 63);
-    if ((accumulator[x / 64] & ((uint64_t)1) << (x & 63)) != 0) { // can this be faster?
-        accumulate_size++;
-    } else {
-        accumulate_size--;
-    }
-}
+// Parallelizes q_power_times_term_table's construction level-by-level (by q_index). Within one
+// level, q_power_times_term_calc(q_index, q_exp, term) for every (q_exp, term) only ever reads
+// q_power_times_term_table rows belonging to STRICTLY LOWER q_index values: term_times_term only
+// follows rows for x's nonzero digits, and it's only ever called here with
+// low_order_part = term % basis[q_index], which by construction has no nonzero digits at or
+// above q_index. So every row within a level is independent of every other row in that level,
+// and depends only on lower levels — which are already fully finalized by the time this level
+// runs. That makes each level parallel-safe: every worker thread only ever *reads*
+// q_power_times_term_table (all writes for a level happen after every thread for it has joined,
+// so there's no race), as long as each thread uses its own calc_scratch — the two functions are
+// otherwise stateless.
+//
+// Each thread accumulates its chunk of the level into its own local flat_term_table (built up
+// sequentially within the thread — safe, since it's a fully independent object) rather than a
+// vector<vector<uint32_t>> per row, to avoid millions of tiny heap allocations for a large,
+// sparse level. After joining, the chunks are appended into q_power_times_term_table in order;
+// that final step is single-threaded but just a bulk copy, cheap given how sparse the data is.
+void impartial_term_algebra::build_q_power_times_term_table() {
+    const unsigned hw_threads = std::max(1u, std::thread::hardware_concurrency());
+    // Below this many rows, thread spawn/join overhead isn't worth it — just do it inline.
+    constexpr size_t MIN_ROWS_PER_LEVEL_TO_PARALLELIZE = 20000;
+    // Rough per-thread reserve() hint, same reasoning as the global table's own hint.
+    constexpr size_t INDEX_ESTIMATE_PER_ROW = 2;
 
-inline bool impartial_term_algebra::accumulator_contains(uint32_t x) {
-    return (accumulator[x / 64] & (((uint64_t)1) << (x & 63))) != 0;
-}
+    for (size_t q_index = 0; q_index < q_components.size(); q_index++) {
+        const size_t level_row_count = (size_t)(q_degrees[q_index] - 1) * term_count;
+        if (level_row_count == 0) continue;
 
-inline void impartial_term_algebra::clear_accumulator() {
-    for (uint32_t i = 0; i < accumulator_size; i++) {
-        accumulator[i] = 0;
+        const unsigned num_threads = (unsigned)std::min<size_t>(
+            level_row_count < MIN_ROWS_PER_LEVEL_TO_PARALLELIZE ? 1 : hw_threads, level_row_count);
+
+        if (num_threads <= 1) {
+            calc_scratch scratch;
+            for (uint16_t q_exp = 1; q_exp < q_degrees[q_index]; q_exp++) {
+                for (uint32_t term = 0; term < term_count; term++) {
+                    q_power_times_term_table.add_row(q_power_times_term_calc(q_index, q_exp, term, scratch));
+                }
+            }
+            continue;
+        }
+
+        vector<size_t> chunk_starts(num_threads + 1);
+        for (unsigned t = 0; t <= num_threads; t++) {
+            chunk_starts[t] = level_row_count * t / num_threads;
+        }
+        vector<flat_term_table> chunks;
+        chunks.reserve(num_threads);
+        for (unsigned t = 0; t < num_threads; t++) {
+            const size_t chunk_size = chunk_starts[t + 1] - chunk_starts[t];
+            chunks.emplace_back((uint32_t)chunk_size, term_count, chunk_size * INDEX_ESTIMATE_PER_ROW);
+        }
+
+        vector<std::thread> workers;
+        workers.reserve(num_threads);
+        for (unsigned t = 0; t < num_threads; t++) {
+            workers.emplace_back([this, q_index, &chunk_starts, &chunks, t]() {
+                calc_scratch scratch;
+                for (size_t local_row = chunk_starts[t]; local_row < chunk_starts[t + 1]; local_row++) {
+                    const uint16_t q_exp = (uint16_t)(1 + local_row / term_count);
+                    const uint32_t term = (uint32_t)(local_row % term_count);
+                    chunks[t].add_row(q_power_times_term_calc(q_index, q_exp, term, scratch));
+                }
+            });
+        }
+        for (auto& w : workers) w.join();
+
+        for (unsigned t = 0; t < num_threads; t++) {
+            const flat_term_table& chunk = chunks[t];
+            const uint64_t base = (uint64_t)q_power_times_term_table.index_data.size();
+            q_power_times_term_table.index_data.insert(q_power_times_term_table.index_data.end(),
+                chunk.index_data.begin(), chunk.index_data.end());
+            for (size_t k = 1; k < chunk.row_offsets.size(); k++) {
+                q_power_times_term_table.row_offsets.push_back(base + chunk.row_offsets[k]);
+            }
+        }
     }
-    accumulate_size = 0;
 }
 
 void impartial_term_algebra::accumulate_term_product(uint32_t x, uint32_t y) {
     if (y == 0) {
-        flip_accumulator_term(x);
+        accumulator.flip_no_count(x);
         return;
     } else {
         const uint32_t bi = basis[basis_search[y]];
         // 0 <= `y / bi` < some prime from `q_degrees`
-        const tmp_term_array product = tmp_term_array(q_power_times_term_table.get(basis_search[y], (uint16_t)(y / bi), x));
-        for (uint32_t i = 0; i < product.terms_size; i++) {
-            accumulate_term_product(product.terms[i], y % bi);
-        }
+        const uint32_t row = (uint32_t)q_power_times_term_row(basis_search[y], (uint16_t)(y / bi), x);
+        q_power_times_term_table.for_each_set_bit_in_row(row, [&](uint32_t i) {
+            accumulate_term_product(i, y % bi);
+        });
         return;
     }
 }
@@ -298,101 +349,64 @@ uint32_t* impartial_term_algebra::get_basis() const {
 
 // a and b must already be sorted
 term_array impartial_term_algebra::multiply(const term_array& a, const term_array& b) {
-    clear_accumulator();
-    for (uint32_t i = 0; i < a.terms_size; i++) {
-        for (uint32_t j = 0; j < b.terms_size; j++) {
-            accumulate_term_product(a.terms[i], b.terms[j]);
-        }
-    }
+    accumulator.clear_all();
+    a.for_each_set_bit([&](uint32_t i) {
+        b.for_each_set_bit([&](uint32_t j) {
+            accumulate_term_product(i, j);
+        });
+    });
+    accumulator.bit_count = accumulator.recompute_bit_count();
 
-    term_array result(accumulate_size);
-    uint32_t j = 0;
-    for (uint32_t i = 0; i < term_count; i++) {
-        if (accumulator_contains(i)) {
-            result.terms[j] = i;
-            j++;
-        }
-    }
+    term_array result = accumulator;
     return result;
 }
 
-term_array impartial_term_algebra::square_term_calc(uint32_t x) {
-    clear_accumulator();
-    accumulate_term_product(x, x);
-
-    term_array result(accumulate_size);
-    uint32_t j = 0;
-    for (uint32_t i = 0; i < term_count; i++) {
-        if (accumulator_contains(i)) {
-            result.terms[j] = i;
-            j++;
-        }
-    }
-    return result;
-}
-
-// a must have enough allocated memory for the result
-void impartial_term_algebra::square_with_table(term_array& a) {
-    clear_accumulator();
-    tmp_term_array square_term;
-    for (uint32_t i = 0; i < a.terms_size; i++) {
-        square_term = tmp_term_array(square_term_table[a.terms[i]]);
-        for (uint32_t j = 0; j < square_term.terms_size; j++) {
-            flip_accumulator_term(square_term.terms[j]);
-        }
-    }
-
-    a.terms_size = accumulate_size;
-    uint32_t j = 0;
-    for (uint32_t i = 0; i < term_count; i++) {
-        if (accumulator_contains(i)) {
-            a.terms[j] = i;
-            j++;
-        }
-    }
+// a must have enough allocated memory for the result. bit_count is only ever read back for
+// progress logging, which fires once every PUSH_INTERVAL iterations — pass need_bit_count=false
+// on the other calls to skip the O(word_count) popcount scan entirely; a's bit_count is then
+// left stale (whatever accumulator's was before this call) until the next call that does pass
+// true, which is harmless as long as nothing reads it in between.
+void impartial_term_algebra::square_with_table(term_array& a, bool need_bit_count) {
+    accumulator.clear_all();
+    a.for_each_set_bit([&](uint32_t i) {
+        square_term_table.for_each_set_bit_in_row(i, [&](uint32_t idx) {
+            accumulator.flip_no_count(idx);
+        });
+    });
+    if (need_bit_count) accumulator.bit_count = accumulator.recompute_bit_count();
+    a.swap(accumulator);
     return;
 }
 
-// a must already be sorted
-term_array impartial_term_algebra::square(const term_array& a) {
-    clear_accumulator();
-    tmp_term_array square_term;
-    for (uint32_t i = 0; i < a.terms_size; i++) {
-        square_term = tmp_term_array(square_term_table[a.terms[i]]);
-        for (uint32_t j = 0; j < square_term.terms_size; j++) {
-            flip_accumulator_term(square_term.terms[j]);
-        }
-    }
-
-    term_array result(accumulate_size);
-    uint32_t j = 0;
-    for (uint32_t i = 0; i < term_count; i++) {
-        if (accumulator_contains(i)) {
-            result.terms[j] = i;
-            j++;
-        }
-    }
+// a must already be sorted. need_bit_count skips the O(word_count) popcount scan when the
+// caller knows it won't read the result's bit_count (see square_with_table for the same idea).
+term_array impartial_term_algebra::square(const term_array& a, bool need_bit_count) {
+    accumulator.clear_all();
+    a.for_each_set_bit([&](uint32_t i) {
+        square_term_table.for_each_set_bit_in_row(i, [&](uint32_t idx) {
+            accumulator.flip_no_count(idx);
+        });
+    });
+    if (need_bit_count) accumulator.bit_count = accumulator.recompute_bit_count();
+    term_array result = accumulator;
     return result;
 }
 
 // a must already be sorted
 term_array impartial_term_algebra::power(const term_array& a, const cpp_int& n) {
-    term_array result(1);
-    result.terms[0] = 0;
+    term_array result(term_count);
+    result.set(0);
     if(n.is_zero()) return result;
-    
-    term_array curpow(a.terms_size);
-    for (uint32_t i = 0; i < a.terms_size; i++) {
-        curpow.terms[i] = a.terms[i];
-    }
+
+    term_array curpow(a);
     unsigned index = 0;
     const unsigned msbnp1 = msb(n) + 1;
-    
+
     while (index < msbnp1) {
         if (bit_test(n, index)) {
             result = multiply(result, curpow);
         }
-        curpow = square(curpow);
+        curpow = square(curpow, false); // bit_count is never read here
         index++;
     }
     return result;
@@ -402,17 +416,12 @@ term_array impartial_term_algebra::power(const term_array& a, const cpp_int& n) 
 // a must already be sorted
 void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, term_array& res) {
     term_array result(term_count);
-    result.terms_size = 1; // feels hacky but very useful
-    result.terms[0] = 0;
+    result.set(0);
     if(n.is_zero()) {
         res = result;
         return;
     }
     
-    term_array curpow(a.terms_size);
-    for (uint32_t i = 0; i < a.terms_size; i++) {
-        curpow.terms[i] = a.terms[i];
-    }
     unsigned index = 0;
     const unsigned msbnp1 = msb(n) + 1;
     constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
@@ -421,136 +430,67 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
     for (unsigned i = 0; i < msbnp1; i++) {
         vn[i] = bit_test(n, i);
     }
-    
-    //TODO optimize (maybe multithreading the multiplication of powers of `tmp`)
-    /* test: sliding-window; doesn't really help nor hurt...
-    cpp_dec_float_100 lnnm1 = log(cpp_dec_float_100(n)) - 1;
-    cpp_int twotokp1 = 4, fourtok = 4;
-    size_t k = 1;
-    while (lnnm1 >= cpp_dec_float_100(k * (k+1) * fourtok) / cpp_dec_float_100(twotokp1 - k - 2)) {
-        k++;
-        twotokp1 << 1;
-        fourtok << 2;
-    }
-    cout << "Sliding-window with k = " << k << '\n';
 
-    size_t odd_powers_size = (size_t)((1 << (k-1)) - 1);
-    term_array* odd_powers = new term_array[odd_powers_size];
-    term_array sqa = square(a);
-    if (odd_powers_size != 0) {
-        odd_powers[0] = multiply(a, sqa);
-        for (size_t i = 1; i < odd_powers_size; i++) {
-            odd_powers[i] = multiply(odd_powers[i-1], sqa);
-        }
-    }
-    cout << "Precomputed values done." << '\n';
-
-    while (!log_queue_.push({0, msbnp1, curpow.terms_size, result.terms_size})) {
-        std::this_thread::sleep_for(std::chrono::microseconds(10));
-    }
-    size_t ip1 = (size_t)msbnp1, s = 0, u = 0, pow2 = 0;
-    while (ip1 > 0) {
-        if (!vn[ip1-1]) {
-            square_with_table(result);
-            index++;
-            if (!(index & MASK)) { // Send progress update
-                while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
-                    std::this_thread::sleep_for(std::chrono::microseconds(10));
-                }
-            }
-            ip1--;
-        } else {
-            if (ip1 > k) {
-                s = ip1 - k;
-            } else {
-                s = 0;
-            }
-            while (!vn[s]) s++;
-            for (size_t h = s; h < ip1; h++) {
-                square_with_table(result);
-                index++;
-                if (!(index & MASK)) { // Send progress update
-                    while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
-                        std::this_thread::sleep_for(std::chrono::microseconds(10));
-                    }
-                }
-            }
-            u = 0;
-            pow2 = 1;
-            for (size_t h = s; h < ip1; h++) {
-                if (vn[h]) {
-                    u += pow2;
-                }
-                pow2 <<= 1;
-            }
-            if (u == 1) {
-                result = multiply(result, a);
-            } else {
-                result = multiply(result, odd_powers[(u-3) >> 1]);
-            }
-            ip1 = s;
-        }
-    }
-    while (!log_queue_.push({msbnp1, msbnp1, curpow.terms_size, result.terms_size})) {
-        std::this_thread::sleep_for(std::chrono::microseconds(10));
-    }
-    calculation_done_ = true;
-    while (!log_queue_.push({UNSIGNED_MAX, 0, 0, 0})) { // Signal completion to logger
-        std::this_thread::sleep_for(std::chrono::microseconds(10));
-    }
-    delete[] odd_powers;
-    odd_powers = nullptr;
-    */
-
-    term_array* term_times_a = new term_array[term_count];
-    term_array term_as_array(1);
+    // Same reserve()-hint reasoning as square_term_table's — rows here scale with a.bit_count
+    // rather than a fixed constant, so the estimate follows suit (2x headroom).
+    flat_term_table term_times_a_table(term_count, term_count,
+        (size_t)term_count * std::max<uint32_t>(a.bit_count, 1) * 2);
+    term_array term_as_array(term_count);
     for (uint32_t term = 0; term < term_count; term++) {
-        term_as_array.terms[0] = term;
-        term_times_a[term] = multiply(term_as_array, a);
+        term_as_array.set(term);
+        term_times_a_table.add_row(multiply(term_as_array, a));
+        term_as_array.clear_bit(term);
     }
     cout << "Precomputed values done." << '\n';
 
-    while (!log_queue_.push({0, msbnp1, curpow.terms_size, result.terms_size})) {
+    while (!log_queue_.push({0, msbnp1, a.bit_count, result.bit_count})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
+    time_t last_push_time = time(nullptr);
     size_t ip1 = (size_t)msbnp1;
-    tmp_term_array tmp;
     while (ip1 > 0) {
-        square_with_table(result);
+        const bool is_last = (ip1 == 1);
+        // Checking the wall clock is cheap (a vDSO read, no real syscall), but there's still no
+        // reason to do it more often than every MASK+1 iterations. Once we do check, only
+        // actually push — and only then need the freshly-recomputed bit_count for it — if
+        // PROGRESS_LOG_SECONDS of real time have passed since the last push. The previous
+        // fixed "every 64 iterations" schedule fired far more often than the logger's own 60s
+        // threshold could ever use, for large term_count — that's wasted pushes and wasted
+        // popcount scans with nothing shown for it.
+        time_t now = 0;
+        bool due = false;
+        if (!((index + 1) & MASK)) {
+            now = time(nullptr);
+            due = now - last_push_time >= PROGRESS_LOG_SECONDS;
+        }
+        const bool need_bit_count = is_last || due;
+        square_with_table(result, need_bit_count);
         if (vn[ip1-1]) {
-            clear_accumulator();
-            for (uint32_t i = 0; i < result.terms_size; i++) {
-                tmp = tmp_term_array(term_times_a[result.terms[i]]);
-                for (uint32_t j = 0; j < tmp.terms_size; j++) {
-                    flip_accumulator_term(tmp.terms[j]);
-                }
-            }
-            result.terms_size = accumulate_size;
-            uint32_t j = 0;
-            for (uint32_t i = 0; i < term_count; i++) {
-                if (accumulator_contains(i)) {
-                    result.terms[j] = i;
-                    j++;
-                }
-            }
+            accumulator.clear_all();
+            result.for_each_set_bit([&](uint32_t i) {
+                term_times_a_table.for_each_set_bit_in_row(i, [&](uint32_t idx) {
+                    accumulator.flip_no_count(idx);
+                });
+            });
+            if (need_bit_count) accumulator.bit_count = accumulator.recompute_bit_count();
+            result.swap(accumulator);
         }
         index++;
-        if (!(index & MASK)) { // Send progress update
-            while (!log_queue_.push({index, msbnp1, curpow.terms_size, result.terms_size})) {
+        if (due) { // Send progress update
+            last_push_time = now;
+            while (!log_queue_.push({index, msbnp1, a.bit_count, result.bit_count})) {
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
         }
         ip1--;
     }
-    while (!log_queue_.push({msbnp1, msbnp1, curpow.terms_size, result.terms_size})) {
+    while (!log_queue_.push({msbnp1, msbnp1, a.bit_count, result.bit_count})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     calculation_done_ = true;
     while (!log_queue_.push({UNSIGNED_MAX, 0, 0, 0})) { // Signal completion to logger
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
-    delete[] term_times_a;
-    term_times_a = nullptr;
 
     res = result;
     return;
@@ -558,10 +498,10 @@ void impartial_term_algebra::excess_power(const term_array&a, const cpp_int& n, 
 
 // a must already be sorted
 uint32_t impartial_term_algebra::degree(const term_array& a) {
-    term_array respow = square(a);
+    term_array respow = square(a, false); // bit_count is never read here
     uint32_t result = 1;
     while (respow != a) {
-        respow = square(respow);
+        respow = square(respow, false);
         result++;
     }
     return result;
@@ -569,23 +509,38 @@ uint32_t impartial_term_algebra::degree(const term_array& a) {
 
 // a must already be sorted
 void impartial_term_algebra::q_set_degree(const term_array& a, uint32_t& res) {
-    term_array respow = square(a);
+    term_array respow = square(a, true); // logged unconditionally right after
     uint32_t result = 1;
-    constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only log when first PUSH_INTERVAL bits are off
+    constexpr unsigned MASK = ((unsigned)1 << PUSH_INTERVAL) - 1; // only check the wall clock when first PUSH_INTERVAL bits are off
 
-    while (!log_queue_.push({0, 0, respow.terms_size, 0})) {
+    while (!log_queue_.push({0, 0, respow.bit_count, 0})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
+    time_t last_push_time = time(nullptr);
     while (respow != a) {
-        respow = square(respow);
+        // Same idea as excess_power's loop: only actually push (and only then need a fresh
+        // bit_count) once PROGRESS_LOG_SECONDS have genuinely passed, not every fixed number of
+        // iterations — degree() calls can run for a long time on large term_count too.
+        time_t now = 0;
+        bool due = false;
+        if (!((result + 1) & MASK)) {
+            now = time(nullptr);
+            due = now - last_push_time >= PROGRESS_LOG_SECONDS;
+        }
+        respow = square(respow, due);
         result++;
-        if (!(result & MASK)) { // Send progress update
-            while (!log_queue_.push({result, 0, respow.terms_size, 0})) {
+        if (due) { // Send progress update
+            last_push_time = now;
+            while (!log_queue_.push({result, 0, respow.bit_count, 0})) {
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
         }
     }
-    while (!log_queue_.push({result, result, respow.terms_size, 0})) {
+    // The loop's last squaring may not have refreshed bit_count (it's not known to be the last
+    // iteration in advance, since the loop ends on a data-dependent condition) — this final log
+    // line needs it accurate regardless.
+    respow.bit_count = respow.recompute_bit_count();
+    while (!log_queue_.push({result, result, respow.bit_count, 0})) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     calculation_done_ = true;
