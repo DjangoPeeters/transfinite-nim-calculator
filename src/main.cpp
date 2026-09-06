@@ -135,13 +135,6 @@ void excess_to_bfile() {
 
 namespace {
 
-void set_logs_dir_if_given(int argc, char* argv[], int index) {
-    if (index < argc) {
-        logs_dir = argv[index];
-        cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
-    }
-}
-
 // a prime given either directly (e.g. "127") or as "nth_prime N"
 uint16_t parse_prime_arg(int argc, char* argv[], int index) {
     if (argv[index] == string("nth_prime") && index + 1 < argc) {
@@ -165,12 +158,9 @@ uint16_t next_unknown_prime() {
 }
 
 void cmd_alphas(int argc, char* argv[]) {
-    set_logs_dir_if_given(argc, argv, 2);
     init();
-    if (2 < argc) {
-        if (3 < argc) MAX_TERM_COUNT = strtou32(argv[3]);
-        cout << "setting MAX_TERM_COUNT to " << MAX_TERM_COUNT << "\n";
-    }
+    if (3 < argc) MAX_TERM_COUNT = strtou32(argv[3]);
+    cout << "setting MAX_TERM_COUNT to " << MAX_TERM_COUNT << "\n";
     if (4 < argc) {
         alphas(parse_prime_arg(argc, argv, 4));
     } else {
@@ -179,7 +169,6 @@ void cmd_alphas(int argc, char* argv[]) {
 }
 
 void cmd_alpha(int argc, char* argv[]) {
-    set_logs_dir_if_given(argc, argv, 2);
     init();
     if (3 < argc) {
         compute_and_report_alpha(parse_prime_arg(argc, argv, 3));
@@ -189,22 +178,21 @@ void cmd_alpha(int argc, char* argv[]) {
 }
 
 void cmd_afile(int argc, char* argv[]) {
-    set_logs_dir_if_given(argc, argv, 2);
+    (void)argc; (void)argv;
     init();
     excess_to_afile();
 }
 
 void cmd_bfile(int argc, char* argv[]) {
-    set_logs_dir_if_given(argc, argv, 2);
+    (void)argc; (void)argv;
     init();
     excess_to_bfile();
 }
 
 void cmd_calc(int argc, char* argv[]) {
-    set_logs_dir_if_given(argc, argv, 2);
     init();
     if (argc <= 3) {
-        cout << "usage: calc [logs_dir] EXPRESSION\n";
+        cout << "usage: calc EXPRESSION\n";
         cout << "  ordinal arithmetic: + * and w^E (Cantor normal form), e.g. \"w^3 + w*2 + 1\"\n";
         cout << "  nim (field) arithmetic: +. *. ^. , e.g. \"w +. w\", \"w *. w\", \"w ^. 5\"\n";
         return;
@@ -226,13 +214,20 @@ int main(int argc, char* argv[]) {
     }
     cout << "argv[" << argc << "] == " << static_cast<void*>(argv[argc]) << "\n\n";
 
-    if (argc <= 1) {
-        init();
-        alphas_upto(150);
+    if (argc <= 2) {
+        cout << "usage: " << argv[0] << " LOGS_DIR COMMAND [args...]\n";
+        cout << "  commands: alphas, alpha, afile, bfile, calc\n";
         return 0;
     }
 
-    const string command = argv[1];
+    // logs_dir isn't specific to any command, so it comes first, before COMMAND — unlike the
+    // command-specific args below, which every cmd_* function still reads starting at argv[3]
+    // (that didn't shift: the old, optional "COMMAND [logs_dir] ..." shape also left the first
+    // command-specific arg at argv[3]).
+    logs_dir = argv[1];
+    cout << "logs will be kept in directory " << logs_dir << " (relative path)\n";
+
+    const string command = argv[2];
     if (command == "alphas") {
         cmd_alphas(argc, argv);
     } else if (command == "alpha") {
@@ -243,6 +238,8 @@ int main(int argc, char* argv[]) {
         cmd_bfile(argc, argv);
     } else if (command == "calc") {
         cmd_calc(argc, argv);
+    } else {
+        cout << "unknown command: " << command << "\n";
     }
 
     return 0;
