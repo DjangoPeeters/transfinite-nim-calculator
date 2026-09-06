@@ -12,7 +12,7 @@ Django Peeters
 
 ## Usage
 
-Currently, there is only support for calculating Lenstra excess and converting the results to an a-file and a b-file for the [OEIS](https://oeis.org/A380496). When calculating Lenstra excess, some other values are calculated as well (Q-sets, the nimbers alpha(p), degree of kappa(p)). Following are some examples of these features.
+Currently, there is support for nim-addition, nim-multiplication and nim-powers. This also (necessarily) includes calculating Lenstra excess and converting the results to an a-file and a b-file for the [OEIS](https://oeis.org/A380496), needing the most time and space in the calculation and the programming itself. When calculating Lenstra excess, some other values are calculated as well (Q-sets, the nimbers alpha(p), degree of kappa(p)). Following are some examples of these features.
 
 Every invocation has the same shape:
 ```
