@@ -8,17 +8,6 @@
 using std::vector;
 using std::map;
 
-namespace test_values {
-    extern const map<uint16_t, vector<uint16_t>> q_set_cache;
-    extern const map<uint16_t, uint8_t> excess_cache;
-    extern const map<uint16_t, uint32_t> degree_kappa_cache; // empty — no base case is needed here
-};
-
-namespace previously_known_values { // known at january 1st 2025
-    extern const map<uint16_t, vector<uint16_t>> q_set_cache;
-    extern const map<uint16_t, uint8_t> excess_cache;
-};
-
 namespace record_values {
     extern map<uint16_t, vector<uint16_t>> q_set_cache;
     extern map<uint16_t, uint8_t> excess_cache;

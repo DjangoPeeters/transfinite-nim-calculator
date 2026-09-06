@@ -11,6 +11,11 @@ bin/
 # Live progress trace, not reference data — regenerated every run
 logs/calculation.log
 
+# The test binary's own fresh cache directory (see test/test.cpp) — regenerated every run,
+# deliberately kept separate from the real logs/ so the test suite always verifies genuine
+# computation rather than reading already-known values.
+test_logs/
+
 # Editor-specific, not project configuration — the Makefile is the source of truth for
 # building/running/testing, and these don't need to be shared across contributors/environments
 .vscode/
