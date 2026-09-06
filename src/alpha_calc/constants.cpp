@@ -12,12 +12,6 @@
 using std::vector;
 using std::map;
 
-namespace test_values {
-    const map<uint16_t, vector<uint16_t>> q_set_cache({{2, {}}});
-    const map<uint16_t, uint8_t> excess_cache({{2, 0}});
-    const map<uint16_t, uint32_t> degree_kappa_cache{};
-};
-
 namespace previously_known_values { // known at 1 january 2025
     const map<uint16_t, vector<uint16_t>> q_set_cache(
         {{2,{}}, {3,{2}}, {5,{4}}, {7,{3}}, {11,{5}}, {13,{4, 3}}, {17,{8}}, {19,{9}},

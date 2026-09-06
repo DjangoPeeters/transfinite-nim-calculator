@@ -194,6 +194,11 @@ void test_www_nim(void) {
 }
 
 void test_important_funcs(void) {
+    // A fresh, gitignored directory of our own — never the repo's real logs/, which has
+    // genuinely accumulated data. init() would otherwise load that real cache and these tests
+    // would just be checking "the committed file has the right value" instead of "the
+    // computation itself produces the right value".
+    logs_dir = "test_logs";
     important_funcs::init();
     TEST_CHECK(excess(2).result == 0);
     TEST_CHECK(excess(3).result == 0);
@@ -215,6 +220,7 @@ void test_important_funcs(void) {
 }
 
 void test_impartial_term_algebra(void) {
+    logs_dir = "test_logs"; // see test_important_funcs() for why
     important_funcs::init();
     vector<uint16_t> q_components{2, 4, 3, 5}; // closed under primitive_components
 

@@ -53,7 +53,9 @@ test 11:  35 seconds for alpha(47) :))      (tweak push interval from calculatin
 test 12:   3 seconds for alpha(47) :)))     (only square result and keep multiplier small)
 */
 
-// most important file for the calculation: important_funcs.cpp (`TEST_MODE = true` initializes the caches empty except for `p = 2`)
+// most important file for the calculation: important_funcs.cpp (init() loads the excess/q_set/
+// degree_kappa caches from logs_dir's *_records.txt files — point logs_dir at a fresh, empty
+// directory to benchmark from a blank slate instead of benefiting from already-known values)
 
 /*
 To calculate alpha(719), the next unknown alpha at the time of writing this, we'd need at least about 200 GB in memory.

@@ -29,17 +29,6 @@ using uint256_t = boost::multiprecision::uint256_t;
 using boost::multiprecision::msb;
 using namespace nt_funcs;
 
-// TEST_MODE=true starts excess/q_set/degree_kappa caches empty (aside from the p=2 base cases,
-// which are hardcoded elsewhere anyway) — every value gets genuinely recomputed rather than
-// looked up, which is what makes it useful for benchmarking. TEST_MODE=false uses record_values'
-// caches (read from logs/*_records.txt at startup), which is what you want for real work: a new
-// alpha(p) then benefits from every already-known excess/q_set/degree_kappa value along the way
-// instead of rederiving them from scratch. Override at build time with `make TEST_MODE=0` (see
-// the Makefile for the object-staleness caveat that comes with that).
-#ifndef TEST_MODE_ENABLED
-#define TEST_MODE_ENABLED 1
-#endif
-constexpr bool TEST_MODE = TEST_MODE_ENABLED;
 uint32_t MAX_TERM_COUNT = 1000000;
 
 //TODO check when calculations failed and report so appropriately
@@ -259,11 +248,11 @@ namespace important_funcs {
         record_values::init();
         {
             std::lock_guard<std::mutex> lock_q_set(q_set_cache_mutex);
-            q_set_cache = (TEST_MODE ? test_values::q_set_cache : record_values::q_set_cache);
+            q_set_cache = record_values::q_set_cache;
             std::lock_guard<std::mutex> lock_excess(excess_cache_mutex);
-            excess_cache = (TEST_MODE ? test_values::excess_cache : record_values::excess_cache);
+            excess_cache = record_values::excess_cache;
             std::lock_guard<std::mutex> lock_degree_kappa(degree_kappa_cache_mutex);
-            degree_kappa_cache = (TEST_MODE ? test_values::degree_kappa_cache : record_values::degree_kappa_cache);
+            degree_kappa_cache = record_values::degree_kappa_cache;
         }
     }
 
